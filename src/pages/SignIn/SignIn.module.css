@@ -1,0 +1,9 @@
+.sign-in {
+  background: white;
+  padding: 10px;
+
+  & .container {
+    background: red;
+    padding: 10px;
+  }
+}
