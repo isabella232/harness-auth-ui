@@ -1,17 +1,21 @@
-import Router, { Route } from "preact-router";
-import { createHashHistory } from "history";
+import React from "react";
+import { Route, BrowserRouter } from "react-router-dom";
+import { RestfulProvider } from "restful-react";
 
+import routes from "./RouteDefinitions";
 import SignIn from "./pages/SignIn/SignIn";
 
-const Temp = () => {
-  return <div>hello again</div>;
-};
+function SignUp() {
+  return <div>sign up</div>;
+}
 
 export function App() {
   return (
-    <Router history={createHashHistory() as any}>
-      <Route path="/" component={SignIn} />
-      <Route path="/hello" component={Temp} />
-    </Router>
+    <RestfulProvider base="/">
+      <BrowserRouter>
+        <Route path={routes.toSignIn()} component={SignIn} />
+        <Route path={routes.toSignUp()} component={SignUp} />
+      </BrowserRouter>
+    </RestfulProvider>
   );
 }

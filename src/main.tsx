@@ -1,5 +1,7 @@
-import { render } from "preact";
+import React from "react";
+import { render } from "react-dom";
 import { App } from "./app";
-import "./index.css";
+
+import "./main.css";
 
 render(<App />, document.getElementById("app")!);

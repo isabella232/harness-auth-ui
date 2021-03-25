@@ -1,0 +1,4 @@
+allowpaths:
+  - "/users/login"
+operationIdOverrides:
+  /users/login: login

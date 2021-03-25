@@ -1,7 +1,22 @@
-import { defineConfig } from 'vite'
-import preact from '@preact/preset-vite'
-
 // https://vitejs.dev/config/
+
+import { defineConfig } from "vite";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+
 export default defineConfig({
-  plugins: [preact()]
-})
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3457",
+        changeOrigin: true
+        // rewrite: (path) => path.replace(/^\/api/, ""),
+      }
+    }
+  },
+  plugins: [
+    nodeResolve({
+      moduleDirectories: ["node_modules", "src"],
+      extensions: [".js", ".ts", ".tsx"]
+    })
+  ]
+});
