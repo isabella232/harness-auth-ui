@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, BrowserRouter } from "react-router-dom";
+import { Route, HashRouter } from "react-router-dom";
 import { RestfulProvider } from "restful-react";
 
 import routes from "./RouteDefinitions";
@@ -12,10 +12,10 @@ function SignUp() {
 export function App() {
   return (
     <RestfulProvider base="/">
-      <BrowserRouter>
+      <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
         <Route path={routes.toSignUp()} component={SignUp} />
-      </BrowserRouter>
+      </HashRouter>
     </RestfulProvider>
   );
 }
