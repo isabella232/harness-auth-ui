@@ -17,6 +17,16 @@ export type IconName =
   | "linkedin"
   | "sso";
 
+const iconMap: Record<IconName, string> = {
+  azure,
+  bitbucket,
+  github,
+  gitlab,
+  google,
+  linkedin,
+  sso
+};
+
 interface IconProps {
   name: IconName;
   height?: number;
@@ -35,71 +45,14 @@ const Icon: React.FC<IconProps> = ({
   const finalHeight = height || size;
   const finalWidth = width || size;
 
-  switch (name) {
-    case "azure":
-      return (
-        <img
-          src={azure}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "bitbucket":
-      return (
-        <img
-          src={bitbucket}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "github":
-      return (
-        <img
-          src={github}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "gitlab":
-      return (
-        <img
-          src={gitlab}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "google":
-      return (
-        <img
-          src={google}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "linkedin":
-      return (
-        <img
-          src={linkedin}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-    case "sso":
-      return (
-        <img
-          src={sso}
-          height={finalHeight}
-          width={finalWidth}
-          className={className}
-        />
-      );
-  }
+  return (
+    <img
+      src={iconMap[name]}
+      height={finalHeight}
+      width={finalWidth}
+      className={className}
+    />
+  );
 };
 
 export default Icon;
