@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import qs from "qs";
 import type { IParseOptions } from "qs";
 
-export function useQueryParams<T = {}>(options?: IParseOptions): T {
+export function useQueryParams<T = Record<string, unknown>>(
+  options?: IParseOptions
+): T {
   const { search } = useLocation();
 
   const queryParams = React.useMemo(
