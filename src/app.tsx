@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, HashRouter } from "react-router-dom";
+import { Route, HashRouter, Redirect } from "react-router-dom";
 import { RestfulProvider } from "restful-react";
 
 import routes from "./RouteDefinitions";
@@ -15,6 +15,7 @@ export function App() {
       <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
         <Route path={routes.toSignUp()} component={SignUp} />
+        <Redirect from="/" to={routes.toSignIn()} />
       </HashRouter>
     </RestfulProvider>
   );

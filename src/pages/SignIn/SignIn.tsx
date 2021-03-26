@@ -43,11 +43,11 @@ export default function SignIn() {
         )?.defaultExperience;
         switch (experience) {
           case "NG":
-            window.location.href = `/account/${resource.defaultAccountId}/projects`;
+            window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
             return;
           case "CG":
           default:
-            window.location.href = `/account/${resource.defaultAccountId}/dashboard`;
+            window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
             return;
         }
       }
