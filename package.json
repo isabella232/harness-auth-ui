@@ -10,7 +10,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "services": "restful-react import --config restful-react.config.js portal",
-    "postservices": "prettier --write src/services/portal/index.tsx"
+    "postservices": "prettier --write src/services/portal/index.tsx",
+    "typecheck": "tsc"
   },
   "repository": {
     "type": "git",
