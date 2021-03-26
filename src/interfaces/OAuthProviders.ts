@@ -1,8 +1,10 @@
+import type { IconName } from "components/Icon/Icon";
+
 export interface OAuthProviderType {
   type: string;
   name: string;
   url: string;
-  iconName: string;
+  iconName: IconName;
 }
 
 export const OAuthProviders: OAuthProviderType[] = [
@@ -16,13 +18,13 @@ export const OAuthProviders: OAuthProviderType[] = [
     type: "BITBUCKET",
     name: "Bitbucket",
     url: "oauth2Redirect?provider=bitbucket",
-    iconName: "bitbucket-blue"
+    iconName: "bitbucket"
   },
   {
     type: "GITLAB",
     name: "GitLab",
     url: "oauth2Redirect?provider=gitlab",
-    iconName: "service-gotlab"
+    iconName: "gitlab"
   },
   {
     type: "LINKEDIN",
@@ -40,7 +42,7 @@ export const OAuthProviders: OAuthProviderType[] = [
     type: "AZURE",
     name: "Azure",
     url: "oauth2Redirect?provider=azure",
-    iconName: "service-azure"
+    iconName: "azure"
   }
 ];
 

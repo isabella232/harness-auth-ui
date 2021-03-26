@@ -1,61 +1,57 @@
-.authFooter {
-  & .lineMessage {
-    color: var(--grey-450);
-    width: 100%;
-    text-align: center;
-    border-bottom: 1px solid var(--grey-400);
-    line-height: 1px;
-    margin-top: 50px;
+.lineMessage {
+  color: var(--dark-400);
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid var(--dark-400);
+  line-height: 1px;
+  margin-top: 50px;
 
-    & .message {
-      font-weight: normal;
-      font-size: var(--font-size-normal);
-      background: var(--white);
-      padding: 0 12px;
-    }
-  }
-
-  & .oAuthIcons {
-    display: flex;
-    justify-content: space-between;
-
-    & .iconContainer {
-      cursor: pointer;
-      background-color: var(--grey-200);
-      height: fit-content;
-      width: fit-content;
-      padding: 11px;
-      border-radius: 2px;
-    }
-  }
-
-  & .disclaimer {
-    margin-top: 35px;
-    text-align: center;
+  & .message {
+    font-weight: normal;
     font-size: var(--font-size-normal);
+    background: var(--light-200);
+    padding: 0 12px;
+  }
+}
 
-    & .externalLink {
-      color: var(--blue-500);
+.oAuthIcons {
+  padding-top: var(--spacing-medium);
+  display: flex;
+  justify-content: space-between;
+
+  & .iconContainer {
+    cursor: pointer;
+    background-color: var(--light-400);
+    height: fit-content;
+    width: fit-content;
+    padding: 11px;
+    border-radius: 2px;
+
+    &:hover {
+      background-color: var(--light-600);
     }
   }
+}
 
-  & .ssoButton {
-    background-color: var(--grey-200) !important;
-    border-radius: 2px;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    margin-top: var(--spacing-large);
-    display: flex;
-    justify-content: center;
+.disclaimer {
+  margin-top: 35px;
+  text-align: center;
+  font-size: var(--font-size-normal);
 
-    & .icon {
-      color: var(--blue-500) !important;
-    }
+  & .externalLink {
+    color: var(--blue-500);
+  }
+}
 
-    & .text {
-      width: 100%;
-      justify-content: center;
-    }
+.ssoButton {
+  margin-top: var(--spacing-large);
+  background-color: var(--light-400);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & .icon {
+    margin-right: var(--spacing-small);
   }
 }

@@ -1,11 +1,13 @@
+import React from "react";
+import cx from "classnames";
 import {
   OAuthProviders,
   OAuthProviderType,
   URLS
 } from "interfaces/OAuthProviders";
-import React from "react";
 
 import css from "./AuthFooter.module.css";
+import Icon from "components/Icon/Icon";
 
 export enum AuthPage {
   SignIn,
@@ -21,12 +23,12 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
     <>
       <h2 className={css.lineMessage}>
         <span className={css.message}>
-          {page === AuthPage.SignUp ? "Sign Up" : "Sign In"}
+          {page === AuthPage.SignUp ? "or sign up with" : "or login with"}
         </span>
       </h2>
 
       <div>
-        <div className="layout-horizontal spacing-auto">
+        <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
           {OAuthProviders.map((oAuthProvider: OAuthProviderType) => {
             const { iconName, type, url } = oAuthProvider;
 
@@ -40,7 +42,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
                 rel="noreferrer"
                 target="_blank"
               >
-                icon
+                <Icon name={iconName} size={24} />
               </a>
             );
           })}
@@ -67,7 +69,9 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
             </a>
           </div>
         ) : (
-          <button className={css.ssoButton}>sso</button>
+          <button className={cx("button", css.ssoButton)}>
+            <Icon name="sso" size={24} className={css.icon} /> Single Sign-On
+          </button>
         )}
       </div>
     </>
