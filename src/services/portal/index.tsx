@@ -19790,7 +19790,7 @@ export const Login = (props: LoginProps) => (
   <Mutate<RestResponseUser, unknown, LoginQueryParams, LoginRequest, void>
     verb="POST"
     path={`/users/login`}
-    base={"/api"}
+    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19810,5 +19810,5 @@ export const useLogin = (props: UseLoginProps) =>
   useMutate<RestResponseUser, unknown, LoginQueryParams, LoginRequest, void>(
     "POST",
     `/users/login`,
-    { base: "/api", ...props }
+    { base: "/gateway/api", ...props }
   );

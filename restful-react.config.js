@@ -11,7 +11,7 @@ module.exports = {
     validation: false,
     transformer: "scripts/swagger-transform.js",
     customProps: {
-      base: `{'/api'}`,
-    },
-  },
+      base: `{'/gateway/api'}`
+    }
+  }
 };
