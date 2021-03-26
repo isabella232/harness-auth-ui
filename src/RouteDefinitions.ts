@@ -1,4 +1,4 @@
 export default {
   toSignIn: () => `/signin`,
-  toSignUp: () => `/signup`,
+  toSignUp: () => `/signup`
 };
