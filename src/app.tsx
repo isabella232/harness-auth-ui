@@ -11,7 +11,7 @@ function SignUp() {
 
 export function App() {
   return (
-    <RestfulProvider base="/">
+    <RestfulProvider base="/gateway">
       <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
         <Route path={routes.toSignUp()} component={SignUp} />
