@@ -10,6 +10,7 @@ import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
+import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -105,6 +106,7 @@ export default function SignIn() {
             disabled={loading}
           />
         </form>
+        <AuthFooter page={AuthPage.SignIn} />
         <div className={css.footer}>
           No account? <Link to={RouteDefinitions.toSignUp()}>Get Started</Link>
         </div>

@@ -25,6 +25,15 @@ input {
 
 .button {
   border-radius: 6px;
+  background-color: var(--light-400);
+  border: none;
+  padding: var(--spacing-small);
+  outline: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--light-600);
+  }
 
   &.primary {
     background-color: var(--blue-700);
@@ -40,9 +49,6 @@ a {
 /*********** Application CSS ************/
 
 body {
-  font-size: 13px;
-  font-family: "Inter", sans-serif;
-
   --black-100: #1a1a1a;
   --dark-600: #1c1c28;
   --dark-500: #28293d; /* main background color for dark theme */
@@ -118,6 +124,15 @@ body {
   --spacing-xxlarge: 30px;
   --spacing-xxxlarge: 40px;
   --spacing-huge: 50px;
+
+  --font-size-xsmall: 10px; /* very small text */
+  --font-size-small: 12px; /* H4, small text */
+  --font-size-normal: 14px; /* H3, normal text */
+  --font-size-medium: 18px; /* H2 */
+  --font-size-large: 29px; /* H1 */
+
+  font-size: var(--font-size-normal);
+  font-family: "Inter", sans-serif;
 }
 
 .spacing-small {
