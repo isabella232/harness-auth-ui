@@ -18,5 +18,6 @@ export default defineConfig({
       moduleDirectories: ["node_modules", "src"],
       extensions: [".js", ".ts", ".tsx"]
     })
-  ]
+  ],
+  base: ""
 });

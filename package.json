@@ -11,7 +11,8 @@
     "serve": "vite preview",
     "services": "restful-react import --config restful-react.config.js portal",
     "postservices": "prettier --write src/services/portal/index.tsx",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "docker": "sh -c 'docker build -t harness/ng-auth-ui:\"$0\" . && docker push harness/ng-auth-ui:\"$0\"'"
   },
   "repository": {
     "type": "git",
