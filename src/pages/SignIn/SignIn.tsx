@@ -6,7 +6,7 @@ import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useLogin } from "services/portal";
-import { useQueryParams } from "hooks/useQueryParams";
+// import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
@@ -25,7 +25,7 @@ interface LoginFormData {
 
 export default function SignIn() {
   const { mutate: login, loading } = useLogin({});
-  const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
+  // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
     const response = await login({
@@ -38,22 +38,17 @@ export default function SignIn() {
         AppStorage.set("acctId", resource.defaultAccountId);
         AppStorage.set("lastTokenSetTime", +new Date());
 
-        if (returnUrl) {
-          // TODO: check allow-list
-          window.location.href = returnUrl;
-        } else {
-          const experience = resource.accounts?.find(
-            (account) => account.uuid === resource.defaultAccountId
-          )?.defaultExperience;
-          switch (experience) {
-            case "NG":
-              window.location.href = `/account/${resource.defaultAccountId}/projects`;
-              return;
-            case "CG":
-            default:
-              window.location.href = `/account/${resource.defaultAccountId}/dashboard`;
-              return;
-          }
+        const experience = resource.accounts?.find(
+          (account) => account.uuid === resource.defaultAccountId
+        )?.defaultExperience;
+        switch (experience) {
+          case "NG":
+            window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
+            return;
+          case "CG":
+          default:
+            window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
+            return;
         }
       }
     }
