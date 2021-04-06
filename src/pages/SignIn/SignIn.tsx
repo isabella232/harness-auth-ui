@@ -57,7 +57,9 @@ export default function SignIn() {
   return (
     <BasicLayout>
       <div className={cx(css.signin)}>
-        <img src={logo} width={120} className={css.logo} />
+        <div className={css.header}>
+          <img src={logo} width={120} className={css.logo} />
+        </div>
         <div className={css.title}>Sign In</div>
         <div className={css.subtitle}>and get ship done.</div>
         <form

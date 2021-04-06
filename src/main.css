@@ -128,7 +128,7 @@ body {
   --font-size-xsmall: 10px; /* very small text */
   --font-size-small: 12px; /* H4, small text */
   --font-size-normal: 14px; /* H3, normal text */
-  --font-size-medium: 18px; /* H2 */
+  --font-size-medium: 16px; /* H2 */
   --font-size-large: 29px; /* H1 */
 
   font-size: var(--font-size-normal);
