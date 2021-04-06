@@ -12,6 +12,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import toast from "react-hot-toast";
+import { handleError } from "utils/ErrorUtils";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -56,25 +57,7 @@ export default function SignIn() {
         }
       }
     } catch (error) {
-      if (error.data) {
-        const response: RestResponseUser = error.data;
-        if (
-          response?.responseMessages &&
-          response.responseMessages.length > 0
-        ) {
-          if (
-            response.responseMessages[response.responseMessages.length - 1]
-              .message
-          ) {
-            toast(
-              response.responseMessages[response.responseMessages.length - 1]
-                .message || ""
-            );
-          }
-        }
-      } else {
-        toast(error.message);
-      }
+      handleError(error);
     }
   };
 
@@ -106,6 +89,7 @@ export default function SignIn() {
             <label htmlFor="email">Email</label>
             <input
               name="email"
+              type="email"
               id="email"
               placeholder="email@work.com"
               disabled={loading}

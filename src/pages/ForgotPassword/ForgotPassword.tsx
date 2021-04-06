@@ -1,9 +1,12 @@
 import React from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
+import { useResetPassword } from "services/portal";
+import { regexEmail } from "utils/StringUtils";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
@@ -14,6 +17,23 @@ interface ForgotPasswordFormData {
 }
 
 export default function ForgotPassword() {
+  const { mutate: resetPassword, loading } = useResetPassword({});
+
+  const handleReset = async (data: ForgotPasswordFormData) => {
+    try {
+      const response = await resetPassword({ email: data.email });
+      if (response.resource) {
+        toast.success(
+          "An email has been sent to you with a link to reset your password"
+        );
+      } else {
+        // TODO: handle failure
+      }
+    } catch (err) {
+      // TODO: handle error
+    }
+  };
+
   return (
     <BasicLayout>
       <div className={cx(css.signin)}>
@@ -24,8 +44,8 @@ export default function ForgotPassword() {
             <Text icon="leftArrow">Sign In</Text>
           </Link>
         </div>
-        <div className={css.title}>Reset Password</div>
-        <div className={css.subtitle}>and get ship done.</div>
+        <div className={css.title}>Forgot Password</div>
+        <div className={css.subtitle}></div>
         <form
           className="layout-vertical spacing-medium"
           onSubmit={(e) => {
@@ -34,19 +54,31 @@ export default function ForgotPassword() {
             const loginFormData = (Object.fromEntries(
               data.entries()
             ) as unknown) as ForgotPasswordFormData;
-            if (loginFormData.email.length > 0) {
-              // handleLogin(loginFormData);
+            if (
+              loginFormData.email.length > 0 &&
+              regexEmail.test(loginFormData.email)
+            ) {
+              handleReset(loginFormData);
+            } else {
+              toast("Please enter a valid email ID");
             }
           }}
         >
           <div className="layout-vertical spacing-small">
             <label htmlFor="email">Email</label>
-            <input name="email" id="email" placeholder="email@work.com" />
+            <input
+              name="email"
+              type="email"
+              id="email"
+              placeholder="email@work.com"
+              disabled={loading}
+            />
           </div>
           <input
             type="submit"
             value="Reset Password"
             className="button primary"
+            disabled={loading}
           />
         </form>
       </div>

@@ -19862,3 +19862,89 @@ export const useGetLoginType = (props: UseGetLoginTypeProps) =>
     LoginTypeRequest,
     void
   >("POST", `/users/logintype`, { base: "/gateway/api", ...props });
+
+export type ResetPasswordProps = Omit<
+  MutateProps<RestResponse, unknown, void, ResetPasswordRequest, void>,
+  "path" | "verb"
+>;
+
+export const ResetPassword = (props: ResetPasswordProps) => (
+  <Mutate<RestResponse, unknown, void, ResetPasswordRequest, void>
+    verb="POST"
+    path={`/users/reset-password`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseResetPasswordProps = Omit<
+  UseMutateProps<RestResponse, unknown, void, ResetPasswordRequest, void>,
+  "path" | "verb"
+>;
+
+export const useResetPassword = (props: UseResetPasswordProps) =>
+  useMutate<RestResponse, unknown, void, ResetPasswordRequest, void>(
+    "POST",
+    `/users/reset-password`,
+    { base: "/gateway/api", ...props }
+  );
+
+export interface UpdatePasswordPathParams {
+  token: string;
+}
+
+export type UpdatePasswordProps = Omit<
+  MutateProps<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdatePasswordPathParams;
+
+export const UpdatePassword = ({ token, ...props }: UpdatePasswordProps) => (
+  <Mutate<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >
+    verb="POST"
+    path={`/users/reset-password/${token}`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseUpdatePasswordProps = Omit<
+  UseMutateProps<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdatePasswordPathParams;
+
+export const useUpdatePassword = ({
+  token,
+  ...props
+}: UseUpdatePasswordProps) =>
+  useMutate<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >(
+    "POST",
+    (paramsInPath: UpdatePasswordPathParams) =>
+      `/users/reset-password/${paramsInPath.token}`,
+    { base: "/gateway/api", pathParams: { token }, ...props }
+  );

@@ -64,6 +64,7 @@ const SSOSignIn: React.FC = () => {
             <label htmlFor="email">Work Email</label>
             <input
               name="email"
+              type="email"
               id="email"
               placeholder="email@work.com"
               disabled={loading}
