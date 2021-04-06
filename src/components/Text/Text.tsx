@@ -7,7 +7,7 @@ import css from "./Text.module.css";
 interface TextProps {
   className?: string;
   icon?: IconName;
-  iconProps?: IconProps;
+  iconProps?: Omit<IconProps, "name">;
 }
 
 const Text: React.FC<TextProps> = ({

@@ -19948,3 +19948,39 @@ export const useUpdatePassword = ({
       `/users/reset-password/${paramsInPath.token}`,
     { base: "/gateway/api", pathParams: { token }, ...props }
   );
+
+export type ForceLoginUsingHarnessPasswordProps = Omit<
+  MutateProps<RestResponseUser, unknown, void, LoginRequestRequestBody, void>,
+  "path" | "verb"
+>;
+
+export const ForceLoginUsingHarnessPassword = (
+  props: ForceLoginUsingHarnessPasswordProps
+) => (
+  <Mutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>
+    verb="POST"
+    path={`/users/harness-local-login`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseForceLoginUsingHarnessPasswordProps = Omit<
+  UseMutateProps<
+    RestResponseUser,
+    unknown,
+    void,
+    LoginRequestRequestBody,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useForceLoginUsingHarnessPassword = (
+  props: UseForceLoginUsingHarnessPasswordProps
+) =>
+  useMutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>(
+    "POST",
+    `/users/harness-local-login`,
+    { base: "/gateway/api", ...props }
+  );

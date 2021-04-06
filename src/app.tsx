@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 import routes from "./RouteDefinitions";
 import SignIn from "./pages/SignIn/SignIn";
+import LocalLogin from "./pages/LocalLogin/LocalLogin";
 import SSOSignIn from "./pages/SSOSignIn/SSOSignIn";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
@@ -18,6 +19,7 @@ export function App() {
     <RestfulProvider base="/">
       <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
+        <Route path={routes.toLocalLogin()} component={LocalLogin} />
         <Route path={routes.toSignUp()} component={SignUp} />
         <Route path={routes.toForgotPassword()} component={ForgotPassword} />
         <Route path={routes.toResetPassword()} component={ResetPassword} />

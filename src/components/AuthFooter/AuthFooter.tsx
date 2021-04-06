@@ -74,16 +74,26 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
             </a>
           </div>
         ) : (
-          <button
-            className={cx("button", css.ssoButton)}
-            onClick={() => {
-              history.push(RouteDefinitions.toSSOSignIn());
-            }}
-          >
-            <Text icon="sso" iconProps={{ size: 24 }}>
-              Single Sign-On
-            </Text>
-          </button>
+          <>
+            <button
+              className={cx("button", css.ssoButton)}
+              onClick={() => {
+                history.push(RouteDefinitions.toSSOSignIn());
+              }}
+            >
+              <Text icon="sso" iconProps={{ size: 24 }}>
+                Single Sign-On
+              </Text>
+            </button>
+            <button
+              className={cx("button", css.ssoButton)}
+              onClick={() => {
+                history.push(RouteDefinitions.toLocalLogin());
+              }}
+            >
+              <Text>Harness Local Login</Text>
+            </button>
+          </>
         )}
       </div>
     </>
