@@ -2,7 +2,6 @@ import React from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 
-import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useForceLoginUsingHarnessPassword } from "services/portal";
@@ -12,6 +11,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import { handleError } from "utils/ErrorUtils";
 import Text from "components/Text/Text";
+import { handleLoginSuccess } from "utils/LoginUtils";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -24,7 +24,7 @@ interface LoginFormData {
   password: string;
 }
 
-export default function LocalLogin() {
+const LocalLogin: React.FC = () => {
   const { mutate: login, loading } = useForceLoginUsingHarnessPassword({});
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
@@ -33,28 +33,7 @@ export default function LocalLogin() {
       const response = await login({
         authorization: createAuthToken(formData.email, formData.password)
       });
-      if (response) {
-        const { resource } = response;
-        console.log(resource);
-        if (resource) {
-          AppStorage.set("token", resource.token);
-          AppStorage.set("acctId", resource.defaultAccountId);
-          AppStorage.set("lastTokenSetTime", +new Date());
-
-          const experience = resource.accounts?.find(
-            (account) => account.uuid === resource.defaultAccountId
-          )?.defaultExperience;
-          switch (experience) {
-            case "NG":
-              window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
-              return;
-            case "CG":
-            default:
-              window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
-              return;
-          }
-        }
-      }
+      handleLoginSuccess(response?.resource);
     } catch (error) {
       handleError(error);
     }
@@ -117,4 +96,6 @@ export default function LocalLogin() {
       </div>
     </BasicLayout>
   );
-}
+};
+
+export default LocalLogin;
