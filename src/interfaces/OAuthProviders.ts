@@ -47,7 +47,7 @@ export const OAuthProviders: OAuthProviderType[] = [
 ];
 
 export const URLS = {
-  OAUTH: "https://app.harness.io/gateway/",
+  OAUTH: `https://${location.hostname || "app.harness.io"}/gateway/`,
   FREE_TRIAL: "https://harness.io/thanks-freetrial-p/",
   PRIVACY_AGREEMENT: "https://harness.io/privacy/",
   SUBSCRIPTION_TERMS: "https://harness.io/subscriptionterms/"

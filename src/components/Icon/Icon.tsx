@@ -7,6 +7,7 @@ import gitlab from "static/icons/gitlab.svg";
 import google from "static/icons/google.svg";
 import linkedin from "static/icons/linkedin.svg";
 import sso from "static/icons/sso.svg";
+import leftArrow from "static/icons/left-arrow.svg";
 
 export type IconName =
   | "azure"
@@ -15,7 +16,8 @@ export type IconName =
   | "gitlab"
   | "google"
   | "linkedin"
-  | "sso";
+  | "sso"
+  | "leftArrow";
 
 const iconMap: Record<IconName, string> = {
   azure,
@@ -24,10 +26,11 @@ const iconMap: Record<IconName, string> = {
   gitlab,
   google,
   linkedin,
-  sso
+  sso,
+  leftArrow
 };
 
-interface IconProps {
+export interface IconProps {
   name: IconName;
   height?: number;
   width?: number;

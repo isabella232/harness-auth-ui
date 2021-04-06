@@ -19812,3 +19812,175 @@ export const useLogin = (props: UseLoginProps) =>
     `/users/login`,
     { base: "/gateway/api", ...props }
   );
+
+export interface GetLoginTypeQueryParams {
+  accountId?: string;
+}
+
+export type GetLoginTypeProps = Omit<
+  MutateProps<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const GetLoginType = (props: GetLoginTypeProps) => (
+  <Mutate<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >
+    verb="POST"
+    path={`/users/logintype`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseGetLoginTypeProps = Omit<
+  UseMutateProps<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useGetLoginType = (props: UseGetLoginTypeProps) =>
+  useMutate<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >("POST", `/users/logintype`, { base: "/gateway/api", ...props });
+
+export type ResetPasswordProps = Omit<
+  MutateProps<RestResponse, unknown, void, ResetPasswordRequest, void>,
+  "path" | "verb"
+>;
+
+export const ResetPassword = (props: ResetPasswordProps) => (
+  <Mutate<RestResponse, unknown, void, ResetPasswordRequest, void>
+    verb="POST"
+    path={`/users/reset-password`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseResetPasswordProps = Omit<
+  UseMutateProps<RestResponse, unknown, void, ResetPasswordRequest, void>,
+  "path" | "verb"
+>;
+
+export const useResetPassword = (props: UseResetPasswordProps) =>
+  useMutate<RestResponse, unknown, void, ResetPasswordRequest, void>(
+    "POST",
+    `/users/reset-password`,
+    { base: "/gateway/api", ...props }
+  );
+
+export interface UpdatePasswordPathParams {
+  token: string;
+}
+
+export type UpdatePasswordProps = Omit<
+  MutateProps<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdatePasswordPathParams;
+
+export const UpdatePassword = ({ token, ...props }: UpdatePasswordProps) => (
+  <Mutate<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >
+    verb="POST"
+    path={`/users/reset-password/${token}`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseUpdatePasswordProps = Omit<
+  UseMutateProps<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdatePasswordPathParams;
+
+export const useUpdatePassword = ({
+  token,
+  ...props
+}: UseUpdatePasswordProps) =>
+  useMutate<
+    RestResponse,
+    unknown,
+    void,
+    UpdatePasswordRequestRequestBody,
+    UpdatePasswordPathParams
+  >(
+    "POST",
+    (paramsInPath: UpdatePasswordPathParams) =>
+      `/users/reset-password/${paramsInPath.token}`,
+    { base: "/gateway/api", pathParams: { token }, ...props }
+  );
+
+export type ForceLoginUsingHarnessPasswordProps = Omit<
+  MutateProps<RestResponseUser, unknown, void, LoginRequestRequestBody, void>,
+  "path" | "verb"
+>;
+
+export const ForceLoginUsingHarnessPassword = (
+  props: ForceLoginUsingHarnessPasswordProps
+) => (
+  <Mutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>
+    verb="POST"
+    path={`/users/harness-local-login`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseForceLoginUsingHarnessPasswordProps = Omit<
+  UseMutateProps<
+    RestResponseUser,
+    unknown,
+    void,
+    LoginRequestRequestBody,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useForceLoginUsingHarnessPassword = (
+  props: UseForceLoginUsingHarnessPasswordProps
+) =>
+  useMutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>(
+    "POST",
+    `/users/harness-local-login`,
+    { base: "/gateway/api", ...props }
+  );

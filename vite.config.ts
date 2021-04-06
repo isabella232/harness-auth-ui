@@ -9,7 +9,11 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3457",
         changeOrigin: true
-        // rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/gateway/api": {
+        target: "http://localhost:3457",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/gateway/, "")
       }
     }
   },

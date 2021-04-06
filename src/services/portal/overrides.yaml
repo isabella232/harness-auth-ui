@@ -1,4 +1,9 @@
 allowpaths:
   - "/users/login"
+  - "/users/logintype"
+  - "/users/reset-password"
+  - "/users/reset-password/{token}"
+  - "/users/harness-local-login"
 operationIdOverrides:
   /users/login: login
+  /users/logintype: loginType

@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useLogin } from "services/portal";
+import { useForceLoginUsingHarnessPassword } from "services/portal";
 // import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
-import css from "./SignIn.module.css";
-import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+import css from "../SignIn/SignIn.module.css";
 import { handleError } from "utils/ErrorUtils";
+import Text from "components/Text/Text";
 import { handleLoginSuccess } from "utils/LoginUtils";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
@@ -24,8 +24,8 @@ interface LoginFormData {
   password: string;
 }
 
-const SignIn: React.FC = () => {
-  const { mutate: login, loading } = useLogin({});
+const LocalLogin: React.FC = () => {
+  const { mutate: login, loading } = useForceLoginUsingHarnessPassword({});
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
@@ -44,9 +44,13 @@ const SignIn: React.FC = () => {
       <div className={cx(css.signin)}>
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
+          <div style={{ flex: 1 }}></div>
+          <Link to={RouteDefinitions.toSignIn()}>
+            <Text icon="leftArrow">Main Sign In</Text>
+          </Link>
         </div>
-        <div className={css.title}>Sign In</div>
-        <div className={css.subtitle}>and get ship done.</div>
+        <div className={css.title}>Local Login</div>
+        <div className={css.subtitle}></div>
         <form
           className="layout-vertical spacing-medium"
           onSubmit={(e) => {
@@ -73,17 +77,8 @@ const SignIn: React.FC = () => {
               disabled={loading}
             />
           </div>
-          <div
-            className="layout-vertical spacing-small"
-            style={{ position: "relative" }}
-          >
+          <div className="layout-vertical spacing-small">
             <label htmlFor="password">Password</label>
-            <Link
-              to={RouteDefinitions.toForgotPassword()}
-              className={css.forgotLink}
-            >
-              Forgot Password?
-            </Link>
             <input
               name="password"
               id="password"
@@ -98,13 +93,9 @@ const SignIn: React.FC = () => {
             disabled={loading}
           />
         </form>
-        <AuthFooter page={AuthPage.SignIn} />
-        <div className={css.footer}>
-          No account? <Link to={RouteDefinitions.toSignUp()}>Get Started</Link>
-        </div>
       </div>
     </BasicLayout>
   );
 };
 
-export default SignIn;
+export default LocalLogin;
