@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
 
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
@@ -87,8 +87,17 @@ export default function SignIn() {
               disabled={loading}
             />
           </div>
-          <div className="layout-vertical spacing-small">
+          <div
+            className="layout-vertical spacing-small"
+            style={{ position: "relative" }}
+          >
             <label htmlFor="password">Password</label>
+            <Link
+              to={RouteDefinitions.toForgotPassword()}
+              className={css.forgotLink}
+            >
+              Forgot Password?
+            </Link>
             <input
               name="password"
               id="password"

@@ -1,19 +1,19 @@
 import React from "react";
 import cx from "classnames";
+import { Link } from "react-router-dom";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
-import { Link } from "react-router-dom";
 import Text from "components/Text/Text";
 
-interface SSOFormData {
+interface ForgotPasswordFormData {
   email: string;
 }
 
-export default function SSOSignIn() {
+export default function ForgotPassword() {
   return (
     <BasicLayout>
       <div className={cx(css.signin)}>
@@ -21,13 +21,10 @@ export default function SSOSignIn() {
           <img src={logo} width={120} className={css.logo} />
           <div style={{ flex: 1 }}></div>
           <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Main Sign In</Text>
+            <Text icon="leftArrow">Sign In</Text>
           </Link>
         </div>
-        <div className={css.title}>
-          Sign In with an <br />
-          SSO Identity Provider
-        </div>
+        <div className={css.title}>Reset Password</div>
         <div className={css.subtitle}>and get ship done.</div>
         <form
           className="layout-vertical spacing-medium"
@@ -36,17 +33,21 @@ export default function SSOSignIn() {
             const data = new FormData(e.target as HTMLFormElement);
             const loginFormData = (Object.fromEntries(
               data.entries()
-            ) as unknown) as SSOFormData;
+            ) as unknown) as ForgotPasswordFormData;
             if (loginFormData.email.length > 0) {
-              // todo
+              // handleLogin(loginFormData);
             }
           }}
         >
           <div className="layout-vertical spacing-small">
-            <label htmlFor="email">Work Email</label>
+            <label htmlFor="email">Email</label>
             <input name="email" id="email" placeholder="email@work.com" />
           </div>
-          <input type="submit" value="Sign In" className="button primary" />
+          <input
+            type="submit"
+            value="Reset Password"
+            className="button primary"
+          />
         </form>
       </div>
     </BasicLayout>

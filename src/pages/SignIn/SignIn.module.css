@@ -6,7 +6,9 @@
     font-size: var(--font-size-medium);
   }
 
-  & .logo {
+  & .forgotLink {
+    position: absolute;
+    right: 0;
   }
 
   & .title {
