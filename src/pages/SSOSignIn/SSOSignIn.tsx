@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-
+import toast from "react-hot-toast";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 
@@ -8,12 +8,30 @@ import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import { Link } from "react-router-dom";
 import Text from "components/Text/Text";
+import { useGetLoginType } from "services/portal";
 
 interface SSOFormData {
   email: string;
 }
 
-export default function SSOSignIn() {
+const SSOSignIn: React.FC = () => {
+  const { mutate: getLoginType, loading } = useGetLoginType({});
+
+  const handleSSOInit = async (data: SSOFormData): Promise<void> => {
+    try {
+      const res = await getLoginType({ userName: data.email });
+      if (res.resource?.authenticationMechanism === "SAML") {
+        if (res.resource.ssorequest?.idpRedirectUrl) {
+          window.location.href = res.resource.ssorequest?.idpRedirectUrl;
+        }
+      } else {
+        toast("Single Sign-on is not enabled for your account");
+      }
+    } catch (err) {
+      toast("There was an error");
+    }
+  };
+
   return (
     <BasicLayout>
       <div className={cx(css.signin)}>
@@ -38,17 +56,29 @@ export default function SSOSignIn() {
               data.entries()
             ) as unknown) as SSOFormData;
             if (loginFormData.email.length > 0) {
-              // todo
+              handleSSOInit(loginFormData);
             }
           }}
         >
           <div className="layout-vertical spacing-small">
             <label htmlFor="email">Work Email</label>
-            <input name="email" id="email" placeholder="email@work.com" />
+            <input
+              name="email"
+              id="email"
+              placeholder="email@work.com"
+              disabled={loading}
+            />
           </div>
-          <input type="submit" value="Sign In" className="button primary" />
+          <input
+            type="submit"
+            value="Sign In"
+            className="button primary"
+            disabled={loading}
+          />
         </form>
       </div>
     </BasicLayout>
   );
-}
+};
+
+export default SSOSignIn;

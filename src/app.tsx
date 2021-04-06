@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, HashRouter, Redirect } from "react-router-dom";
 import { RestfulProvider } from "restful-react";
+import { Toaster } from "react-hot-toast";
 
 import routes from "./RouteDefinitions";
 import SignIn from "./pages/SignIn/SignIn";
@@ -23,6 +24,7 @@ export function App() {
           <Redirect to={routes.toSignIn()} />
         </Route>
       </HashRouter>
+      <Toaster />
     </RestfulProvider>
   );
 }

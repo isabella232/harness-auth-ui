@@ -1,16 +1,17 @@
 import React from "react";
 import cx from "classnames";
-import { Link, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useLogin } from "services/portal";
+import { RestResponseUser, useLogin } from "services/portal";
 // import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+import toast from "react-hot-toast";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -28,28 +29,51 @@ export default function SignIn() {
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
-    const response = await login({
-      authorization: createAuthToken(formData.email, formData.password)
-    });
-    if (response) {
-      const { resource } = response;
-      if (resource) {
-        AppStorage.set("token", resource.token);
-        AppStorage.set("acctId", resource.defaultAccountId);
-        AppStorage.set("lastTokenSetTime", +new Date());
+    try {
+      const response = await login({
+        authorization: createAuthToken(formData.email, formData.password)
+      });
+      if (response) {
+        const { resource } = response;
+        console.log(resource);
+        if (resource) {
+          AppStorage.set("token", resource.token);
+          AppStorage.set("acctId", resource.defaultAccountId);
+          AppStorage.set("lastTokenSetTime", +new Date());
 
-        const experience = resource.accounts?.find(
-          (account) => account.uuid === resource.defaultAccountId
-        )?.defaultExperience;
-        switch (experience) {
-          case "NG":
-            window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
-            return;
-          case "CG":
-          default:
-            window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
-            return;
+          const experience = resource.accounts?.find(
+            (account) => account.uuid === resource.defaultAccountId
+          )?.defaultExperience;
+          switch (experience) {
+            case "NG":
+              window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
+              return;
+            case "CG":
+            default:
+              window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
+              return;
+          }
         }
+      }
+    } catch (error) {
+      if (error.data) {
+        const response: RestResponseUser = error.data;
+        if (
+          response?.responseMessages &&
+          response.responseMessages.length > 0
+        ) {
+          if (
+            response.responseMessages[response.responseMessages.length - 1]
+              .message
+          ) {
+            toast(
+              response.responseMessages[response.responseMessages.length - 1]
+                .message || ""
+            );
+          }
+        }
+      } else {
+        toast(error.message);
       }
     }
   };

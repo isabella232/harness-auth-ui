@@ -19812,3 +19812,53 @@ export const useLogin = (props: UseLoginProps) =>
     `/users/login`,
     { base: "/gateway/api", ...props }
   );
+
+export interface GetLoginTypeQueryParams {
+  accountId?: string;
+}
+
+export type GetLoginTypeProps = Omit<
+  MutateProps<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const GetLoginType = (props: GetLoginTypeProps) => (
+  <Mutate<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >
+    verb="POST"
+    path={`/users/logintype`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseGetLoginTypeProps = Omit<
+  UseMutateProps<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useGetLoginType = (props: UseGetLoginTypeProps) =>
+  useMutate<
+    RestResponseLoginTypeResponse,
+    unknown,
+    GetLoginTypeQueryParams,
+    LoginTypeRequest,
+    void
+  >("POST", `/users/logintype`, { base: "/gateway/api", ...props });
