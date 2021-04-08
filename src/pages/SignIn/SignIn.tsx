@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 
@@ -10,6 +10,7 @@ import { useLogin } from "services/portal";
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+import Captcha from "components/Captcha/Captcha";
 import { handleError } from "utils/ErrorUtils";
 import { handleLoginSuccess } from "utils/LoginUtils";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
@@ -26,6 +27,7 @@ interface LoginFormData {
 
 const SignIn: React.FC = () => {
   const { mutate: login, loading } = useLogin({});
+  const [showCaptcha] = useState(false);
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
@@ -35,6 +37,7 @@ const SignIn: React.FC = () => {
       });
       handleLoginSuccess(response?.resource);
     } catch (error) {
+      // if (error.showCaptcha) setShowCaptcha(true)
       handleError(error);
     }
   };
@@ -91,6 +94,7 @@ const SignIn: React.FC = () => {
               disabled={loading}
             />
           </div>
+          {showCaptcha ? <Captcha onCaptchaSubmit={() => void 0} /> : null}
           <input
             type="submit"
             value="Sign In"
