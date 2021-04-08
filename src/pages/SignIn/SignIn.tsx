@@ -26,8 +26,9 @@ interface LoginFormData {
 }
 
 const SignIn: React.FC = () => {
-  const { mutate: login, loading } = useLogin({});
-  const [showCaptcha] = useState(false);
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [captcha, setCaptcha] = useState<string | undefined>();
+  const { mutate: login, loading } = useLogin({ queryParams: { captcha } });
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
@@ -37,7 +38,10 @@ const SignIn: React.FC = () => {
       });
       handleLoginSuccess(response?.resource);
     } catch (error) {
-      // if (error.showCaptcha) setShowCaptcha(true)
+      const errorCode = error.data?.responseMessages?.[0]?.code;
+      if (errorCode === "MAX_FAILED_ATTEMPT_COUNT_EXCEEDED") {
+        setShowCaptcha(true);
+      }
       handleError(error);
     }
   };
@@ -94,12 +98,18 @@ const SignIn: React.FC = () => {
               disabled={loading}
             />
           </div>
-          {showCaptcha ? <Captcha onCaptchaSubmit={() => void 0} /> : null}
+          {showCaptcha ? (
+            <Captcha
+              onCaptchaSubmit={(str) => {
+                setCaptcha(str);
+              }}
+            />
+          ) : null}
           <input
             type="submit"
             value="Sign In"
             className="button primary"
-            disabled={loading}
+            disabled={loading || (showCaptcha && !captcha)}
           />
         </form>
         <AuthFooter page={AuthPage.SignIn} />
