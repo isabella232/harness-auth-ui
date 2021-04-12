@@ -17,7 +17,9 @@ interface ForgotPasswordFormData {
 }
 
 export default function ForgotPassword() {
-  const { mutate: resetPassword, loading } = useResetPassword({});
+  const { mutate: resetPassword, loading } = useResetPassword({
+    queryParams: { isNG: true } as any // TODO: backend doesn't have this flag yet
+  });
 
   const handleReset = async (data: ForgotPasswordFormData) => {
     try {
