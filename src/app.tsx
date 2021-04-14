@@ -9,6 +9,7 @@ import LocalLogin from "./pages/LocalLogin/LocalLogin";
 import SSOSignIn from "./pages/SSOSignIn/SSOSignIn";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 
 function SignUp() {
   return <div>sign up</div>;
@@ -24,6 +25,7 @@ export function App() {
         <Route path={routes.toForgotPassword()} component={ForgotPassword} />
         <Route path={routes.toResetPassword()} component={ResetPassword} />
         <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
+        <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
         <Route path="/" exact>
           <Redirect to={routes.toSignIn()} />
         </Route>

@@ -100,7 +100,7 @@ function decode64(input) {
   return unescape(output);
 }
 
-const secureStorage = new SecureStorageConstructor(localStorage, {
+export const secureStorage = new SecureStorageConstructor(localStorage, {
   hash: function hash(key) {
     return key;
   },
