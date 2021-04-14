@@ -21,7 +21,10 @@ export default function ForgotPassword() {
 
   const handleReset = async (data: ForgotPasswordFormData) => {
     try {
-      const response = await resetPassword({ email: data.email });
+      const response = await resetPassword({
+        email: data.email,
+        isNG: true
+      } as any); // FIXME: isNG is not supported by backend yet
       if (response.resource) {
         toast.success(
           "An email has been sent to you with a link to reset your password"

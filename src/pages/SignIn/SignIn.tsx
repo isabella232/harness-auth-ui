@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 
@@ -10,8 +10,10 @@ import { useLogin } from "services/portal";
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+// import Captcha from "components/Captcha/Captcha";
 import { handleError } from "utils/ErrorUtils";
 import { handleLoginSuccess } from "utils/LoginUtils";
+import Recaptcha from "react-recaptcha";
 // import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -25,7 +27,12 @@ interface LoginFormData {
 }
 
 const SignIn: React.FC = () => {
-  const { mutate: login, loading } = useLogin({});
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
+  const { mutate: login, loading } = useLogin({
+    queryParams: { captcha: captchaReponse }
+  });
+  const captchaRef = useRef<Recaptcha>(null);
   // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
@@ -35,6 +42,11 @@ const SignIn: React.FC = () => {
       });
       handleLoginSuccess(response?.resource);
     } catch (error) {
+      const errorCode = error.data?.responseMessages?.[0]?.code;
+      captchaRef.current?.reset();
+      if (errorCode === "MAX_FAILED_ATTEMPT_COUNT_EXCEEDED") {
+        setShowCaptcha(true);
+      }
       handleError(error);
     }
   };
@@ -91,11 +103,22 @@ const SignIn: React.FC = () => {
               disabled={loading}
             />
           </div>
+          {showCaptcha ? (
+            <Recaptcha
+              sitekey="6Lc2grEUAAAAAIpHGjcthvQ_1BnwveIAYRL-B2jM"
+              render="explicit"
+              ref={captchaRef}
+              verifyCallback={(_captchaResponse: string) => {
+                setCaptchaResponse(_captchaResponse);
+              }}
+              onloadCallback={() => void 0}
+            />
+          ) : null}
           <input
             type="submit"
             value="Sign In"
             className="button primary"
-            disabled={loading}
+            disabled={loading || (showCaptcha && !captchaReponse)}
           />
         </form>
         <AuthFooter page={AuthPage.SignIn} />
