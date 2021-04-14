@@ -19984,3 +19984,35 @@ export const useForceLoginUsingHarnessPassword = (
     `/users/harness-local-login`,
     { base: "/gateway/api", ...props }
   );
+
+export type TwoFactorLoginProps = Omit<
+  MutateProps<RestResponseUser, unknown, void, LoginRequestRequestBody, void>,
+  "path" | "verb"
+>;
+
+export const TwoFactorLogin = (props: TwoFactorLoginProps) => (
+  <Mutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>
+    verb="POST"
+    path={`/users/two-factor-login`}
+    base={"/gateway/api"}
+    {...props}
+  />
+);
+
+export type UseTwoFactorLoginProps = Omit<
+  UseMutateProps<
+    RestResponseUser,
+    unknown,
+    void,
+    LoginRequestRequestBody,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useTwoFactorLogin = (props: UseTwoFactorLoginProps) =>
+  useMutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>(
+    "POST",
+    `/users/two-factor-login`,
+    { base: "/gateway/api", ...props }
+  );

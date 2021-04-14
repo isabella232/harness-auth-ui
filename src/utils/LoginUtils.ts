@@ -1,6 +1,20 @@
 import type { User } from "services/portal";
 import AppStorage from "utils/AppStorage";
 
+interface AuthHeader {
+  authorization: string;
+}
+
+export function formatJWTHeader(authCode: string): AuthHeader {
+  const token = window.btoa(
+    `${AppStorage.get("twoFactorJwtToken")}:${authCode}`
+  );
+  const header = {
+    authorization: `JWT ${token}`
+  };
+  return header;
+}
+
 export function handleLoginSuccess(resource?: User): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
