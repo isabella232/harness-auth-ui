@@ -3,3 +3,4 @@ dist
 src/services
 scripts
 restful-react.config.js
+src/static/js
