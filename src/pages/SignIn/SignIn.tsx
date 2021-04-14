@@ -101,7 +101,7 @@ const SignIn: React.FC = () => {
           </div>
           {showCaptcha ? (
             <Recaptcha
-              sitekey="6Lc2grEUAAAAAIpHGjcthvQ_1BnwveIAYRL-B2jM"
+              sitekey="6LeKjaEaAAAAAMxAu_bo4b9wcr9Cp0STlAFh6qzx"
               render="explicit"
               ref={captchaRef}
               verifyCallback={(_captchaResponse: string) => {
