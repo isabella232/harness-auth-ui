@@ -5,16 +5,13 @@ import { Link } from "react-router-dom";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useLogin } from "services/portal";
-// import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
-// import Captcha from "components/Captcha/Captcha";
 import { handleError } from "utils/ErrorUtils";
 import { handleLoginSuccess } from "utils/LoginUtils";
 import Recaptcha from "react-recaptcha";
-// import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -33,7 +30,6 @@ const SignIn: React.FC = () => {
     queryParams: { captcha: captchaReponse }
   });
   const captchaRef = useRef<Recaptcha>(null);
-  // const { returnUrl } = useQueryParams<{ returnUrl?: string }>();
 
   const handleLogin = async (formData: LoginFormData) => {
     try {
