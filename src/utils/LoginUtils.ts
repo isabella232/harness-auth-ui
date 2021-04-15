@@ -32,8 +32,9 @@ export function handleLoginSuccess(resource?: User): void {
     ) {
       AppStorage.set("twoFactorJwtToken", resource.twoFactorJwtToken);
       // TODO: history.push instead of window.location
-      // TODO: handle returnUrl
-      window.location.href = "/auth/#/two-factor-auth";
+      window.location.href = returnUrl
+        ? `/auth/#/two-factor-auth?returnUrl=${returnUrl}`
+        : "/auth/#/two-factor-auth";
       return;
     }
 
