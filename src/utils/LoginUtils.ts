@@ -26,6 +26,17 @@ export function handleLoginSuccess(resource?: User): void {
     AppStorage.set("acctId", resource.defaultAccountId);
     AppStorage.set("lastTokenSetTime", +new Date());
 
+    if (
+      resource.twoFactorAuthenticationEnabled === true &&
+      resource.twoFactorJwtToken
+    ) {
+      AppStorage.set("twoFactorJwtToken", resource.twoFactorJwtToken);
+      // TODO: history.push instead of window.location
+      // TODO: handle returnUrl
+      window.location.href = "/auth/#/two-factor-auth";
+      return;
+    }
+
     if (returnUrl) {
       try {
         const returnUrlObject = new URL(returnUrl);
