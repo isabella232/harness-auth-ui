@@ -38,8 +38,9 @@ const SignIn: React.FC = () => {
       });
       handleLoginSuccess(response?.resource);
     } catch (error) {
-      const errorCode = error.data?.responseMessages?.[0]?.code;
       captchaRef.current?.reset();
+      setCaptchaResponse(undefined);
+      const errorCode = error.data?.responseMessages?.[0]?.code;
       if (errorCode === "MAX_FAILED_ATTEMPT_COUNT_EXCEEDED") {
         setShowCaptcha(true);
       }
@@ -101,7 +102,7 @@ const SignIn: React.FC = () => {
           </div>
           {showCaptcha ? (
             <Recaptcha
-              sitekey="6Lc2grEUAAAAAIpHGjcthvQ_1BnwveIAYRL-B2jM"
+              sitekey="6LeKjaEaAAAAAMxAu_bo4b9wcr9Cp0STlAFh6qzx"
               render="explicit"
               ref={captchaRef}
               verifyCallback={(_captchaResponse: string) => {
