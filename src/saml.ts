@@ -13,11 +13,11 @@ function saml(): void {
     return;
   } else {
     const accountId = queryParams.get("accountId");
-    const token = queryParams.get("token");
+    const userToken = queryParams.get("userToken");
     const userId = queryParams.get("userId");
 
-    if (accountId && token && userId) {
-      secureStorage.setItem("token", token);
+    if (accountId && userToken && userId) {
+      secureStorage.setItem("token", userToken);
       secureStorage.setItem("uuid", userId);
       secureStorage.setItem("acctId", accountId);
       secureStorage.setItem("lastTokenSetTime", +new Date());

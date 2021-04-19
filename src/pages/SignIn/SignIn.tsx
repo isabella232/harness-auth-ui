@@ -38,8 +38,9 @@ const SignIn: React.FC = () => {
       });
       handleLoginSuccess(response?.resource);
     } catch (error) {
-      const errorCode = error.data?.responseMessages?.[0]?.code;
       captchaRef.current?.reset();
+      setCaptchaResponse(undefined);
+      const errorCode = error.data?.responseMessages?.[0]?.code;
       if (errorCode === "MAX_FAILED_ATTEMPT_COUNT_EXCEEDED") {
         setShowCaptcha(true);
       }
