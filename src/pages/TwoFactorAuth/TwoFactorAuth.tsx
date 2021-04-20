@@ -14,18 +14,24 @@ import { handleError } from "utils/ErrorUtils";
 
 import css from "../SignIn/SignIn.module.css";
 import css2 from "./TwoFactorAuth.module.css";
+import AppStorage from "utils/AppStorage";
 
 interface TwoFactorAuthFormData {
   authCode: string;
 }
 
 const TwoFactorAuth: React.FC = () => {
-  const { mutate: login, loading } = useTwoFactorLogin({});
+  const accountId = AppStorage.get("acctId");
+  const { mutate: login, loading } = useTwoFactorLogin({
+    queryParams: {
+      routingId: accountId // FIXME: swagger doesn't have this query param yet
+    } as any
+  });
 
   const handleLogin = async (formData: TwoFactorAuthFormData) => {
     try {
       const response = await login(formatJWTHeader(formData.authCode));
-      response && handleLoginSuccess(response.resource);
+      handleLoginSuccess(response?.resource);
     } catch (err) {
       handleError(err);
     }
@@ -64,6 +70,7 @@ const TwoFactorAuth: React.FC = () => {
               id="authCode"
               placeholder="6-digit code"
               disabled={loading}
+              autoComplete="off"
             />
           </div>
 
