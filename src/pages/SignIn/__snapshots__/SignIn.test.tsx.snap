@@ -1,0 +1,217 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SignIn render 1`] = `
+<div>
+  <div
+    class="layout"
+  >
+    <div
+      class="cardColumn"
+    >
+      <div
+        class="card"
+      >
+        <div
+          class="signin"
+        >
+          <div
+            class="header"
+          >
+            <img
+              class="logo"
+              src="test-file-stub"
+              width="120"
+            />
+          </div>
+          <div
+            class="title"
+          >
+            Sign In
+          </div>
+          <div
+            class="subtitle"
+          >
+            and get ship done.
+          </div>
+          <form
+            class="layout-vertical spacing-medium"
+          >
+            <div
+              class="layout-vertical spacing-small"
+            >
+              <label
+                for="email"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                placeholder="email@work.com"
+                type="email"
+              />
+            </div>
+            <div
+              class="layout-vertical spacing-small"
+              style="position: relative;"
+            >
+              <label
+                for="password"
+              >
+                Password
+              </label>
+              <a
+                class="forgotLink"
+                href="/forgot-password"
+              >
+                Forgot Password?
+              </a>
+              <input
+                id="password"
+                name="password"
+                type="password"
+              />
+            </div>
+            <input
+              class="button primary"
+              type="submit"
+              value="Sign In"
+            />
+          </form>
+          <h2
+            class="lineMessage"
+          >
+            <span
+              class="message"
+            >
+              or login with
+            </span>
+          </h2>
+          <div>
+            <div
+              class="layout-horizontal spacing-auto oAuthIcons"
+            >
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+              <a
+                class="iconContainer"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+              </a>
+            </div>
+            <button
+              class="button ssoButton"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="24"
+                  src="test-file-stub"
+                  width="24"
+                />
+                Single Sign-On
+              </span>
+            </button>
+            <button
+              class="button ssoButton"
+            >
+              <span
+                class="text"
+              >
+                Harness Local Login
+              </span>
+            </button>
+          </div>
+          <div
+            class="footer"
+          >
+            No account? 
+            <a
+              href="/signup"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="imageColumn"
+    >
+      <img
+        alt=""
+        aria-hidden="true"
+        class="image"
+        src="test-file-stub"
+      />
+    </div>
+  </div>
+</div>
+`;
