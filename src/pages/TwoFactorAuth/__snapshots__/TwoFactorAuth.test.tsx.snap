@@ -1,0 +1,114 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TwoFactorAuth render 1`] = `
+<div>
+  <div
+    class="layout"
+  >
+    <div
+      class="cardColumn"
+    >
+      <div
+        class="card"
+      >
+        <div
+          class="signin"
+        >
+          <div
+            class="header"
+          >
+            <img
+              class="logo"
+              src="test-file-stub"
+              width="120"
+            />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Sign In
+              </span>
+            </a>
+          </div>
+          <div
+            class="title"
+          >
+            Enter Authorization Code
+          </div>
+          <div
+            class="subtitle"
+          >
+            and get ship done.
+          </div>
+          <form
+            class="layout-vertical spacing-medium"
+          >
+            <div
+              class="layout-vertical spacing-small"
+            >
+              <label
+                for="email"
+              >
+                Code
+              </label>
+              <input
+                autocomplete="off"
+                id="authCode"
+                name="authCode"
+                placeholder="6-digit code"
+                type="text"
+              />
+            </div>
+            <input
+              class="button primary"
+              type="submit"
+              value="Continue"
+            />
+          </form>
+          <div
+            class="explainer"
+          >
+            If you’re a new Harness user, or your account has recently enabled Two Factor Authentication, check for an email containing your Two Factor Authentication secret.
+          </div>
+          <div
+            class="explainer"
+          >
+            If you don’t have a Two Factor Authentication secret, ask your Harness account administrator to provide one.
+          </div>
+          <div
+            class="footer"
+          >
+            No account? 
+            <a
+              href="/signup"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="imageColumn"
+    >
+      <img
+        alt=""
+        aria-hidden="true"
+        class="image"
+        src="test-file-stub"
+      />
+    </div>
+  </div>
+</div>
+`;

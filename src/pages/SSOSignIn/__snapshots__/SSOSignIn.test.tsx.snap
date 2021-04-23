@@ -1,0 +1,95 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SSOSignIn render 1`] = `
+<div>
+  <div
+    class="layout"
+  >
+    <div
+      class="cardColumn"
+    >
+      <div
+        class="card"
+      >
+        <div
+          class="signin"
+        >
+          <div
+            class="header"
+          >
+            <img
+              class="logo"
+              src="test-file-stub"
+              width="120"
+            />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Main Sign In
+              </span>
+            </a>
+          </div>
+          <div
+            class="title"
+          >
+            Sign In with an 
+            <br />
+            SSO Identity Provider
+          </div>
+          <div
+            class="subtitle"
+          >
+            and get ship done.
+          </div>
+          <form
+            class="layout-vertical spacing-medium"
+          >
+            <div
+              class="layout-vertical spacing-small"
+            >
+              <label
+                for="email"
+              >
+                Work Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                placeholder="email@work.com"
+                type="email"
+              />
+            </div>
+            <input
+              class="button primary"
+              type="submit"
+              value="Sign In"
+            />
+          </form>
+        </div>
+      </div>
+    </div>
+    <div
+      class="imageColumn"
+    >
+      <img
+        alt=""
+        aria-hidden="true"
+        class="image"
+        src="test-file-stub"
+      />
+    </div>
+  </div>
+</div>
+`;
