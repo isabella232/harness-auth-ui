@@ -23,8 +23,7 @@
   & .imageColumn {
     overflow-y: hidden;
     background-color: var(--blue-900);
-    padding-top: 240px;
-    padding-left: 240px;
+    padding-left: 60px;
 
     & .image {
       object-fit: contain;
