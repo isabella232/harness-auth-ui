@@ -13,5 +13,14 @@ module.exports = {
     customProps: {
       base: `{'/gateway/api'}`
     }
+  },
+  ng: {
+    output: "src/services/ng/index.tsx",
+    url: "http://localhost:7457/swagger.json",
+    validation: false,
+    transformer: "scripts/swagger-transform.js",
+    customProps: {
+      base: `{'/gateway/ng/api'}`
+    }
   }
 };

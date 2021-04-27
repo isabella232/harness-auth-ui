@@ -12,7 +12,8 @@
     "build-saml": "vite build -c saml.config.ts",
     "build": "yarn build-main && yarn build-saml",
     "serve": "vite preview",
-    "services": "restful-react import --config restful-react.config.js portal",
+    "services-portal": "restful-react import --config restful-react.config.js portal",
+    "services-ng": "restful-react import --config restful-react.config.js ng",
     "postservices": "prettier --write src/services/portal/index.tsx",
     "typecheck": "tsc",
     "docker": "sh -c 'docker build -t us.gcr.io/platform-205701/harness/ng-auth-ui:\"$0\" . && docker push us.gcr.io/platform-205701/harness/ng-auth-ui:\"$0\"'"

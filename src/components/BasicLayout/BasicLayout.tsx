@@ -1,6 +1,6 @@
 import React from "react";
 
-import SignupIllustration from "./SignupIllustration.png";
+import AuthIllustration from "./AuthIllustration.png";
 import css from "./BasicLayout.module.css";
 
 interface BasicLayoutProps {
@@ -14,12 +14,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
         <div className={css.card}>{children}</div>
       </div>
       <div className={css.imageColumn}>
-        <img
-          className={css.image}
-          src={SignupIllustration}
-          alt=""
-          aria-hidden
-        />
+        <img className={css.image} src={AuthIllustration} alt="" aria-hidden />
       </div>
     </div>
   );

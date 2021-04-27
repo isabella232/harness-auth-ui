@@ -54,23 +54,23 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
         </div>
         {page === AuthPage.SignUp ? (
           <div className={css.disclaimer}>
-            disclaimer
+            By signing up you agree to our&nbsp;
             <a
               className={css.externalLink}
               href={URLS.PRIVACY_AGREEMENT}
               rel="noreferrer"
               target="_blank"
             >
-              privacy
+              Privacy Policy&nbsp;
             </a>
-            middle
+            and our&nbsp;
             <a
               className={css.externalLink}
               href={URLS.SUBSCRIPTION_TERMS}
               rel="noreferrer"
               target="_blank"
             >
-              terms
+              Terms of Use
             </a>
           </div>
         ) : (
