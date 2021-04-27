@@ -16,7 +16,7 @@ module.exports = {
   },
   ng: {
     output: "src/services/ng/index.tsx",
-    file: "src/services/ng/swagger.json",
+    url: "http://localhost:7457/swagger.json",
     validation: false,
     transformer: "scripts/swagger-transform.js",
     customProps: {
