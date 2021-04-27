@@ -1,0 +1,24 @@
+.signup {
+  & .header {
+    display: flex;
+    margin-bottom: var(--spacing-huge);
+    align-items: center;
+    font-size: var(--font-size-medium);
+  }
+
+  & .title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-small);
+  }
+
+  & .subtitle {
+    font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-huge);
+    color: var(--dark-400);
+  }
+
+  & .footer {
+    margin-top: var(--spacing-huge);
+  }
+}

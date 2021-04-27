@@ -4,16 +4,13 @@ import { RestfulProvider } from "restful-react";
 import { Toaster } from "react-hot-toast";
 
 import routes from "./RouteDefinitions";
+import SignUp from "./pages/SignUp/Signup";
 import SignIn from "./pages/SignIn/SignIn";
 import LocalLogin from "./pages/LocalLogin/LocalLogin";
 import SSOSignIn from "./pages/SSOSignIn/SSOSignIn";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
-
-function SignUp() {
-  return <div>sign up</div>;
-}
 
 export function App() {
   return (
