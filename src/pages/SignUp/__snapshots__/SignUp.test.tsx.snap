@@ -39,16 +39,15 @@ exports[`SignUp render 1`] = `
             <div
               class="layout-vertical spacing-small"
             >
-              <label
-                for="email"
-              >
+              <label>
                 Email
               </label>
               <input
+                class=""
                 id="email"
                 name="email"
                 placeholder="email@work.com"
-                type="email"
+                value=""
               />
             </div>
             <div
@@ -61,9 +60,12 @@ exports[`SignUp render 1`] = `
                 Password
               </label>
               <input
+                class=""
                 id="password"
                 name="password"
+                placeholder="Password"
                 type="password"
+                value=""
               />
             </div>
             <div
