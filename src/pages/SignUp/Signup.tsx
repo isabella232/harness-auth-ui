@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
-import { Form, Field } from "react-final-form";
+import { Form } from "react-final-form";
 import Recaptcha from "react-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -9,6 +9,7 @@ import { useSignup } from "services/ng";
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
 import { handleSignUpSuccess } from "utils/SignUpUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
@@ -54,56 +55,24 @@ const SignUp: React.FC = () => {
   };
 
   const emailField = (
-    <Field name="email" validate={validateEmail}>
-      {({ input, meta }) => {
-        const showError = meta.error && meta.touched;
-
-        return (
-          <>
-            <label>Email</label>
-            <input
-              {...input}
-              id="email"
-              placeholder="email@work.com"
-              disabled={loading}
-              className={cx(showError && css["validation-outline"])}
-            />
-            {showError && (
-              <span className={cx(css["validation-message"])}>
-                {meta.error}
-              </span>
-            )}
-          </>
-        );
-      }}
-    </Field>
+    <Field
+      name="email"
+      label={"Email"}
+      placeholder="email@work.com"
+      disabled={loading}
+      validate={validateEmail}
+    />
   );
 
   const passwordField = (
-    <Field name="password" validate={validatePassword}>
-      {({ input, meta }) => {
-        const showError = meta.error && meta.touched;
-
-        return (
-          <>
-            <label htmlFor="password">Password</label>
-            <input
-              {...input}
-              id="password"
-              type="password"
-              placeholder="Password"
-              disabled={loading}
-              className={cx(showError && css["validation-outline"])}
-            />
-            {showError && (
-              <span className={cx(css["validation-message"])}>
-                {meta.error}
-              </span>
-            )}
-          </>
-        );
-      }}
-    </Field>
+    <Field
+      name="password"
+      label="Password"
+      type="password"
+      placeholder="Password"
+      disabled={loading}
+      validate={validatePassword}
+    />
   );
 
   return (
@@ -121,13 +90,8 @@ const SignUp: React.FC = () => {
               className="layout-vertical spacing-medium"
               onSubmit={handleSubmit}
             >
-              <div className="layout-vertical spacing-small">{emailField}</div>
-              <div
-                className="layout-vertical spacing-small"
-                style={{ position: "relative" }}
-              >
-                {passwordField}
-              </div>
+              {emailField}
+              {passwordField}
               <Recaptcha
                 sitekey={window.captchaToken}
                 size="invisible"
