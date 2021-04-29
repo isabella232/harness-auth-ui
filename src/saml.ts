@@ -22,15 +22,29 @@ function saml(): void {
       secureStorage.setItem("acctId", accountId);
       secureStorage.setItem("lastTokenSetTime", +new Date());
 
-      const defaultExperience = queryParams.get("defaultExperience");
-      switch (defaultExperience) {
-        case "NG":
-          window.location.href = `/ng/#/account/${accountId}/projects`;
-          return;
-        case "CG":
-        default:
-          window.location.href = `/#/account/${accountId}/dashboard`;
-          return;
+      const isNG = queryParams.get("isNG");
+
+      if (isNG) {
+        const module = queryParams.get("module");
+
+        const base = `/ng/#/account/${accountId}`;
+
+        const completeLink = module
+          ? `${base}/${module}/home/trial`
+          : `${base}/purpose`;
+
+        window.location.href = completeLink;
+      } else {
+        const defaultExperience = queryParams.get("defaultExperience");
+        switch (defaultExperience) {
+          case "NG":
+            window.location.href = `/ng/#/account/${accountId}/projects`;
+            return;
+          case "CG":
+          default:
+            window.location.href = `/#/account/${accountId}/dashboard`;
+            return;
+        }
       }
     } else {
       // eslint-disable-next-line no-console

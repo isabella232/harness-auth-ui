@@ -95,7 +95,7 @@ exports[`SignUp render 1`] = `
             >
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -107,7 +107,7 @@ exports[`SignUp render 1`] = `
               </a>
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -119,7 +119,7 @@ exports[`SignUp render 1`] = `
               </a>
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -131,7 +131,7 @@ exports[`SignUp render 1`] = `
               </a>
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -143,7 +143,7 @@ exports[`SignUp render 1`] = `
               </a>
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -155,7 +155,7 @@ exports[`SignUp render 1`] = `
               </a>
               <a
                 class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
+                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure&action=signup&isNG=true"
                 rel="noopener noreferrer"
                 target="_blank"
               >
