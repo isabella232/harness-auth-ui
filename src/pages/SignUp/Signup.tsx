@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
+import { Form } from "react-final-form";
+import Recaptcha from "react-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useSignup } from "services/ng";
@@ -7,9 +9,10 @@ import { useSignup } from "services/ng";
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
+import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
 import { handleSignUpSuccess } from "utils/SignUpUtils";
-import Recaptcha from "react-recaptcha";
+import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 
 interface SignUpFormData {
   email: string;
@@ -34,15 +37,8 @@ const SignUp: React.FC = () => {
     data: SignUpFormData,
     captchaToken: string
   ): Promise<void> => {
-    const { email, password } = data;
-
-    const signupData: SignUpFormData = {
-      email,
-      password
-    };
-
     try {
-      const userInfo = await signup(signupData, {
+      const userInfo = await signup(data, {
         queryParams: { captchaToken: captchaToken }
       });
       handleSignUpSuccess(userInfo.resource);
@@ -53,17 +49,31 @@ const SignUp: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.target);
-    const signupFormData = (Object.fromEntries(
-      data.entries()
-    ) as unknown) as SignUpFormData;
-    if (signupFormData.email.length > 0 && signupFormData.password.length > 0) {
-      captchaRef.current?.execute();
-      setSignupData(signupFormData);
-    }
+  const onSubmit = (data: SignUpFormData) => {
+    captchaRef.current?.execute();
+    setSignupData(data);
   };
+
+  const emailField = (
+    <Field
+      name="email"
+      label={"Email"}
+      placeholder="email@work.com"
+      disabled={loading}
+      validate={validateEmail}
+    />
+  );
+
+  const passwordField = (
+    <Field
+      name="password"
+      label="Password"
+      type="password"
+      placeholder="Password"
+      disabled={loading}
+      validate={validatePassword}
+    />
+  );
 
   return (
     <BasicLayout>
@@ -73,47 +83,32 @@ const SignUp: React.FC = () => {
         </div>
         <div className={css.title}>Sign Up</div>
         <div className={css.subtitle}>and get ship done.</div>
-        <form
-          className="layout-vertical spacing-medium"
-          onSubmit={handleSubmit}
-        >
-          <div className="layout-vertical spacing-small">
-            <label htmlFor="email">Email</label>
-            <input
-              name="email"
-              type="email"
-              id="email"
-              placeholder="email@work.com"
-              disabled={loading}
-            />
-          </div>
-          <div
-            className="layout-vertical spacing-small"
-            style={{ position: "relative" }}
-          >
-            <label htmlFor="password">Password</label>
-            <input
-              name="password"
-              id="password"
-              type="password"
-              disabled={loading}
-            />
-          </div>
-          <Recaptcha
-            sitekey={window.captchaToken}
-            size="invisible"
-            ref={captchaRef}
-            verifyCallback={(captchaToken: string) => {
-              setCaptchaToken(captchaToken);
-            }}
-          />
-          <input
-            type="submit"
-            value="Sign Up"
-            className="button primary"
-            disabled={loading}
-          />
-        </form>
+        <Form
+          onSubmit={onSubmit}
+          render={({ handleSubmit }) => (
+            <form
+              className="layout-vertical spacing-medium"
+              onSubmit={handleSubmit}
+            >
+              {emailField}
+              {passwordField}
+              <Recaptcha
+                sitekey={window.captchaToken}
+                size="invisible"
+                ref={captchaRef}
+                verifyCallback={(captchaToken: string) => {
+                  setCaptchaToken(captchaToken);
+                }}
+              />
+              <input
+                type="submit"
+                value="Sign Up"
+                className="button primary"
+                disabled={loading}
+              />
+            </form>
+          )}
+        />
         <AuthFooter page={AuthPage.SignUp} />
       </div>
     </BasicLayout>
