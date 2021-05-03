@@ -100,7 +100,7 @@ const SignUp: React.FC = () => {
             />
           </div>
           <Recaptcha
-            sitekey="6LdLgLwaAAAAAJ3MyiYcxGeUSNqkJDq-_gDIVU66"
+            sitekey={window.captchaToken}
             size="invisible"
             ref={captchaRef}
             verifyCallback={(captchaToken: string) => {
