@@ -62,12 +62,13 @@ export default function ResetPassword() {
             ) as unknown) as UpdatePasswordFormData;
             if (
               loginFormData.password.length > 0 &&
-              loginFormData.confirmPassword.length > 0 &&
-              loginFormData.password === loginFormData.confirmPassword
+              loginFormData.confirmPassword.length > 0
             ) {
-              handleReset(loginFormData);
-            } else {
-              toast("Passwords do not match");
+              if (loginFormData.password === loginFormData.confirmPassword) {
+                handleReset(loginFormData);
+              } else {
+                toast("Passwords do not match");
+              }
             }
           }}
         >
