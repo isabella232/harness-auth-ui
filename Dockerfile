@@ -15,4 +15,5 @@ USER 101
 
 EXPOSE 8080
 
-CMD nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
+CMD sed -i "s|<\!-- captchaToken -->|<script>window.captchaToken = '$CAPTCHA_TOKEN'</script>|" index.html && \
+  nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
