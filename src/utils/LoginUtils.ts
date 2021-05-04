@@ -19,6 +19,7 @@ export function handleLoginSuccess(resource?: User): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
   const returnUrl = urlParams?.get("returnUrl");
+  const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
     AppStorage.set("token", resource.token);
@@ -33,8 +34,8 @@ export function handleLoginSuccess(resource?: User): void {
       AppStorage.set("twoFactorJwtToken", resource.twoFactorJwtToken);
       // TODO: history.push instead of window.location
       window.location.href = returnUrl
-        ? `/auth/#/two-factor-auth?returnUrl=${returnUrl}`
-        : "/auth/#/two-factor-auth";
+        ? `${baseUrl}auth/#/two-factor-auth?returnUrl=${returnUrl}`
+        : `${baseUrl}auth/#/two-factor-auth`;
       return;
     }
 
@@ -62,7 +63,6 @@ export function handleLoginSuccess(resource?: User): void {
       (account) => account.uuid === resource.defaultAccountId
     )?.defaultExperience;
 
-    const baseUrl = window.location.pathname.replace("auth/", "");
     switch (experience) {
       case "NG":
         window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/projects`;
