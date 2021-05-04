@@ -5,6 +5,7 @@ export function handleSignUpSuccess(resource?: UserInfo): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
   const module = urlParams?.get("module");
+  const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
     AppStorage.set("token", resource.token);
@@ -13,9 +14,9 @@ export function handleSignUpSuccess(resource?: UserInfo): void {
     AppStorage.set("lastTokenSetTime", +new Date());
 
     if (module) {
-      window.location.href = `/ng/#/account/${resource.defaultAccountId}/${module}/home/trial`;
+      window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/${module}/home/trial`;
     } else {
-      window.location.href = `/ng/#/account/${resource.defaultAccountId}/purpose`;
+      window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/purpose`;
     }
   }
 }
