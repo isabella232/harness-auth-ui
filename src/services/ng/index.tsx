@@ -8465,7 +8465,6 @@ export const Signup = (props: SignupProps) => (
   >
     verb="POST"
     path={`/signup`}
-    base={"/gateway/ng/api"}
     {...props}
   />
 );
@@ -8488,4 +8487,4 @@ export const useSignup = (props: UseSignupProps) =>
     SignupQueryParams,
     SignupDTO,
     void
-  >("POST", `/signup`, { base: "/gateway/ng/api", ...props });
+  >("POST", `/signup`, props);

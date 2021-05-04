@@ -102,7 +102,7 @@ const SignIn: React.FC = () => {
           </div>
           {showCaptcha ? (
             <Recaptcha
-              sitekey={window.captchaToken}
+              sitekey={window.captchaToken || ""}
               render="explicit"
               ref={captchaRef}
               verifyCallback={(_captchaResponse: string) => {

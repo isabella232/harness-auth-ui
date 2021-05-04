@@ -62,13 +62,14 @@ export function handleLoginSuccess(resource?: User): void {
       (account) => account.uuid === resource.defaultAccountId
     )?.defaultExperience;
 
+    const baseUrl = window.location.pathname.replace("auth/", "");
     switch (experience) {
       case "NG":
-        window.location.href = `/ng/#/account/${resource.defaultAccountId}/projects`;
+        window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/projects`;
         return;
       case "CG":
       default:
-        window.location.href = `/#/account/${resource.defaultAccountId}/dashboard`;
+        window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/dashboard`;
         return;
     }
   } else {

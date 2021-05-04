@@ -14,7 +14,8 @@
     "serve": "vite preview",
     "services-portal": "restful-react import --config restful-react.config.js portal",
     "services-ng": "restful-react import --config restful-react.config.js ng",
-    "postservices": "prettier --write src/services/portal/index.tsx",
+    "postservices-portal": "prettier --write src/services/portal/index.tsx",
+    "postservices-ng": "prettier --write src/services/ng/index.tsx",
     "typecheck": "tsc",
     "docker": "sh -c 'docker build -t us.gcr.io/platform-205701/harness/ng-auth-ui:\"$0\" . && docker push us.gcr.io/platform-205701/harness/ng-auth-ui:\"$0\"'"
   },
@@ -94,7 +95,8 @@
   "lint-staged": {
     "*.{js,ts,tsx}": [
       "eslint",
-      "prettier --check"
+      "prettier --check",
+      "sh scripts/typecheck-staged.sh"
     ]
   },
   "resolutions": {

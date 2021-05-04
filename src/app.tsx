@@ -14,7 +14,9 @@ import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 
 export function App() {
   return (
-    <RestfulProvider base="/">
+    <RestfulProvider
+      base={window.location.pathname.replace("auth/", "") + "gateway/api/"}
+    >
       <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
         <Route path={routes.toLocalLogin()} component={LocalLogin} />

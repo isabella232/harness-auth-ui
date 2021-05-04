@@ -19790,7 +19790,6 @@ export const Login = (props: LoginProps) => (
   <Mutate<RestResponseUser, unknown, LoginQueryParams, LoginRequest, void>
     verb="POST"
     path={`/users/login`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19810,7 +19809,7 @@ export const useLogin = (props: UseLoginProps) =>
   useMutate<RestResponseUser, unknown, LoginQueryParams, LoginRequest, void>(
     "POST",
     `/users/login`,
-    { base: "/gateway/api", ...props }
+    props
   );
 
 export interface GetLoginTypeQueryParams {
@@ -19838,7 +19837,6 @@ export const GetLoginType = (props: GetLoginTypeProps) => (
   >
     verb="POST"
     path={`/users/logintype`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19861,7 +19859,7 @@ export const useGetLoginType = (props: UseGetLoginTypeProps) =>
     GetLoginTypeQueryParams,
     LoginTypeRequest,
     void
-  >("POST", `/users/logintype`, { base: "/gateway/api", ...props });
+  >("POST", `/users/logintype`, props);
 
 export type ResetPasswordProps = Omit<
   MutateProps<RestResponse, unknown, void, ResetPasswordRequest, void>,
@@ -19872,7 +19870,6 @@ export const ResetPassword = (props: ResetPasswordProps) => (
   <Mutate<RestResponse, unknown, void, ResetPasswordRequest, void>
     verb="POST"
     path={`/users/reset-password`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19886,7 +19883,7 @@ export const useResetPassword = (props: UseResetPasswordProps) =>
   useMutate<RestResponse, unknown, void, ResetPasswordRequest, void>(
     "POST",
     `/users/reset-password`,
-    { base: "/gateway/api", ...props }
+    props
   );
 
 export interface UpdatePasswordPathParams {
@@ -19915,7 +19912,6 @@ export const UpdatePassword = ({ token, ...props }: UpdatePasswordProps) => (
   >
     verb="POST"
     path={`/users/reset-password/${token}`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19946,7 +19942,7 @@ export const useUpdatePassword = ({
     "POST",
     (paramsInPath: UpdatePasswordPathParams) =>
       `/users/reset-password/${paramsInPath.token}`,
-    { base: "/gateway/api", pathParams: { token }, ...props }
+    { pathParams: { token }, ...props }
   );
 
 export type ForceLoginUsingHarnessPasswordProps = Omit<
@@ -19960,7 +19956,6 @@ export const ForceLoginUsingHarnessPassword = (
   <Mutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>
     verb="POST"
     path={`/users/harness-local-login`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -19982,7 +19977,7 @@ export const useForceLoginUsingHarnessPassword = (
   useMutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>(
     "POST",
     `/users/harness-local-login`,
-    { base: "/gateway/api", ...props }
+    props
   );
 
 export type TwoFactorLoginProps = Omit<
@@ -19994,7 +19989,6 @@ export const TwoFactorLogin = (props: TwoFactorLoginProps) => (
   <Mutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>
     verb="POST"
     path={`/users/two-factor-login`}
-    base={"/gateway/api"}
     {...props}
   />
 );
@@ -20014,5 +20008,5 @@ export const useTwoFactorLogin = (props: UseTwoFactorLoginProps) =>
   useMutate<RestResponseUser, unknown, void, LoginRequestRequestBody, void>(
     "POST",
     `/users/two-factor-login`,
-    { base: "/gateway/api", ...props }
+    props
   );
