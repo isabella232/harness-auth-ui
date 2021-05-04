@@ -24,35 +24,54 @@ interface AuthFooterProps {
 const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
   const history = useHistory();
 
+  const isSignup = page === AuthPage.SignUp;
+
+  function getSignupQueryParams() {
+    const queryString = window.location.hash?.split("?")?.[1];
+    const urlParams = new URLSearchParams(queryString);
+    const module = urlParams?.get("module");
+    const moduleParam = module ? `&module=${module}` : "";
+
+    return `&action=signup&isNG=true${moduleParam}`;
+  }
+
+  function getOAuthLink(
+    isOauthSignup: boolean,
+    oAuthProvider: OAuthProviderType
+  ) {
+    const { iconName, type, url } = oAuthProvider;
+    const link = `${URLS.OAUTH}api/users/${url}${
+      isOauthSignup ? getSignupQueryParams() : ""
+    }`;
+
+    return (
+      <a
+        className={css.iconContainer}
+        key={type}
+        href={link}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <Icon name={iconName} size={24} />
+      </a>
+    );
+  }
+
   return (
     <>
       <h2 className={css.lineMessage}>
         <span className={css.message}>
-          {page === AuthPage.SignUp ? "or sign up with" : "or login with"}
+          {isSignup ? "or sign up with" : "or login with"}
         </span>
       </h2>
 
       <div>
         <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
-          {OAuthProviders.map((oAuthProvider: OAuthProviderType) => {
-            const { iconName, type, url } = oAuthProvider;
-
-            const link = `${URLS.OAUTH}api/users/${url}`;
-
-            return (
-              <a
-                className={css.iconContainer}
-                key={type}
-                href={link}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <Icon name={iconName} size={24} />
-              </a>
-            );
-          })}
+          {OAuthProviders.map((oAuthProvider: OAuthProviderType) =>
+            getOAuthLink(isSignup, oAuthProvider)
+          )}
         </div>
-        {page === AuthPage.SignUp ? (
+        {isSignup ? (
           <div className={css.disclaimer}>
             By signing up you agree to our&nbsp;
             <a
