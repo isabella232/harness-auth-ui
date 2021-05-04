@@ -68,6 +68,7 @@ exports[`SignUp render 1`] = `
             <div
               class="g-recaptcha"
               data-badge="bottomright"
+              data-sitekey=""
               data-size="invisible"
               data-tabindex="0"
               data-theme="light"
