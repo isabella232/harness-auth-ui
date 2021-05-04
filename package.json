@@ -14,6 +14,7 @@
     "serve": "vite preview",
     "services-portal": "restful-react import --config restful-react.config.js portal",
     "services-ng": "restful-react import --config restful-react.config.js ng",
+    "services": "yarn services-portal && yarn services-ng",
     "postservices-portal": "prettier --write src/services/portal/index.tsx",
     "postservices-ng": "prettier --write src/services/ng/index.tsx",
     "typecheck": "tsc",

@@ -8465,6 +8465,7 @@ export const Signup = (props: SignupProps) => (
   >
     verb="POST"
     path={`/signup`}
+    base={window.location.pathname.replace("auth/", "") + "gateway/ng/api"}
     {...props}
   />
 );
@@ -8487,4 +8488,7 @@ export const useSignup = (props: UseSignupProps) =>
     SignupQueryParams,
     SignupDTO,
     void
-  >("POST", `/signup`, props);
+  >("POST", `/signup`, {
+    base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
+    ...props
+  });
