@@ -11,7 +11,7 @@ module.exports = {
     validation: false,
     transformer: "scripts/swagger-transform.js",
     customProps: {
-      base: `{'/gateway/api'}`
+      base: `{window.location.pathname.replace("auth/", "") + 'gateway/api'}`
     }
   },
   ng: {
@@ -20,7 +20,7 @@ module.exports = {
     validation: false,
     transformer: "scripts/swagger-transform.js",
     customProps: {
-      base: `{'/gateway/ng/api'}`
+      base: `{window.location.pathname.replace("auth/", "") + 'gateway/ng/api'}`
     }
   }
 };
