@@ -4,6 +4,8 @@ function saml(): void {
   const queryString = window.location.search;
   const queryParams = new URLSearchParams(queryString);
 
+  const baseUrl = window.location.pathname.replace("auth/", "");
+
   if (queryParams.get("isTwoFactorEnabled") === "true") {
     secureStorage.setItem(
       "twoFactorJwtToken",
@@ -27,22 +29,24 @@ function saml(): void {
       if (isNG) {
         const module = queryParams.get("module");
 
-        const base = `/ng/#/account/${accountId}`;
+        const base = `${baseUrl}ng/#/account/${accountId}`;
 
         const completeLink = module
           ? `${base}/${module}/home/trial`
           : `${base}/purpose`;
 
         window.location.href = completeLink;
+
+        return;
       } else {
         const defaultExperience = queryParams.get("defaultExperience");
         switch (defaultExperience) {
           case "NG":
-            window.location.href = `/ng/#/account/${accountId}/projects`;
+            window.location.href = `${baseUrl}ng/#/account/${accountId}/projects`;
             return;
           case "CG":
           default:
-            window.location.href = `/#/account/${accountId}/dashboard`;
+            window.location.href = `${baseUrl}#/account/${accountId}/dashboard`;
             return;
         }
       }
