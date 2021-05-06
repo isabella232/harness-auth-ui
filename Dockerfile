@@ -16,4 +16,5 @@ USER 101
 EXPOSE 8080
 
 CMD sed -i "s|<\!-- captchaToken -->|<script>window.captchaToken = '$CAPTCHA_TOKEN'</script>|" index.html && \
+  sed -i "s|<\!-- invisibleCaptchaToken -->|<script>window.invisibleCaptchaToken = '$INVISIBLE_CAPTCHA_TOKEN'</script>|" index.html && \
   nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
