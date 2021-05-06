@@ -4,14 +4,16 @@ function saml(): void {
   const queryString = window.location.search;
   const queryParams = new URLSearchParams(queryString);
 
-  const baseUrl = window.location.pathname.replace("auth/", "");
+  const baseUrl = window.location.pathname
+    .replace("auth/", "")
+    .replace("saml.html", "");
 
   if (queryParams.get("isTwoFactorEnabled") === "true") {
     secureStorage.setItem(
       "twoFactorJwtToken",
       queryParams.get("twoFactorJWTToken")
     );
-    window.location.href = "/auth/#/two-factor-login";
+    window.location.href = "/auth/#/two-factor-auth";
     return;
   } else {
     const accountId = queryParams.get("accountId");

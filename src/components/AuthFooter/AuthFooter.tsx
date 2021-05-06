@@ -45,13 +45,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
     }`;
 
     return (
-      <a
-        className={css.iconContainer}
-        key={type}
-        href={link}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
+      <a className={css.iconContainer} key={type} href={link}>
         <Icon name={iconName} size={24} />
       </a>
     );
