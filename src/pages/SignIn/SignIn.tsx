@@ -113,7 +113,7 @@ const SignIn: React.FC = () => {
           ) : null}
           <input
             type="submit"
-            value={loading ? "Signing In ..." : "Sign In"}
+            value={loading ? "Signing in..." : "Sign In"}
             className="button primary"
             disabled={loading || (showCaptcha && !captchaReponse)}
           />

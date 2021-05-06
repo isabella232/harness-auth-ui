@@ -94,8 +94,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
@@ -106,8 +104,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
@@ -118,8 +114,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
@@ -130,8 +124,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
@@ -142,8 +134,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
@@ -154,8 +144,6 @@ exports[`SignIn render 1`] = `
               <a
                 class="iconContainer"
                 href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
-                rel="noopener noreferrer"
-                target="_blank"
               >
                 <img
                   height="24"
