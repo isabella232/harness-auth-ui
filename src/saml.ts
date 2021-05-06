@@ -4,7 +4,9 @@ function saml(): void {
   const queryString = window.location.search;
   const queryParams = new URLSearchParams(queryString);
 
-  const baseUrl = window.location.pathname.replace("auth/", "");
+  const baseUrl = window.location.pathname
+    .replace("auth/", "")
+    .replace("saml.html", "");
 
   if (queryParams.get("isTwoFactorEnabled") === "true") {
     secureStorage.setItem(
