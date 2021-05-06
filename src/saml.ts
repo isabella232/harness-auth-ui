@@ -13,7 +13,7 @@ function saml(): void {
       "twoFactorJwtToken",
       queryParams.get("twoFactorJWTToken")
     );
-    window.location.href = "/auth/#/two-factor-login";
+    window.location.href = "/auth/#/two-factor-auth";
     return;
   } else {
     const accountId = queryParams.get("accountId");
