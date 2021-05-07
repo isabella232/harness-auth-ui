@@ -1,6 +1,7 @@
 import React from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -33,7 +34,11 @@ const TwoFactorAuth: React.FC = () => {
       const response = await login(formatJWTHeader(formData.authCode));
       handleLoginSuccess(response?.resource);
     } catch (err) {
-      handleError(err);
+      if (err.status === 401) {
+        toast("Invalid Authentication Code");
+      } else {
+        handleError(err);
+      }
     }
   };
 
