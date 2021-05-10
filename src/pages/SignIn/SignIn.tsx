@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -30,6 +31,25 @@ const SignIn: React.FC = () => {
     queryParams: { captcha: captchaReponse }
   });
   const captchaRef = useRef<Recaptcha>(null);
+  const queryString = window.location.hash?.split("?")?.[1];
+  const urlParams = new URLSearchParams(queryString);
+
+  useEffect(() => {
+    const errorCode = urlParams.get("errorCode");
+    switch (errorCode) {
+      case "GATEWAY_SSO_REDIRECT_ERROR":
+        toast.error(
+          "Can't log in the user using OAuth as it's not configured with OAuth authentication."
+        );
+        return;
+      case "unauth":
+        toast.error("Current IP Address is not whitelisted.");
+        return;
+      case "invalidsso":
+        toast.error("Invalid SSO Login.");
+        return;
+    }
+  }, [queryString]);
 
   const handleLogin = async (formData: LoginFormData) => {
     try {
