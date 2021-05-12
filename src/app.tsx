@@ -15,6 +15,7 @@ import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 export function App() {
   return (
     <RestfulProvider base="/">
+      <Toaster />
       <HashRouter>
         <Route path={routes.toSignIn()} component={SignIn} />
         <Route path={routes.toLocalLogin()} component={LocalLogin} />
@@ -27,7 +28,6 @@ export function App() {
           <Redirect to={routes.toSignIn()} />
         </Route>
       </HashRouter>
-      <Toaster />
     </RestfulProvider>
   );
 }
