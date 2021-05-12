@@ -39,7 +39,7 @@ const SignIn: React.FC = () => {
     switch (errorCode) {
       case "GATEWAY_SSO_REDIRECT_ERROR":
         toast.error(
-          "Can't log in the user using OAuth as it's not configured with OAuth authentication."
+          "Unable to sign-in using OAuth because the account is not configured with OAuth authentication."
         );
         return;
       case "unauth":
@@ -49,7 +49,7 @@ const SignIn: React.FC = () => {
         toast.error("Invalid SSO Login.");
         return;
     }
-  }, [queryString]);
+  }, []);
 
   const handleLogin = async (formData: LoginFormData) => {
     try {
