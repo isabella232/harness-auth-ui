@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Mutate, MutateProps, useMutate, UseMutateProps } from "restful-react";
-export const SPEC_VERSION = "0.0.1";
+export const SPEC_VERSION = "0.0.2";
 export interface ResponseMessage {
   code?:
     | "DEFAULT_ERROR_CODE"
@@ -29,6 +29,7 @@ export interface ResponseMessage {
     | "EXPIRED_TOKEN"
     | "TOKEN_ALREADY_REFRESHED_ONCE"
     | "ACCESS_DENIED"
+    | "NG_ACCESS_DENIED"
     | "INVALID_CREDENTIAL"
     | "INVALID_KEY"
     | "INVALID_KEYPATH"
@@ -118,6 +119,8 @@ export interface ResponseMessage {
     | "AWS_ACCESS_DENIED"
     | "AWS_CLUSTER_NOT_FOUND"
     | "AWS_SERVICE_NOT_FOUND"
+    | "IMAGE_NOT_FOUND"
+    | "IMAGE_TAG_NOT_FOUND"
     | "INVALID_YAML_PAYLOAD"
     | "UNRECOGNIZED_YAML_FIELDS"
     | "COULD_NOT_MAP_BEFORE_YAML"
@@ -178,6 +181,7 @@ export interface ResponseMessage {
     | "INCORRECT_SIGN_IN_MECHANISM"
     | "OAUTH_LOGIN_FAILED"
     | "INVALID_TERRAFORM_TARGETS_REQUEST"
+    | "TERRAFORM_EXECUTION_ERROR"
     | "FILE_READ_FAILED"
     | "FILE_SIZE_EXCEEDS_LIMIT"
     | "CLUSTER_NOT_FOUND"
@@ -247,11 +251,31 @@ export interface ResponseMessage {
     | "INSTANCE_STATS_AGGREGATION_ERROR"
     | "UNRESOLVED_EXPRESSIONS_ERROR"
     | "KRYO_HANDLER_NOT_FOUND_ERROR"
-    | "DELEGATE_ERROR_HANDLER_ERROR"
-    | "UNEXPECTED_TYPE_ERROR";
+    | "DELEGATE_ERROR_HANDLER_EXCEPTION"
+    | "UNEXPECTED_TYPE_ERROR"
+    | "EXCEPTION_HANDLER_NOT_FOUND"
+    | "CONNECTOR_NOT_FOUND_EXCEPTION"
+    | "GCP_SERVER_ERROR"
+    | "HTTP_RESPONSE_EXCEPTION"
+    | "SCM_NOT_FOUND_ERROR"
+    | "SCM_CONFLICT_ERROR"
+    | "SCM_UNPROCESSABLE_ENTITY"
+    | "SCM_UNAUTHORIZED"
+    | "DATA"
+    | "CONTEXT";
   level?: "INFO" | "ERROR";
   message?: string;
   exception?: Throwable;
+  failureTypes?: (
+    | "EXPIRED"
+    | "DELEGATE_PROVISIONING"
+    | "CONNECTIVITY"
+    | "AUTHENTICATION"
+    | "VERIFICATION_FAILURE"
+    | "APPLICATION_ERROR"
+    | "AUTHORIZATION_ERROR"
+    | "TIMEOUT_ERROR"
+  )[];
 }
 
 export interface RestResponse {
@@ -286,6 +310,98 @@ export interface Throwable {
   suppressed?: Throwable[];
 }
 
+export interface DelegateConnectionDetails {
+  uuid?: string;
+  version?: string;
+  lastHeartbeat?: number;
+}
+
+export interface DelegateGroupDetails {
+  delegateType?: string;
+  groupName?: string;
+  groupHostName?: string;
+  groupImplicitSelectors?: {
+    [key: string]:
+      | "PROFILE_NAME"
+      | "DELEGATE_NAME"
+      | "HOST_NAME"
+      | "GROUP_NAME"
+      | "PROFILE_SELECTORS";
+  };
+  delegateInsightsDetails?: DelegateInsightsDetails;
+  lastHeartBeat?: number;
+  activelyConnected?: boolean;
+  delegateReplicas?: number;
+  delegateInstanceDetails?: DelegateInner[];
+}
+
+export interface DelegateGroupListing {
+  delegateGroupDetails?: DelegateGroupDetails[];
+}
+
+export interface DelegateInner {
+  uuid?: string;
+  ip?: string;
+  hostName?: string;
+  delegateName?: string;
+  delegateGroupName?: string;
+  description?: string;
+  status?: "ENABLED" | "WAITING_FOR_APPROVAL" | "DISABLED" | "DELETED";
+  lastHeartBeat?: number;
+  activelyConnected?: boolean;
+  delegateProfileId?: string;
+  delegateType?: string;
+  polllingModeEnabled?: boolean;
+  proxy?: boolean;
+  ceEnabled?: boolean;
+  includeScopes?: DelegateScope[];
+  excludeScopes?: DelegateScope[];
+  tags?: string[];
+  implicitSelectors?: {
+    [key: string]:
+      | "PROFILE_NAME"
+      | "DELEGATE_NAME"
+      | "HOST_NAME"
+      | "GROUP_NAME"
+      | "PROFILE_SELECTORS";
+  };
+  profileExecutedAt?: number;
+  profileError?: boolean;
+  sampleDelegate?: boolean;
+  connections?: DelegateConnectionDetails[];
+}
+
+export interface DelegateInsightsBarDetails {
+  timeStamp?: number;
+  counts?: PairDelegateInsightsTypeLong[];
+}
+
+export interface DelegateInsightsDetails {
+  insights?: DelegateInsightsBarDetails[];
+}
+
+export interface Pair {
+  value?: { [key: string]: any };
+  key?: { [key: string]: any };
+  left?: { [key: string]: any };
+  right?: { [key: string]: any };
+}
+
+export interface PairDelegateInsightsTypeLong {
+  value?: number;
+  key?: "SUCCESSFUL" | "FAILED" | "IN_PROGRESS" | "PERPETUAL_TASK_ASSIGNED";
+  left?: "SUCCESSFUL" | "FAILED" | "IN_PROGRESS" | "PERPETUAL_TASK_ASSIGNED";
+  right?: number;
+}
+
+export interface RestResponseDelegateGroupListing {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: DelegateGroupListing;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface DelegateResponseData {
   [key: string]: any;
 }
@@ -294,6 +410,97 @@ export interface DelegateTaskResponse {
   accountId?: string;
   response?: DelegateResponseData;
   responseCode?: "OK" | "FAILED" | "RETRY_ON_OTHER_DELEGATE";
+}
+
+export interface DelegateTokenDetails {
+  uuid?: string;
+  accountId?: string;
+  name?: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  status?: "ACTIVE" | "REVOKED";
+  value?: string;
+}
+
+export interface EmbeddedUser {
+  uuid?: string;
+  name?: string;
+  email?: string;
+}
+
+export interface RestResponseListDelegateTokenDetails {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: DelegateTokenDetails[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseDelegateTokenDetails {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: DelegateTokenDetails;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseVoid {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: Void;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface Void {
+  [key: string]: any;
+}
+
+export interface RestResponseBoolean {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: boolean;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface AccessRequest {
+  uuid: string;
+  createdAt?: number;
+  lastUpdatedAt: number;
+  accountId: string;
+  accessType: "GROUP_ACCESS" | "MEMBER_ACCESS";
+  harnessUserGroupId?: string;
+  memberIds?: string[];
+  accessStartAt?: number;
+  accessEndAt?: number;
+  accessActive?: boolean;
+  nextIteration?: number;
+}
+
+export interface RestResponseAccessRequest {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AccessRequest;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface AccessRequestDTO {
+  accountId?: string;
+  harnessUserGroupId?: string;
+  emailIds?: string[];
+  accessStartAt?: number;
+  accessEndAt?: number;
+  hours?: number;
+}
+
+export interface RestResponseListAccessRequest {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AccessRequest[];
+  responseMessages?: ResponseMessage[];
 }
 
 export interface ImportStatus {
@@ -335,6 +542,7 @@ export interface Account {
   forImport?: boolean;
   migratedToClusterUrl?: string;
   defaultExperience?: "NG" | "CG";
+  createdFromNG?: boolean;
   localEncryptionEnabled?: boolean;
   delegateConfiguration?: DelegateConfiguration;
   techStacks?: TechStack[];
@@ -387,12 +595,6 @@ export interface DelegateConfiguration {
   delegateVersions?: string[];
 }
 
-export interface EmbeddedUser {
-  uuid?: string;
-  name?: string;
-  email?: string;
-}
-
 export interface LicenseInfo {
   accountType?: string;
   accountStatus?: string;
@@ -400,11 +602,11 @@ export interface LicenseInfo {
   licenseUnits?: number;
 }
 
-export interface RestResponseAccount {
+export interface RestResponsePageResponseAccount {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: Account;
+  resource?: Account[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -418,22 +620,6 @@ export interface TrialSignupOptions {
   assistedOption?: boolean;
 }
 
-export interface RestResponsePageResponseAccount {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: Account[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseBoolean {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: boolean;
-  responseMessages?: ResponseMessage[];
-}
-
 export interface RestResponseSetString {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -442,8 +628,29 @@ export interface RestResponseSetString {
   responseMessages?: ResponseMessage[];
 }
 
+export interface RestResponseAccount {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: Account;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface SubdomainUrl {
   url?: string;
+}
+
+export interface LicenseUpdateInfo {
+  licenseInfo: LicenseInfo;
+  requiredInfoToComply?: {
+    [key: string]: {
+      [key: string]: { [key: string]: any };
+    };
+  };
+}
+
+export interface AccountSalesContactsInfo {
+  salesContacts?: string[];
 }
 
 export interface Activity {
@@ -513,7 +720,8 @@ export interface Activity {
     | "AZURE_APP_SERVICE_SLOT_SWAP"
     | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES"
     | "AZURE_ARM_DEPLOYMENT"
-    | "AZURE_BLUEPRINT_DEPLOYMENT";
+    | "AZURE_BLUEPRINT_DEPLOYMENT"
+    | "TERRAGRUNT_PROVISION";
   logPurged?: boolean;
   artifactStreamId?: string;
   artifactStreamName?: string;
@@ -774,6 +982,9 @@ export interface CVConfiguration {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -867,7 +1078,8 @@ export interface Command {
     | "AZURE_VMSS_DUMMY"
     | "AZURE_WEBAPP"
     | "FETCH_INSTANCES_DUMMY"
-    | "AZURE_ARM";
+    | "AZURE_ARM"
+    | "TERRAGRUNT_PROVISION";
   commandExecutionStatus?:
     | "SUCCESS"
     | "FAILURE"
@@ -920,6 +1132,7 @@ export interface Command {
 
 export interface CommandUnit {
   name?: string;
+  variables?: Variable[];
   commandUnitType?:
     | "EXEC"
     | "SCP"
@@ -948,7 +1161,8 @@ export interface CommandUnit {
     | "AZURE_VMSS_DUMMY"
     | "AZURE_WEBAPP"
     | "FETCH_INSTANCES_DUMMY"
-    | "AZURE_ARM";
+    | "AZURE_ARM"
+    | "TERRAGRUNT_PROVISION";
   commandExecutionStatus?:
     | "SUCCESS"
     | "FAILURE"
@@ -957,7 +1171,6 @@ export interface CommandUnit {
     | "SKIPPED";
   artifactNeeded?: boolean;
   deploymentType?: string;
-  variables?: Variable[];
 }
 
 export interface ConfigFile {
@@ -1212,6 +1425,7 @@ export interface ContextElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -1676,6 +1890,7 @@ export interface HostElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -1835,6 +2050,7 @@ export interface InstanceElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -1941,8 +2157,6 @@ export interface PcfInstanceElement {
   instanceIndex?: string;
   displayName?: string;
   name?: string;
-  upsize?: boolean;
-  newInstance?: boolean;
   elementType?:
     | "SERVICE"
     | "INFRAMAPPING"
@@ -1979,10 +2193,13 @@ export interface PcfInstanceElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
     | "MANIFEST_VARIABLE";
+  newInstance?: boolean;
+  upsize?: boolean;
 }
 
 export interface Placement {
@@ -2070,8 +2287,8 @@ export interface Service {
   tagLinks?: HarnessTagLink[];
   deploymentTypeTemplateId?: string;
   customDeploymentName?: string;
-  pcfV2?: boolean;
   k8sV2?: boolean;
+  pcfV2?: boolean;
 }
 
 export interface ServiceCommand {
@@ -2136,6 +2353,7 @@ export interface ServiceElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -2182,6 +2400,7 @@ export interface ServiceTemplateElement {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -2472,21 +2691,25 @@ export interface RestResponseListProvisionStep {
   responseMessages?: ResponseMessage[];
 }
 
+export interface AccountDetails {
+  accountId?: string;
+  accountName?: string;
+  companyName?: string;
+  cluster?: string;
+  licenseInfo?: LicenseInfo;
+  ceLicenseInfo?: CeLicenseInfo;
+}
+
+export interface RestResponseAccountDetails {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AccountDetails;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface ServiceGuardLimitDTO {
   serviceGuardLimit?: number;
-}
-
-export interface LicenseUpdateInfo {
-  licenseInfo: LicenseInfo;
-  requiredInfoToComply?: {
-    [key: string]: {
-      [key: string]: { [key: string]: any };
-    };
-  };
-}
-
-export interface AccountSalesContactsInfo {
-  salesContacts?: string[];
 }
 
 export interface RestResponseActivity {
@@ -2627,7 +2850,8 @@ export interface CommandUnitDetails {
     | "AZURE_APP_SERVICE_SLOT_SWAP"
     | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES"
     | "AZURE_ARM_DEPLOYMENT"
-    | "AZURE_BLUEPRINT_DEPLOYMENT";
+    | "AZURE_BLUEPRINT_DEPLOYMENT"
+    | "TERRAGRUNT_PROVISION";
   variables?: Variable[];
 }
 
@@ -2768,6 +2992,7 @@ export interface AccountPermissions {
     | "MANAGE_CONFIG_AS_CODE"
     | "MANAGE_SECRETS"
     | "MANAGE_SECRET_MANAGERS"
+    | "MANAGE_SSH_AND_WINRM"
     | "MANAGE_AUTHENTICATION_SETTINGS"
     | "MANAGE_USER_AND_USER_GROUPS_AND_API_KEYS"
     | "VIEW_USER_AND_USER_GROUPS_AND_API_KEYS"
@@ -2828,6 +3053,7 @@ export interface AppPermission {
     | "MANAGE_CONFIG_AS_CODE"
     | "MANAGE_SECRETS"
     | "MANAGE_SECRET_MANAGERS"
+    | "MANAGE_SSH_AND_WINRM"
     | "MANAGE_AUTHENTICATION_SETTINGS"
     | "MANAGE_USER_AND_USER_GROUPS_AND_API_KEYS"
     | "VIEW_USER_AND_USER_GROUPS_AND_API_KEYS"
@@ -2850,6 +3076,7 @@ export interface AppPermission {
     | "EXECUTE"
     | "EXECUTE_WORKFLOW"
     | "EXECUTE_PIPELINE"
+    | "EXECUTE_WORKFLOW_ROLLBACK"
     | "DEFAULT"
   )[];
 }
@@ -2972,18 +3199,6 @@ export type WorkflowFilter = Filter & {
   filterTypes?: string[];
 };
 
-export interface RestResponseVoid {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: Void;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface Void {
-  [key: string]: any;
-}
-
 export interface RestResponsePageResponseApiKeyEntry {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -3045,6 +3260,7 @@ export interface Application {
     [key: string]: string;
   };
   sample?: boolean;
+  isManualTriggerAuthorized?: boolean;
   tagLinks?: HarnessTagLink[];
 }
 
@@ -3148,13 +3364,13 @@ export interface Artifact {
   buildIdentity?: string;
   key?: string;
   fileName?: string;
-  duplicate?: boolean;
+  url?: string;
   bucketName?: string;
+  buildNo?: string;
+  artifactPath?: string;
+  duplicate?: boolean;
   buildFullDisplayName?: string;
   artifactFileSize?: number;
-  buildNo?: string;
-  url?: string;
-  artifactPath?: string;
 }
 
 export interface ArtifactFile {
@@ -3533,6 +3749,7 @@ export type CustomOrchestrationWorkflow = OrchestrationWorkflow & {
 export interface CustomSourceConfig {
   script?: string;
   path?: string;
+  delegateSelectors?: string[];
 }
 
 export interface DelegateMetaInfo {
@@ -3662,6 +3879,7 @@ export interface FailureStrategy {
     | "VERIFICATION_FAILURE"
     | "APPLICATION_ERROR"
     | "AUTHORIZATION_ERROR"
+    | "TIMEOUT_ERROR"
   )[];
   executionScope?: "WORKFLOW" | "WORKFLOW_PHASE";
   repairActionCode?:
@@ -3876,7 +4094,6 @@ export interface InfrastructureMapping {
   infrastructureDefinitionId?: string;
   sample?: boolean;
   customDeploymentTemplateId?: string;
-  hostConnectionAttrs?: string;
   settingType?:
     | "HOST_CONNECTION_ATTRIBUTES"
     | "BASTION_HOST_CONNECTION_ATTRIBUTES"
@@ -3950,6 +4167,7 @@ export interface InfrastructureMapping {
     | "KUBERNETES_CLUSTER_NG"
     | "GIT_NG"
     | "GCP_SECRETS_MANAGER";
+  hostConnectionAttrs?: string;
 }
 
 export interface InstanceExecutionHistory {
@@ -3980,6 +4198,7 @@ export interface InstanceExecutionHistory {
     | "EXPIRED_TOKEN"
     | "TOKEN_ALREADY_REFRESHED_ONCE"
     | "ACCESS_DENIED"
+    | "NG_ACCESS_DENIED"
     | "INVALID_CREDENTIAL"
     | "INVALID_KEY"
     | "INVALID_KEYPATH"
@@ -4069,6 +4288,8 @@ export interface InstanceExecutionHistory {
     | "AWS_ACCESS_DENIED"
     | "AWS_CLUSTER_NOT_FOUND"
     | "AWS_SERVICE_NOT_FOUND"
+    | "IMAGE_NOT_FOUND"
+    | "IMAGE_TAG_NOT_FOUND"
     | "INVALID_YAML_PAYLOAD"
     | "UNRECOGNIZED_YAML_FIELDS"
     | "COULD_NOT_MAP_BEFORE_YAML"
@@ -4129,6 +4350,7 @@ export interface InstanceExecutionHistory {
     | "INCORRECT_SIGN_IN_MECHANISM"
     | "OAUTH_LOGIN_FAILED"
     | "INVALID_TERRAFORM_TARGETS_REQUEST"
+    | "TERRAFORM_EXECUTION_ERROR"
     | "FILE_READ_FAILED"
     | "FILE_SIZE_EXCEEDS_LIMIT"
     | "CLUSTER_NOT_FOUND"
@@ -4198,8 +4420,18 @@ export interface InstanceExecutionHistory {
     | "INSTANCE_STATS_AGGREGATION_ERROR"
     | "UNRESOLVED_EXPRESSIONS_ERROR"
     | "KRYO_HANDLER_NOT_FOUND_ERROR"
-    | "DELEGATE_ERROR_HANDLER_ERROR"
-    | "UNEXPECTED_TYPE_ERROR";
+    | "DELEGATE_ERROR_HANDLER_EXCEPTION"
+    | "UNEXPECTED_TYPE_ERROR"
+    | "EXCEPTION_HANDLER_NOT_FOUND"
+    | "CONNECTOR_NOT_FOUND_EXCEPTION"
+    | "GCP_SERVER_ERROR"
+    | "HTTP_RESPONSE_EXCEPTION"
+    | "SCM_NOT_FOUND_ERROR"
+    | "SCM_CONFLICT_ERROR"
+    | "SCM_UNPROCESSABLE_ENTITY"
+    | "SCM_UNAUTHORIZED"
+    | "DATA"
+    | "CONTEXT";
   executionInterruptType?:
     | "ABORT"
     | "ABORT_ALL"
@@ -4685,6 +4917,7 @@ export interface Permission {
     | "EXECUTE"
     | "EXECUTE_WORKFLOW"
     | "EXECUTE_PIPELINE"
+    | "EXECUTE_WORKFLOW_ROLLBACK"
     | "DEFAULT";
   envId?: string;
   appId?: string;
@@ -4722,6 +4955,7 @@ export interface Permission {
     | "MANAGE_CONFIG_AS_CODE"
     | "MANAGE_SECRETS"
     | "MANAGE_SECRET_MANAGERS"
+    | "MANAGE_SSH_AND_WINRM"
     | "MANAGE_AUTHENTICATION_SETTINGS"
     | "MANAGE_USER_AND_USER_GROUPS_AND_API_KEYS"
     | "VIEW_USER_AND_USER_GROUPS_AND_API_KEYS"
@@ -4994,6 +5228,7 @@ export interface PipelineStageExecution {
   triggeredBy?: EmbeddedUser;
   disableAssertionInspection?: StateInspection;
   skipCondition?: string;
+  needsInputButNotReceivedYet?: boolean;
 }
 
 export interface PipelineSummary {
@@ -5227,6 +5462,7 @@ export interface State {
     | "SHELL_SCRIPT_PROVISION"
     | "K8S"
     | "TERRAFORM_INHERIT_PLAN"
+    | "TERRAGRUNT_INHERIT_PLAN"
     | "AZURE_VMSS_SETUP"
     | "AZURE_WEBAPP_SETUP"
     | "HELM_CHART"
@@ -5562,6 +5798,7 @@ export interface WorkflowExecution {
   nextIteration?: number;
   tags?: NameValuePair[];
   message?: string;
+  failureDetails?: string;
   validUntil?: string;
   baseline?: boolean;
 }
@@ -5820,12 +6057,15 @@ export interface RestResponseListAppDynamicsApplication {
 }
 
 export type AppDynamicsConnectorDTO = ConnectorConfigDTO & {
-  username: string;
+  username?: string;
   accountname: string;
   controllerUrl: string;
   accountId: string;
   delegateSelectors?: string[];
-  passwordRef: string;
+  passwordRef?: string;
+  clientSecretRef?: string;
+  clientId?: string;
+  authType?: "UsernamePassword" | "ApiClientToken";
 };
 
 export interface NewRelicApplication {
@@ -6019,6 +6259,9 @@ export interface AppdynamicsSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -6120,6 +6363,8 @@ export interface MetricDefinitionDTO {
   type?: "INFRA" | "RESP_TIME" | "THROUGHPUT" | "ERROR" | "APDEX" | "OTHER";
   path?: string;
   validationPath?: string;
+  responseJsonPath?: string;
+  validationResponseJsonPath?: string;
   thresholds?: TimeSeriesThresholdDTO[];
   included?: boolean;
 }
@@ -6129,7 +6374,12 @@ export interface MetricPackDTO {
   accountId?: string;
   orgIdentifier?: string;
   projectIdentifier?: string;
-  dataSourceType?: "APP_DYNAMICS" | "SPLUNK" | "STACKDRIVER" | "KUBERNETES";
+  dataSourceType?:
+    | "APP_DYNAMICS"
+    | "SPLUNK"
+    | "STACKDRIVER"
+    | "KUBERNETES"
+    | "NEW_RELIC";
   identifier?: string;
   category?: "PERFORMANCE" | "ERRORS" | "INFRASTRUCTURE";
   metrics?: MetricDefinitionDTO[];
@@ -6150,7 +6400,12 @@ export interface TimeSeriesThresholdDTO {
   accountId?: string;
   orgIdentifier?: string;
   projectIdentifier?: string;
-  dataSourceType?: "APP_DYNAMICS" | "SPLUNK" | "STACKDRIVER" | "KUBERNETES";
+  dataSourceType?:
+    | "APP_DYNAMICS"
+    | "SPLUNK"
+    | "STACKDRIVER"
+    | "KUBERNETES"
+    | "NEW_RELIC";
   metricPackIdentifier?: string;
   metricName?: string;
   metricType?:
@@ -6349,6 +6604,9 @@ export interface AuditHeader {
   requestTime?: number;
   responseTime?: number;
   failureStatusMsg?: string;
+  details?: {
+    [key: string]: { [key: string]: any };
+  };
   accountId?: string;
   gitAuditDetails?: GitAuditDetails;
   entityAuditRecords?: EntityAuditRecord[];
@@ -6672,6 +6930,9 @@ export interface BugsnagSetupTestData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -6712,36 +6973,6 @@ export interface RestResponseSetBugsnagApplication {
     [key: string]: { [key: string]: any };
   };
   resource?: BugsnagApplication[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface JobDetails {
-  jobName?: string;
-  url?: string;
-  parameters?: JobParameter[];
-  folder?: boolean;
-}
-
-export interface JobParameter {
-  name?: string;
-  options?: string[];
-  defaultValue?: string;
-  description?: string;
-}
-
-export interface RestResponseSetJobDetails {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: JobDetails[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseJobDetails {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: JobDetails;
   responseMessages?: ResponseMessage[];
 }
 
@@ -6815,6 +7046,36 @@ export interface RestResponseListAzureArtifactsPackage {
     [key: string]: { [key: string]: any };
   };
   resource?: AzureArtifactsPackage[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface JobDetails {
+  jobName?: string;
+  url?: string;
+  parameters?: JobParameter[];
+  folder?: boolean;
+}
+
+export interface JobParameter {
+  name?: string;
+  options?: string[];
+  defaultValue?: string;
+  description?: string;
+}
+
+export interface RestResponseJobDetails {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: JobDetails;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseSetJobDetails {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: JobDetails[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -7035,6 +7296,9 @@ export interface LogsCVConfiguration {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -7241,6 +7505,9 @@ export interface CloudWatchSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -7288,8 +7555,8 @@ export interface RestResponseListCloudWatchMetric {
 
 export interface Cluster {
   cloudProviderId?: string;
-  clusterName?: string;
   clusterType?: string;
+  clusterName?: string;
 }
 
 export interface ClusterRecord {
@@ -7466,6 +7733,9 @@ export interface ContinuousVerificationExecutionMetaData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -7528,14 +7798,6 @@ export interface ContinuousVerificationExecutionMetaData {
   lastUpdatedAt: number;
 }
 
-export interface RestResponsePageResponseContinuousVerificationExecutionMetaData {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ContinuousVerificationExecutionMetaData[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface RestResponseLinkedHashMapLongLinkedHashMapStringLinkedHashMapStringLinkedHashMapStringLinkedHashMapStringListContinuousVerificationExecutionMetaData {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -7551,6 +7813,14 @@ export interface RestResponseLinkedHashMapLongLinkedHashMapStringLinkedHashMapSt
       };
     };
   };
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponsePageResponseContinuousVerificationExecutionMetaData {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ContinuousVerificationExecutionMetaData[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -7826,6 +8096,9 @@ export interface LogMLAnalysisSummary {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -7929,6 +8202,193 @@ export interface RestResponseLong {
   };
   resource?: number;
   responseMessages?: ResponseMessage[];
+}
+
+export interface APMFetchConfig {
+  url?: string;
+  body?: string;
+  guid?: string;
+}
+
+export interface APMSetupTestNodeData {
+  fetchConfig?: APMFetchConfig;
+  apmMetricCollectionInfo?: MetricCollectionInfo;
+  host?: string;
+  appId: string;
+  settingId: string;
+  instanceName?: string;
+  isServiceLevel?: boolean;
+  instanceElement?: Instance;
+  hostExpression?: string;
+  workflowId?: string;
+  guid?: string;
+  stateType?:
+    | "SUB_WORKFLOW"
+    | "REPEAT"
+    | "FORK"
+    | "WAIT"
+    | "PAUSE"
+    | "BARRIER"
+    | "RESOURCE_CONSTRAINT"
+    | "SHELL_SCRIPT"
+    | "HTTP"
+    | "TEMPLATIZED_SECRET_MANAGER"
+    | "EMAIL"
+    | "APP_DYNAMICS"
+    | "NEW_RELIC"
+    | "NEW_RELIC_DEPLOYMENT_MARKER"
+    | "DYNA_TRACE"
+    | "PROMETHEUS"
+    | "SPLUNKV2"
+    | "ELK"
+    | "LOGZ"
+    | "SUMO"
+    | "DATA_DOG"
+    | "DATA_DOG_LOG"
+    | "CVNG"
+    | "CLOUD_WATCH"
+    | "AWS_LAMBDA_VERIFICATION"
+    | "APM_VERIFICATION"
+    | "LOG_VERIFICATION"
+    | "BUG_SNAG"
+    | "STACK_DRIVER"
+    | "STACK_DRIVER_LOG"
+    | "INSTANA"
+    | "SCALYR"
+    | "ENV_STATE"
+    | "ENV_LOOP_STATE"
+    | "ENV_RESUME_STATE"
+    | "ENV_LOOP_RESUME_STATE"
+    | "COMMAND"
+    | "APPROVAL"
+    | "APPROVAL_RESUME"
+    | "ELASTIC_LOAD_BALANCER"
+    | "JENKINS"
+    | "GCB"
+    | "BAMBOO"
+    | "ARTIFACT_COLLECTION"
+    | "ARTIFACT_CHECK"
+    | "AZURE_NODE_SELECT"
+    | "AZURE_VMSS_SETUP"
+    | "AZURE_VMSS_DEPLOY"
+    | "AZURE_VMSS_ROLLBACK"
+    | "AZURE_VMSS_SWITCH_ROUTES"
+    | "AZURE_VMSS_SWITCH_ROUTES_ROLLBACK"
+    | "AZURE_WEBAPP_SLOT_SETUP"
+    | "AZURE_WEBAPP_SLOT_SWAP"
+    | "AZURE_WEBAPP_SLOT_SHIFT_TRAFFIC"
+    | "AZURE_WEBAPP_SLOT_ROLLBACK"
+    | "AWS_NODE_SELECT"
+    | "DC_NODE_SELECT"
+    | "ROLLING_NODE_SELECT"
+    | "PHASE"
+    | "PHASE_STEP"
+    | "STAGING_ORIGINAL_EXECUTION"
+    | "AWS_CODEDEPLOY_STATE"
+    | "AWS_CODEDEPLOY_ROLLBACK"
+    | "AWS_LAMBDA_STATE"
+    | "AWS_LAMBDA_ROLLBACK"
+    | "AWS_AMI_SERVICE_SETUP"
+    | "ASG_AMI_SERVICE_ALB_SHIFT_SETUP"
+    | "AWS_AMI_SERVICE_DEPLOY"
+    | "ASG_AMI_SERVICE_ALB_SHIFT_DEPLOY"
+    | "AWS_AMI_SWITCH_ROUTES"
+    | "ASG_AMI_ALB_SHIFT_SWITCH_ROUTES"
+    | "AWS_AMI_ROLLBACK_SWITCH_ROUTES"
+    | "ASG_AMI_ROLLBACK_ALB_SHIFT_SWITCH_ROUTES"
+    | "AWS_AMI_SERVICE_ROLLBACK"
+    | "ECS_SERVICE_SETUP"
+    | "SPOTINST_SETUP"
+    | "SPOTINST_ALB_SHIFT_SETUP"
+    | "SPOTINST_DEPLOY"
+    | "SPOTINST_ALB_SHIFT_DEPLOY"
+    | "SPOTINST_LISTENER_UPDATE"
+    | "SPOTINST_LISTENER_ALB_SHIFT"
+    | "SPOTINST_ROLLBACK"
+    | "SPOTINST_LISTENER_UPDATE_ROLLBACK"
+    | "SPOTINST_LISTENER_ALB_SHIFT_ROLLBACK"
+    | "ECS_SERVICE_SETUP_ROLLBACK"
+    | "ECS_DAEMON_SERVICE_SETUP"
+    | "ECS_BG_SERVICE_SETUP"
+    | "ECS_BG_SERVICE_SETUP_ROUTE53"
+    | "ECS_SERVICE_DEPLOY"
+    | "ECS_SERVICE_ROLLBACK"
+    | "ECS_LISTENER_UPDATE"
+    | "ECS_LISTENER_UPDATE_ROLLBACK"
+    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE"
+    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE_ROLLBACK"
+    | "KUBERNETES_SETUP"
+    | "KUBERNETES_SETUP_ROLLBACK"
+    | "KUBERNETES_DEPLOY"
+    | "KUBERNETES_DEPLOY_ROLLBACK"
+    | "KUBERNETES_STEADY_STATE_CHECK"
+    | "ECS_STEADY_STATE_CHECK"
+    | "ECS_RUN_TASK"
+    | "GCP_CLUSTER_SETUP"
+    | "HELM_DEPLOY"
+    | "HELM_ROLLBACK"
+    | "PCF_SETUP"
+    | "PCF_RESIZE"
+    | "PCF_ROLLBACK"
+    | "PCF_MAP_ROUTE"
+    | "PCF_UNMAP_ROUTE"
+    | "PCF_BG_MAP_ROUTE"
+    | "PCF_PLUGIN"
+    | "TERRAFORM_PROVISION"
+    | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
+    | "ARM_CREATE_RESOURCE"
+    | "ARM_ROLLBACK"
+    | "SHELL_SCRIPT_PROVISION"
+    | "TERRAFORM_DESTROY"
+    | "CLOUD_FORMATION_CREATE_STACK"
+    | "CLOUD_FORMATION_DELETE_STACK"
+    | "KUBERNETES_SWAP_SERVICE_SELECTORS"
+    | "CLOUD_FORMATION_ROLLBACK_STACK"
+    | "TERRAFORM_ROLLBACK"
+    | "K8S_DEPLOYMENT_ROLLING"
+    | "K8S_SCALE"
+    | "K8S_DEPLOYMENT_ROLLING_ROLLBACK"
+    | "K8S_BLUE_GREEN_DEPLOY"
+    | "K8S_CANARY_DEPLOY"
+    | "K8S_DELETE"
+    | "JIRA_CREATE_UPDATE"
+    | "SERVICENOW_CREATE_UPDATE"
+    | "K8S_TRAFFIC_SPLIT"
+    | "K8S_APPLY"
+    | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES";
+  toTime?: number;
+  fromTime?: number;
+  serviceLevel?: boolean;
+}
+
+export interface MetricCollectionInfo {
+  metricName?: string;
+  metricType?:
+    | "INFRA"
+    | "VALUE"
+    | "RESP_TIME"
+    | "THROUGHPUT"
+    | "ERROR"
+    | "APDEX"
+    | "VALUE_LOWER";
+  tag?: string;
+  collectionUrl?: string;
+  baselineCollectionUrl?: string;
+  collectionBody?: string;
+  responseType?: "JSON";
+  responseMapping?: ResponseMapping;
+  method?: "POST" | "GET";
+}
+
+export interface ResponseMapping {
+  logMessageJsonPath?: string;
+  hostJsonPath?: string;
+  hostRegex?: string;
+  timestampJsonPath?: string;
+  timestampFormat?: string;
 }
 
 export interface Store {
@@ -8093,6 +8553,10 @@ export interface EncryptedRecordData {
 }
 
 export interface EncryptionConfig {
+  name?: string;
+  default?: boolean;
+  type?: "KMS" | "VAULT" | "CUSTOM" | "SSH";
+  uuid?: string;
   encryptionType?:
     | "LOCAL"
     | "KMS"
@@ -8104,15 +8568,11 @@ export interface EncryptionConfig {
     | "GCP_SECRETS_MANAGER"
     | "CUSTOM"
     | "VAULT_SSH";
-  name?: string;
-  default?: boolean;
-  type?: "KMS" | "VAULT" | "CUSTOM" | "SSH";
-  validationCriteria?: string;
-  globalKms?: boolean;
+  accountId?: string;
   numOfEncryptedValue?: number;
   encryptionServiceUrl?: string;
-  uuid?: string;
-  accountId?: string;
+  validationCriteria?: string;
+  globalKms?: boolean;
 }
 
 export interface SecretUniqueIdentifier {
@@ -8125,190 +8585,6 @@ export interface RestResponseStateExecutionData {
   };
   resource?: StateExecutionData;
   responseMessages?: ResponseMessage[];
-}
-
-export interface APMFetchConfig {
-  url?: string;
-  body?: string;
-  guid?: string;
-}
-
-export interface APMSetupTestNodeData {
-  fetchConfig?: APMFetchConfig;
-  apmMetricCollectionInfo?: MetricCollectionInfo;
-  host?: string;
-  appId: string;
-  settingId: string;
-  instanceName?: string;
-  isServiceLevel?: boolean;
-  instanceElement?: Instance;
-  hostExpression?: string;
-  workflowId?: string;
-  guid?: string;
-  stateType?:
-    | "SUB_WORKFLOW"
-    | "REPEAT"
-    | "FORK"
-    | "WAIT"
-    | "PAUSE"
-    | "BARRIER"
-    | "RESOURCE_CONSTRAINT"
-    | "SHELL_SCRIPT"
-    | "HTTP"
-    | "TEMPLATIZED_SECRET_MANAGER"
-    | "EMAIL"
-    | "APP_DYNAMICS"
-    | "NEW_RELIC"
-    | "NEW_RELIC_DEPLOYMENT_MARKER"
-    | "DYNA_TRACE"
-    | "PROMETHEUS"
-    | "SPLUNKV2"
-    | "ELK"
-    | "LOGZ"
-    | "SUMO"
-    | "DATA_DOG"
-    | "DATA_DOG_LOG"
-    | "CVNG"
-    | "CLOUD_WATCH"
-    | "AWS_LAMBDA_VERIFICATION"
-    | "APM_VERIFICATION"
-    | "LOG_VERIFICATION"
-    | "BUG_SNAG"
-    | "STACK_DRIVER"
-    | "STACK_DRIVER_LOG"
-    | "INSTANA"
-    | "SCALYR"
-    | "ENV_STATE"
-    | "ENV_LOOP_STATE"
-    | "ENV_RESUME_STATE"
-    | "ENV_LOOP_RESUME_STATE"
-    | "COMMAND"
-    | "APPROVAL"
-    | "APPROVAL_RESUME"
-    | "ELASTIC_LOAD_BALANCER"
-    | "JENKINS"
-    | "GCB"
-    | "BAMBOO"
-    | "ARTIFACT_COLLECTION"
-    | "ARTIFACT_CHECK"
-    | "AZURE_NODE_SELECT"
-    | "AZURE_VMSS_SETUP"
-    | "AZURE_VMSS_DEPLOY"
-    | "AZURE_VMSS_ROLLBACK"
-    | "AZURE_VMSS_SWITCH_ROUTES"
-    | "AZURE_VMSS_SWITCH_ROUTES_ROLLBACK"
-    | "AZURE_WEBAPP_SLOT_SETUP"
-    | "AZURE_WEBAPP_SLOT_SWAP"
-    | "AZURE_WEBAPP_SLOT_SHIFT_TRAFFIC"
-    | "AZURE_WEBAPP_SLOT_ROLLBACK"
-    | "AWS_NODE_SELECT"
-    | "DC_NODE_SELECT"
-    | "ROLLING_NODE_SELECT"
-    | "PHASE"
-    | "PHASE_STEP"
-    | "STAGING_ORIGINAL_EXECUTION"
-    | "AWS_CODEDEPLOY_STATE"
-    | "AWS_CODEDEPLOY_ROLLBACK"
-    | "AWS_LAMBDA_STATE"
-    | "AWS_LAMBDA_ROLLBACK"
-    | "AWS_AMI_SERVICE_SETUP"
-    | "ASG_AMI_SERVICE_ALB_SHIFT_SETUP"
-    | "AWS_AMI_SERVICE_DEPLOY"
-    | "ASG_AMI_SERVICE_ALB_SHIFT_DEPLOY"
-    | "AWS_AMI_SWITCH_ROUTES"
-    | "ASG_AMI_ALB_SHIFT_SWITCH_ROUTES"
-    | "AWS_AMI_ROLLBACK_SWITCH_ROUTES"
-    | "ASG_AMI_ROLLBACK_ALB_SHIFT_SWITCH_ROUTES"
-    | "AWS_AMI_SERVICE_ROLLBACK"
-    | "ECS_SERVICE_SETUP"
-    | "SPOTINST_SETUP"
-    | "SPOTINST_ALB_SHIFT_SETUP"
-    | "SPOTINST_DEPLOY"
-    | "SPOTINST_ALB_SHIFT_DEPLOY"
-    | "SPOTINST_LISTENER_UPDATE"
-    | "SPOTINST_LISTENER_ALB_SHIFT"
-    | "SPOTINST_ROLLBACK"
-    | "SPOTINST_LISTENER_UPDATE_ROLLBACK"
-    | "SPOTINST_LISTENER_ALB_SHIFT_ROLLBACK"
-    | "ECS_SERVICE_SETUP_ROLLBACK"
-    | "ECS_DAEMON_SERVICE_SETUP"
-    | "ECS_BG_SERVICE_SETUP"
-    | "ECS_BG_SERVICE_SETUP_ROUTE53"
-    | "ECS_SERVICE_DEPLOY"
-    | "ECS_SERVICE_ROLLBACK"
-    | "ECS_LISTENER_UPDATE"
-    | "ECS_LISTENER_UPDATE_ROLLBACK"
-    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE"
-    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE_ROLLBACK"
-    | "KUBERNETES_SETUP"
-    | "KUBERNETES_SETUP_ROLLBACK"
-    | "KUBERNETES_DEPLOY"
-    | "KUBERNETES_DEPLOY_ROLLBACK"
-    | "KUBERNETES_STEADY_STATE_CHECK"
-    | "ECS_STEADY_STATE_CHECK"
-    | "ECS_RUN_TASK"
-    | "GCP_CLUSTER_SETUP"
-    | "HELM_DEPLOY"
-    | "HELM_ROLLBACK"
-    | "PCF_SETUP"
-    | "PCF_RESIZE"
-    | "PCF_ROLLBACK"
-    | "PCF_MAP_ROUTE"
-    | "PCF_UNMAP_ROUTE"
-    | "PCF_BG_MAP_ROUTE"
-    | "PCF_PLUGIN"
-    | "TERRAFORM_PROVISION"
-    | "TERRAFORM_APPLY"
-    | "ARM_CREATE_RESOURCE"
-    | "ARM_ROLLBACK"
-    | "SHELL_SCRIPT_PROVISION"
-    | "TERRAFORM_DESTROY"
-    | "CLOUD_FORMATION_CREATE_STACK"
-    | "CLOUD_FORMATION_DELETE_STACK"
-    | "KUBERNETES_SWAP_SERVICE_SELECTORS"
-    | "CLOUD_FORMATION_ROLLBACK_STACK"
-    | "TERRAFORM_ROLLBACK"
-    | "K8S_DEPLOYMENT_ROLLING"
-    | "K8S_SCALE"
-    | "K8S_DEPLOYMENT_ROLLING_ROLLBACK"
-    | "K8S_BLUE_GREEN_DEPLOY"
-    | "K8S_CANARY_DEPLOY"
-    | "K8S_DELETE"
-    | "JIRA_CREATE_UPDATE"
-    | "SERVICENOW_CREATE_UPDATE"
-    | "K8S_TRAFFIC_SPLIT"
-    | "K8S_APPLY"
-    | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES";
-  toTime?: number;
-  fromTime?: number;
-  serviceLevel?: boolean;
-}
-
-export interface MetricCollectionInfo {
-  metricName?: string;
-  metricType?:
-    | "INFRA"
-    | "VALUE"
-    | "RESP_TIME"
-    | "THROUGHPUT"
-    | "ERROR"
-    | "APDEX"
-    | "VALUE_LOWER";
-  tag?: string;
-  collectionUrl?: string;
-  baselineCollectionUrl?: string;
-  collectionBody?: string;
-  responseType?: "JSON";
-  responseMapping?: ResponseMapping;
-  method?: "POST" | "GET";
-}
-
-export interface ResponseMapping {
-  logMessageJsonPath?: string;
-  hostJsonPath?: string;
-  hostRegex?: string;
-  timestampJsonPath?: string;
-  timestampFormat?: string;
 }
 
 export interface CVCertifiedDetailsForWorkflowState {
@@ -8832,6 +9108,9 @@ export interface DataDogSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -8896,20 +9175,14 @@ export interface RestResponseListMetric {
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponseDelegateConfiguration {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: DelegateConfiguration;
-  responseMessages?: ResponseMessage[];
-}
-
 export interface Delegate {
   uuid: string;
   createdAt?: number;
   accountId?: string;
   sessionIdentifier?: string;
   sizeDetails?: DelegateSizeDetails;
+  owner?: DelegateEntityOwner;
+  ng?: boolean;
   status?: "ENABLED" | "WAITING_FOR_APPROVAL" | "DISABLED" | "DELETED";
   description?: string;
   ip?: string;
@@ -8942,6 +9215,10 @@ export interface Delegate {
   capabilitiesCheckNextIteration?: number;
   validUntil?: string;
   keywords?: string[];
+}
+
+export interface DelegateEntityOwner {
+  identifier?: string;
 }
 
 export interface DelegateScope {
@@ -8996,6 +9273,7 @@ export interface DelegateScope {
     | "LOG"
     | "CLOUD_FORMATION"
     | "TERRAFORM"
+    | "TERRAGRUNT"
     | "AWS"
     | "LDAP"
     | "K8S"
@@ -9025,6 +9303,7 @@ export interface DelegateScope {
     | "BATCH_CAPABILITY_CHECK"
     | "CUSTOM_MANIFEST_VALUES_FETCH_TASK"
     | "TERRAFORM_NG"
+    | "CE"
   )[];
   environmentTypes?: ("PROD" | "NON_PROD" | "ALL")[];
   applications?: string[];
@@ -9036,7 +9315,7 @@ export interface DelegateScope {
 }
 
 export interface DelegateSizeDetails {
-  size?: "EXTRA_SMALL" | "SMALL" | "MEDIUM" | "LARGE";
+  size?: "EXTRA_SMALL" | "LAPTOP" | "SMALL" | "MEDIUM" | "LARGE";
   label?: string;
   taskLimit?: number;
   replicas?: number;
@@ -9072,6 +9351,8 @@ export interface DelegateParams {
   delegateId?: string;
   accountId?: string;
   sessionIdentifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
   delegateSize?: string;
   ip?: string;
   hostName?: string;
@@ -9092,6 +9373,14 @@ export interface DelegateParams {
   proxy?: boolean;
   ceEnabled?: boolean;
   currentlyExecutingDelegateTasks?: string[];
+}
+
+export interface RestResponseDelegateConfiguration {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: DelegateConfiguration;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface DelegateProfileParams {
@@ -9137,13 +9426,20 @@ export interface DelegateTaskPackage {
 
 export interface Duration {
   seconds?: number;
-  nano?: number;
-  units?: TemporalUnit[];
   zero?: boolean;
   negative?: boolean;
+  nano?: number;
+  units?: TemporalUnit[];
 }
 
 export interface EncryptedRecord {
+  name?: string;
+  parameters?: EncryptedDataParams[];
+  path?: string;
+  uuid?: string;
+  encryptionKey?: string;
+  encryptedValue?: string[];
+  kmsId?: string;
   encryptionType?:
     | "LOCAL"
     | "KMS"
@@ -9155,15 +9451,9 @@ export interface EncryptedRecord {
     | "GCP_SECRETS_MANAGER"
     | "CUSTOM"
     | "VAULT_SSH";
-  encryptionKey?: string;
-  encryptedValue?: string[];
-  name?: string;
-  parameters?: EncryptedDataParams[];
-  path?: string;
-  kmsId?: string;
+  backupEncryptedValue?: string[];
   backupEncryptionKey?: string;
   backupKmsId?: string;
-  backupEncryptedValue?: string[];
   backupEncryptionType?:
     | "LOCAL"
     | "KMS"
@@ -9177,7 +9467,6 @@ export interface EncryptedRecord {
     | "VAULT_SSH";
   base64Encoded?: boolean;
   additionalMetadata?: AdditionalMetadata;
-  uuid?: string;
 }
 
 export interface ExecutionCapability {
@@ -9206,7 +9495,8 @@ export interface ExecutionCapability {
     | "SMB"
     | "SELECTORS"
     | "GIT_CONNECTION_NG"
-    | "GIT_INSTALLATION";
+    | "GIT_INSTALLATION"
+    | "LITE_ENGINE";
   maxValidityPeriod?: Duration;
   periodUntilNextValidation?: Duration;
 }
@@ -9370,6 +9660,8 @@ export interface DelegateProfile {
   lastUpdatedBy?: EmbeddedUser;
   lastUpdatedAt: number;
   identifier?: string;
+  owner?: DelegateEntityOwner;
+  ng?: boolean;
 }
 
 export interface DelegateProfileScopingRule {
@@ -9462,6 +9754,7 @@ export interface RestResponsePageResponseDelegateScope {
 
 export interface DelegateSelectionLogParams {
   delegateId?: string;
+  delegateType?: string;
   delegateName?: string;
   delegateHostName?: string;
   delegateProfileName?: string;
@@ -9508,68 +9801,8 @@ export interface RestResponsePageResponseDelegate {
   responseMessages?: ResponseMessage[];
 }
 
-export interface DelegateConnectionInner {
-  uuid?: string;
-  version?: string;
-  lastHeartbeat?: number;
-}
-
-export interface DelegateGroupDetails {
-  delegateType?: string;
-  groupName?: string;
-  groupHostName?: string;
-  groupSelectors?: {
-    [key: string]:
-      | "PROFILE_NAME"
-      | "DELEGATE_NAME"
-      | "HOST_NAME"
-      | "GROUP_NAME"
-      | "PROFILE_SELECTORS";
-  };
-  delegateInsightsDetails?: DelegateInsightsDetails;
-  lastHeartBeat?: number;
-  delegates?: DelegateInner[];
-}
-
-export interface DelegateInner {
-  uuid?: string;
-  ip?: string;
-  hostName?: string;
-  delegateName?: string;
-  delegateGroupName?: string;
-  description?: string;
-  status?: "ENABLED" | "WAITING_FOR_APPROVAL" | "DISABLED" | "DELETED";
-  lastHeartBeat?: number;
-  activelyConnected?: boolean;
-  delegateProfileId?: string;
-  delegateType?: string;
-  polllingModeEnabled?: boolean;
-  proxy?: boolean;
-  ceEnabled?: boolean;
-  includeScopes?: DelegateScope[];
-  excludeScopes?: DelegateScope[];
+export interface DelegateTags {
   tags?: string[];
-  implicitSelectors?: {
-    [key: string]:
-      | "PROFILE_NAME"
-      | "DELEGATE_NAME"
-      | "HOST_NAME"
-      | "GROUP_NAME"
-      | "PROFILE_SELECTORS";
-  };
-  profileExecutedAt?: number;
-  profileError?: boolean;
-  sampleDelegate?: boolean;
-  connections?: DelegateConnectionInner[];
-}
-
-export interface DelegateInsightsBarDetails {
-  timeStamp?: number;
-  counts?: PairDelegateInsightsTypeLong[];
-}
-
-export interface DelegateInsightsDetails {
-  insights?: DelegateInsightsBarDetails[];
 }
 
 export interface DelegateScalingGroup {
@@ -9581,21 +9814,6 @@ export interface DelegateStatus {
   publishedVersions?: string[];
   delegates?: DelegateInner[];
   scalingGroups?: DelegateScalingGroup[];
-  delegateGroupDetails?: DelegateGroupDetails[];
-}
-
-export interface Pair {
-  value?: { [key: string]: any };
-  key?: { [key: string]: any };
-  left?: { [key: string]: any };
-  right?: { [key: string]: any };
-}
-
-export interface PairDelegateInsightsTypeLong {
-  value?: number;
-  key?: "SUCCESSFUL" | "FAILED" | "IN_PROGRESS" | "PERPETUAL";
-  left?: "SUCCESSFUL" | "FAILED" | "IN_PROGRESS" | "PERPETUAL";
-  right?: number;
 }
 
 export interface RestResponseDelegateStatus {
@@ -9622,7 +9840,7 @@ export interface CEDelegateStatus {
   delegateName?: string;
   delegateType?: string;
   status?: "ENABLED" | "WAITING_FOR_APPROVAL" | "DISABLED" | "DELETED";
-  connections?: DelegateConnectionInner[];
+  connections?: DelegateConnectionDetails[];
   metricsServerCheck?: MetricsServerCheck;
   permissionRuleList?: Rule[];
 }
@@ -9662,10 +9880,18 @@ export interface DelegateScopes {
 
 export interface DelegateSetupDetails {
   sessionIdentifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
   name: string;
   description?: string;
-  size: "EXTRA_SMALL" | "SMALL" | "MEDIUM" | "LARGE";
+  size: "EXTRA_SMALL" | "LAPTOP" | "SMALL" | "MEDIUM" | "LARGE";
   delegateConfigurationId: string;
+  k8sConfigDetails?: K8sConfigDetails;
+}
+
+export interface K8sConfigDetails {
+  k8sPermissionType?: "CLUSTER_ADMIN" | "CLUSTER_VIEWER" | "NAMESPACE_ADMIN";
+  namespace?: string;
 }
 
 export interface RestResponseDelegateSetupDetails {
@@ -9674,10 +9900,6 @@ export interface RestResponseDelegateSetupDetails {
   };
   resource?: DelegateSetupDetails;
   responseMessages?: ResponseMessage[];
-}
-
-export interface DelegateTags {
-  tags?: string[];
 }
 
 export interface RestResponseTaskSelectorMap {
@@ -9739,6 +9961,7 @@ export interface TaskSelectorMap {
     | "LOG"
     | "CLOUD_FORMATION"
     | "TERRAFORM"
+    | "TERRAGRUNT"
     | "AWS"
     | "LDAP"
     | "K8S"
@@ -9767,7 +9990,8 @@ export interface TaskSelectorMap {
     | "GIT_NG"
     | "BATCH_CAPABILITY_CHECK"
     | "CUSTOM_MANIFEST_VALUES_FETCH_TASK"
-    | "TERRAFORM_NG";
+    | "TERRAFORM_NG"
+    | "CE";
   selectors?: string[];
 }
 
@@ -9931,6 +10155,9 @@ export interface DynaTraceSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -9968,23 +10195,6 @@ export interface RestResponseListDynaTraceApplication {
     [key: string]: { [key: string]: any };
   };
   resource?: DynaTraceApplication[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface ElkIndexTemplate {
-  name?: string;
-  properties?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface RestResponseMapStringElkIndexTemplate {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: {
-    [key: string]: ElkIndexTemplate;
-  };
   responseMessages?: ResponseMessage[];
 }
 
@@ -10119,6 +10329,9 @@ export interface ElkSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -10151,6 +10364,23 @@ export interface ElkSetupTestNodeData {
   serviceLevel?: boolean;
 }
 
+export interface ElkIndexTemplate {
+  name?: string;
+  properties?: {
+    [key: string]: { [key: string]: any };
+  };
+}
+
+export interface RestResponseMapStringElkIndexTemplate {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: {
+    [key: string]: ElkIndexTemplate;
+  };
+  responseMessages?: ResponseMessage[];
+}
+
 export interface RestResponseEnvironment {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -10165,6 +10395,10 @@ export interface RestResponsePageResponseEnvironment {
   };
   resource?: Environment[];
   responseMessages?: ResponseMessage[];
+}
+
+export interface KubernetesPayload {
+  advancedConfig?: string;
 }
 
 export interface CloneMetadata {
@@ -10231,8 +10465,12 @@ export interface WorkflowCreationFlags {
   awsTrafficShiftAlbType?: boolean;
 }
 
-export interface KubernetesPayload {
-  advancedConfig?: string;
+export interface RestResponseWorkflowExecution {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: WorkflowExecution;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface RestResponseWorkflowVariablesMetadata {
@@ -10247,14 +10485,6 @@ export interface WorkflowVariablesMetadata {
   workflowVariables?: Variable[];
   changed?: boolean;
   changedMessage?: string;
-}
-
-export interface RestResponseWorkflowExecution {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: WorkflowExecution;
-  responseMessages?: ResponseMessage[];
 }
 
 export interface RestResponsePageResponseWorkflowExecution {
@@ -10758,6 +10988,9 @@ export interface ExpAnalysisInfo {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -10973,6 +11206,9 @@ export interface ExperimentalMetricRecord {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -11010,14 +11246,6 @@ export interface RestResponseExperimentalMetricRecord {
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponsePageResponseExpAnalysisInfo {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ExpAnalysisInfo[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface ExperimentPerformance {
   [key: string]: any;
 }
@@ -11030,21 +11258,11 @@ export interface RestResponseExperimentPerformance {
   responseMessages?: ResponseMessage[];
 }
 
-export interface ExportExecutionsRequestLimitChecks {
-  queuedRequests?: LimitCheck;
-  executionCount?: LimitCheck;
-}
-
-export interface LimitCheck {
-  limit?: number;
-  value?: number;
-}
-
-export interface RestResponseExportExecutionsRequestLimitChecks {
+export interface RestResponsePageResponseExpAnalysisInfo {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: ExportExecutionsRequestLimitChecks;
+  resource?: ExpAnalysisInfo[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11072,6 +11290,24 @@ export interface ExportExecutionsUserParams {
   notifyOnlyTriggeringUser?: boolean;
   userGroupIds?: string[];
   createdByType?: "USER" | "API_KEY" | "TRIGGER";
+}
+
+export interface ExportExecutionsRequestLimitChecks {
+  queuedRequests?: LimitCheck;
+  executionCount?: LimitCheck;
+}
+
+export interface LimitCheck {
+  limit?: number;
+  value?: number;
+}
+
+export interface RestResponseExportExecutionsRequestLimitChecks {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ExportExecutionsRequestLimitChecks;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface ExecutionStatusResponse {
@@ -11386,7 +11622,7 @@ export interface GitFileActivity {
   fileContent?: string;
   commitId?: string;
   processingCommitId?: string;
-  changeType?: "ADD" | "RENAME" | "MODIFY" | "DELETE";
+  changeType?: "ADD" | "RENAME" | "MODIFY" | "DELETE" | "NONE";
   errorMessage?: string;
   status?:
     | "SUCCESS"
@@ -11415,6 +11651,26 @@ export interface RestResponsePageResponseGitFileActivity {
     [key: string]: { [key: string]: any };
   };
   resource?: GitFileActivity[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface ChangeSetDTO {
+  gitDetail?: GitDetail;
+  status?: "QUEUED" | "RUNNING" | "FAILED" | "COMPLETED" | "SKIPPED";
+  changeSetId?: string;
+  gitToHarness?: boolean;
+  changesetInformation?: ChangesetInformation;
+}
+
+export interface ChangesetInformation {
+  [key: string]: any;
+}
+
+export interface RestResponseListChangeSetDTO {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ChangeSetDTO[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11455,26 +11711,6 @@ export interface RestResponsePageResponseGitFileActivitySummary {
     [key: string]: { [key: string]: any };
   };
   resource?: GitFileActivitySummary[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface ChangeSetDTO {
-  gitDetail?: GitDetail;
-  status?: "QUEUED" | "RUNNING" | "FAILED" | "COMPLETED" | "SKIPPED";
-  changeSetId?: string;
-  gitToHarness?: boolean;
-  changesetInformation?: ChangesetInformation;
-}
-
-export interface ChangesetInformation {
-  [key: string]: any;
-}
-
-export interface RestResponseListChangeSetDTO {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ChangeSetDTO[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11549,6 +11785,43 @@ export interface RestResponsePageResponseHarnessTagLink {
   responseMessages?: ResponseMessage[];
 }
 
+export interface HarnessUserGroup {
+  uuid: string;
+  appId: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  lastUpdatedBy?: EmbeddedUser;
+  lastUpdatedAt: number;
+  name?: string;
+  description?: string;
+  memberIds?: string[];
+  accountIds?: string[];
+  groupType?: "DEFAULT" | "RESTRICTED";
+}
+
+export interface RestResponseHarnessUserGroup {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: HarnessUserGroup;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface HarnessUserGroupDTO {
+  name?: string;
+  description?: string;
+  emailIds?: string[];
+  accountIds?: string[];
+}
+
+export interface RestResponseListHarnessUserGroup {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: HarnessUserGroup[];
+  responseMessages?: ResponseMessage[];
+}
+
 export interface RestResponseHost {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -11573,34 +11846,6 @@ export interface RestResponseListAccount {
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponseUser {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: User;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface LogoutResponse {
-  logoutUrl?: string;
-}
-
-export interface RestResponseLogoutResponse {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: LogoutResponse;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseListUser {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: User[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface AccountSettingsResponse {
   authenticationMechanism?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
   allowedDomains?: string[];
@@ -11622,6 +11867,26 @@ export interface RestResponseAccountSettingsResponse {
   responseMessages?: ResponseMessage[];
 }
 
+export interface LogoutResponse {
+  logoutUrl?: string;
+}
+
+export interface RestResponseLogoutResponse {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: LogoutResponse;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseUser {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: User;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface OauthUserInfo {
   email?: string;
   name?: string;
@@ -11631,16 +11896,11 @@ export interface OauthUserInfo {
   freemiumAssistedOption?: boolean;
 }
 
-export interface AwsSubnet {
-  id?: string;
-  name?: string;
-}
-
-export interface RestResponseListAwsSubnet {
+export interface RestResponseListUser {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: AwsSubnet[];
+  resource?: User[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11657,6 +11917,51 @@ export interface RestResponsePageResponseInfrastructureDefinition {
     [key: string]: { [key: string]: any };
   };
   resource?: InfrastructureDefinition[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface AwsSubnet {
+  id?: string;
+  name?: string;
+}
+
+export interface RestResponseListAwsSubnet {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AwsSubnet[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface AwsSecurityGroup {
+  id?: string;
+  name?: string;
+}
+
+export interface RestResponseListAwsSecurityGroup {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AwsSecurityGroup[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface InfraDefinitionDetail {
+  infrastructureDefinition?: InfrastructureDefinition;
+  derivedInfraMappingDetailList?: InfraMappingDetail[];
+  countDerivedInfraMappings?: number;
+}
+
+export interface InfraMappingDetail {
+  infrastructureMapping?: InfrastructureMapping;
+  workflowExecutionList?: WorkflowExecution[];
+}
+
+export interface RestResponsePageResponseInfraDefinitionDetail {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: InfraDefinitionDetail[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11680,38 +11985,6 @@ export interface RestResponseListAwsElbListener {
     [key: string]: { [key: string]: any };
   };
   resource?: AwsElbListener[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface InfraDefinitionDetail {
-  infrastructureDefinition?: InfrastructureDefinition;
-  derivedInfraMappingDetailList?: InfraMappingDetail[];
-  countDerivedInfraMappings?: number;
-}
-
-export interface InfraMappingDetail {
-  infrastructureMapping?: InfrastructureMapping;
-  workflowExecutionList?: WorkflowExecution[];
-}
-
-export interface RestResponsePageResponseInfraDefinitionDetail {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: InfraDefinitionDetail[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface AwsVPC {
-  id?: string;
-  name?: string;
-}
-
-export interface RestResponseListAwsVPC {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: AwsVPC[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -11813,19 +12086,6 @@ export interface RestResponseMapDeploymentTypeListSettingVariableTypes {
   responseMessages?: ResponseMessage[];
 }
 
-export interface AwsSecurityGroup {
-  id?: string;
-  name?: string;
-}
-
-export interface RestResponseListAwsSecurityGroup {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: AwsSecurityGroup[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface AwsRoute53HostedZoneData {
   hostedZoneId?: string;
   hostedZoneName?: string;
@@ -11842,14 +12102,6 @@ export interface RestResponseListAwsRoute53HostedZoneData {
 export interface ListInfraDefinitionParams {
   deploymentTypeFromMetaData?: string[];
   serviceIds?: string[];
-}
-
-export interface RestResponseInfraDefinitionDetail {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: InfraDefinitionDetail;
-  responseMessages?: ResponseMessage[];
 }
 
 export interface AwsLoadBalancerDetails {
@@ -11932,6 +12184,27 @@ export interface RestResponseListDeploymentSlotData {
   responseMessages?: ResponseMessage[];
 }
 
+export interface RestResponseInfraDefinitionDetail {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: InfraDefinitionDetail;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface AwsVPC {
+  id?: string;
+  name?: string;
+}
+
+export interface RestResponseListAwsVPC {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AwsVPC[];
+  responseMessages?: ResponseMessage[];
+}
+
 export interface HostValidationResponse {
   hostName?: string;
   status?: string;
@@ -11975,7 +12248,7 @@ export interface RestResponsePageResponseInfrastructureMapping {
 
 export type ARMInfrastructureProvisioner = InfrastructureProvisioner & {
   resourceType?: "ARM" | "BLUEPRINT";
-  sourceType?: "TEMPLATE_BODY" | "GIT" | "UNKNOWN";
+  sourceType?: "TEMPLATE_BODY" | "GIT";
   scopeType?: "RESOURCE_GROUP" | "SUBSCRIPTION" | "MANAGEMENT_GROUP" | "TENANT";
   templateBody?: string;
   gitFileConfig?: GitFileConfig;
@@ -12064,6 +12337,18 @@ export type TerraformInfrastructureProvisioner = InfrastructureProvisioner & {
   skipRefreshBeforeApplyingPlan?: boolean;
 };
 
+export type TerragruntInfrastructureProvisioner = InfrastructureProvisioner & {
+  sourceRepoSettingId?: string;
+  sourceRepoBranch?: string;
+  commitId?: string;
+  repoName?: string;
+  path: string;
+  normalizedPath?: string;
+  templatized?: boolean;
+  secretManagerId?: string;
+  skipRefreshBeforeApplyingPlan?: boolean;
+};
+
 export interface RestResponsePageResponseInfrastructureProvisioner {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -12094,6 +12379,7 @@ export interface InfrastructureProvisionerDetails {
     [key: string]: string;
   };
   cloudFormationSourceType?: string;
+  azureARMResourceType?: "ARM" | "BLUEPRINT";
   tagLinks?: HarnessTagLink[];
 }
 
@@ -12255,6 +12541,9 @@ export interface InstanaSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -12290,6 +12579,30 @@ export interface InstanaTagFilter {
     | "NOT_CONTAIN"
     | "NOT_EMPTY"
     | "IS_EMPTY";
+}
+
+export interface CVFeedbackRecord {
+  uuid?: string;
+  accountId?: string;
+  serviceId?: string;
+  envId?: string;
+  stateExecutionId?: string;
+  cvConfigId?: string;
+  clusterLabel?: number;
+  clusterType?: "CONTROL" | "TEST" | "UNKNOWN" | "IGNORE";
+  logMessage?: string;
+  comment?: string;
+  supervisedLabel?: string;
+  priority?: "BASELINE" | "P5" | "P4" | "P3" | "P2" | "P1" | "P0";
+  jiraLink?: string;
+  analysisMinute?: number;
+  actionTaken?: "ADD_TO_BASELINE" | "REMOVE_FROM_BASELINE" | "UPDATE_PRIORITY";
+  feedbackNote?: string;
+  createdAt?: number;
+  lastUpdatedAt?: number;
+  createdBy?: EmbeddedUser;
+  lastUpdatedBy?: EmbeddedUser;
+  duplicate?: boolean;
 }
 
 export interface LogDataRecord {
@@ -12407,6 +12720,9 @@ export interface LogDataRecord {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -12459,30 +12775,6 @@ export interface RestResponseListLogDataRecord {
   };
   resource?: LogDataRecord[];
   responseMessages?: ResponseMessage[];
-}
-
-export interface CVFeedbackRecord {
-  uuid?: string;
-  accountId?: string;
-  serviceId?: string;
-  envId?: string;
-  stateExecutionId?: string;
-  cvConfigId?: string;
-  clusterLabel?: number;
-  clusterType?: "CONTROL" | "TEST" | "UNKNOWN" | "IGNORE";
-  logMessage?: string;
-  comment?: string;
-  supervisedLabel?: string;
-  priority?: "BASELINE" | "P5" | "P4" | "P3" | "P2" | "P1" | "P0";
-  jiraLink?: string;
-  analysisMinute?: number;
-  actionTaken?: "ADD_TO_BASELINE" | "REMOVE_FROM_BASELINE" | "UPDATE_PRIORITY";
-  feedbackNote?: string;
-  createdAt?: number;
-  lastUpdatedAt?: number;
-  createdBy?: EmbeddedUser;
-  lastUpdatedBy?: EmbeddedUser;
-  duplicate?: boolean;
 }
 
 export interface RestResponseMapPairStringStringInteger {
@@ -12689,6 +12981,9 @@ export interface LogMLFeedbackRecord {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -12894,6 +13189,7 @@ export interface JiraTaskParameters {
     | "GET_STATUSES"
     | "GET_CREATE_METADATA"
     | "FETCH_ISSUE"
+    | "FETCH_ISSUE_DATA"
     | "CHECK_APPROVAL";
   project?: string;
   summary?: string;
@@ -13045,6 +13341,9 @@ export interface CustomLogSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -13242,6 +13541,9 @@ export interface NewRelicSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -13351,8 +13653,6 @@ export interface RestResponsePageResponsePipeline {
 }
 
 export interface JsonNode {
-  array?: boolean;
-  null?: boolean;
   object?: boolean;
   valueNode?: boolean;
   containerNode?: boolean;
@@ -13381,6 +13681,8 @@ export interface JsonNode {
   textual?: boolean;
   boolean?: boolean;
   binary?: boolean;
+  array?: boolean;
+  null?: boolean;
 }
 
 export interface RestResponseListStencil {
@@ -13418,7 +13720,8 @@ export interface Stencil {
     | "STAGING_ORIGINAL_EXECUTION"
     | "AZURE_VMSS"
     | "AZURE_WEBAPP"
-    | "AZURE_ARM";
+    | "AZURE_ARM"
+    | "TERRAGRUNT_PROVISION";
   jsonSchema?: JsonNode;
   uiSchema?: { [key: string]: any };
   displayOrder?: number;
@@ -13556,12 +13859,12 @@ export interface RestResponseListAccountPlugin {
 }
 
 export interface Version {
+  majorVersion?: number;
+  minorVersion?: number;
   preReleaseVersion?: string;
   buildMetadata?: string;
   patchVersion?: number;
   normalVersion?: string;
-  majorVersion?: number;
-  minorVersion?: number;
 }
 
 export interface RestResponseMapStringMapStringObject {
@@ -13587,7 +13890,17 @@ export interface ApplicationAuditFilter {
   resourceIds?: string[];
 }
 
-export type AuditPreference = Preference & {
+export interface AuditPreference {
+  uuid: string;
+  appId: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  lastUpdatedBy?: EmbeddedUser;
+  lastUpdatedAt: number;
+  name?: string;
+  accountId?: string;
+  userId?: string;
+  preferenceType?: string;
   startTime?: string;
   endTime?: string;
   lastNDays?: number;
@@ -13597,33 +13910,6 @@ export type AuditPreference = Preference & {
   includeAppLevelResources?: boolean;
   accountAuditFilter?: AccountAuditFilter;
   applicationAuditFilter?: ApplicationAuditFilter;
-};
-
-export interface AuditPreferenceResponse {
-  auditPreferences?: AuditPreference[];
-  resourceLookupMap?: {
-    [key: string]: ResourceLookup;
-  };
-}
-
-export interface ResourceLookup {
-  uuid: string;
-  accountId?: string;
-  appId?: string;
-  resourceId?: string;
-  resourceType?: string;
-  resourceName?: string;
-  tags?: NameValuePair[];
-  createdAt?: number;
-  lastUpdatedAt?: number;
-}
-
-export interface RestResponseAuditPreferenceResponse {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: AuditPreferenceResponse;
-  responseMessages?: ResponseMessage[];
 }
 
 export type DeploymentPreference = Preference & {
@@ -13699,11 +13985,31 @@ export interface RestResponsePreference {
   responseMessages?: ResponseMessage[];
 }
 
-export interface TimeSeries {
-  txnName: string;
-  url: string;
-  metricName: string;
-  metricType: string;
+export interface AuditPreferenceResponse {
+  auditPreferences?: AuditPreference[];
+  resourceLookupMap?: {
+    [key: string]: ResourceLookup;
+  };
+}
+
+export interface ResourceLookup {
+  uuid: string;
+  accountId?: string;
+  appId?: string;
+  resourceId?: string;
+  resourceType?: string;
+  resourceName?: string;
+  tags?: NameValuePair[];
+  createdAt?: number;
+  lastUpdatedAt?: number;
+}
+
+export interface RestResponseAuditPreferenceResponse {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AuditPreferenceResponse;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface PrometheusSetupTestNodeData {
@@ -13829,6 +14135,9 @@ export interface PrometheusSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -13853,6 +14162,13 @@ export interface PrometheusSetupTestNodeData {
   fromTime?: number;
   timeSeriesToAnalyze?: TimeSeries[];
   serviceLevel?: boolean;
+}
+
+export interface TimeSeries {
+  txnName: string;
+  url: string;
+  metricName: string;
+  metricType: string;
 }
 
 export interface ResourceConstraint {
@@ -14102,8 +14418,8 @@ export interface LoginTypeResponse {
   authenticationMechanism?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
   showCaptcha?: boolean;
   defaultExperience?: "NG" | "CG";
-  ssorequest?: SSORequest;
   oauthEnabled?: boolean;
+  ssorequest?: SSORequest;
 }
 
 export interface RestResponseLoginTypeResponse {
@@ -14357,8 +14673,8 @@ export interface ZoneOffsetTransition {
   gap?: boolean;
   overlap?: boolean;
   dateTimeAfter?: string;
-  instant?: number;
   dateTimeBefore?: string;
+  instant?: number;
 }
 
 export interface ZoneOffsetTransitionRule {
@@ -14394,8 +14710,8 @@ export interface ZoneOffsetTransitionRule {
 
 export interface ZoneRules {
   fixedOffset?: boolean;
-  transitions?: ZoneOffsetTransition[];
   transitionRules?: ZoneOffsetTransitionRule[];
+  transitions?: ZoneOffsetTransition[];
 }
 
 export interface AwsLambdaInstanceKey {
@@ -14475,6 +14791,34 @@ export interface RestResponsePageResponseServiceInstance {
   responseMessages?: ResponseMessage[];
 }
 
+export interface PcfServiceSpecification {
+  serviceId: string;
+  manifestYaml: string;
+  uuid: string;
+  appId: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  lastUpdatedBy?: EmbeddedUser;
+  lastUpdatedAt: number;
+  accountId?: string;
+}
+
+export interface RestResponsePcfServiceSpecification {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: PcfServiceSpecification;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseServiceCommand {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ServiceCommand;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface RestResponseService {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -14499,26 +14843,6 @@ export interface RestResponseListArtifactStream {
   responseMessages?: ResponseMessage[];
 }
 
-export interface PcfServiceSpecification {
-  serviceId: string;
-  manifestYaml: string;
-  uuid: string;
-  appId: string;
-  createdBy?: EmbeddedUser;
-  createdAt?: number;
-  lastUpdatedBy?: EmbeddedUser;
-  lastUpdatedAt: number;
-  accountId?: string;
-}
-
-export interface RestResponsePcfServiceSpecification {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: PcfServiceSpecification;
-  responseMessages?: ResponseMessage[];
-}
-
 export interface EcsServiceSpecification {
   serviceId: string;
   serviceSpecJson?: string;
@@ -14537,14 +14861,6 @@ export interface RestResponseEcsServiceSpecification {
     [key: string]: { [key: string]: any };
   };
   resource?: EcsServiceSpecification;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseServiceCommand {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ServiceCommand;
   responseMessages?: ResponseMessage[];
 }
 
@@ -14808,19 +15124,6 @@ export interface RestResponsePageResponseServiceVariable {
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponseValidationResult {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ValidationResult;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface ValidationResult {
-  valid?: boolean;
-  errorMessage?: string;
-}
-
 export interface AppEnvRestriction {
   appFilter?: GenericEntityFilter;
   envFilter?: EnvFilter;
@@ -14828,6 +15131,14 @@ export interface AppEnvRestriction {
 
 export interface ConnectivityValidationAttributes {
   [key: string]: any;
+}
+
+export interface RestResponseSettingAttribute {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: SettingAttribute;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface SettingAttribute {
@@ -14873,7 +15184,6 @@ export interface SettingAttribute {
 
 export interface SettingValue {
   type?: string;
-  certValidationRequired?: boolean;
   settingType?:
     | "HOST_CONNECTION_ATTRIBUTES"
     | "BASTION_HOST_CONNECTION_ATTRIBUTES"
@@ -14947,18 +15257,11 @@ export interface SettingValue {
     | "KUBERNETES_CLUSTER_NG"
     | "GIT_NG"
     | "GCP_SECRETS_MANAGER";
+  certValidationRequired?: boolean;
 }
 
 export interface UsageRestrictions {
   appEnvRestrictions?: AppEnvRestriction[];
-}
-
-export interface RestResponseSettingAttribute {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: SettingAttribute;
-  responseMessages?: ResponseMessage[];
 }
 
 export interface RestResponsePageResponseSettingAttribute {
@@ -14967,6 +15270,19 @@ export interface RestResponsePageResponseSettingAttribute {
   };
   resource?: SettingAttribute[];
   responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseValidationResult {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ValidationResult;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface ValidationResult {
+  valid?: boolean;
+  errorMessage?: string;
 }
 
 export interface UserInvite {
@@ -15009,10 +15325,6 @@ export interface UserInviteSource {
     | "AZURE_MARKETPLACE"
     | "ONPREM";
   uuid?: string;
-}
-
-export interface UpdatePasswordRequest {
-  password?: string;
 }
 
 export interface RestResponseSmtpConfigResponse {
@@ -15162,6 +15474,9 @@ export interface SplunkSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -15337,6 +15652,9 @@ export interface StackDriverSetupTestNodeData {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -15556,6 +15874,9 @@ export interface SumoLogicSetupTestNodedata {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -15583,16 +15904,6 @@ export interface SumoLogicSetupTestNodedata {
   serviceLevel?: boolean;
 }
 
-export interface DeploymentTimeSeriesAnalysis {
-  stateExecutionId?: string;
-  customThresholdRefId?: string;
-  baseLineExecutionId?: string;
-  message?: string;
-  riskLevel?: "HIGH" | "MEDIUM" | "LOW" | "NA";
-  total?: number;
-  metricAnalyses?: NewRelicMetricAnalysis[];
-}
-
 export interface NewRelicMetricAnalysis {
   metricName?: string;
   riskLevel?: "HIGH" | "MEDIUM" | "LOW" | "NA";
@@ -15600,6 +15911,166 @@ export interface NewRelicMetricAnalysis {
   displayName?: string;
   fullMetricName?: string;
   tag?: string;
+}
+
+export interface NewRelicMetricAnalysisRecord {
+  uuid: string;
+  appId: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  lastUpdatedBy?: EmbeddedUser;
+  lastUpdatedAt: number;
+  stateType?:
+    | "SUB_WORKFLOW"
+    | "REPEAT"
+    | "FORK"
+    | "WAIT"
+    | "PAUSE"
+    | "BARRIER"
+    | "RESOURCE_CONSTRAINT"
+    | "SHELL_SCRIPT"
+    | "HTTP"
+    | "TEMPLATIZED_SECRET_MANAGER"
+    | "EMAIL"
+    | "APP_DYNAMICS"
+    | "NEW_RELIC"
+    | "NEW_RELIC_DEPLOYMENT_MARKER"
+    | "DYNA_TRACE"
+    | "PROMETHEUS"
+    | "SPLUNKV2"
+    | "ELK"
+    | "LOGZ"
+    | "SUMO"
+    | "DATA_DOG"
+    | "DATA_DOG_LOG"
+    | "CVNG"
+    | "CLOUD_WATCH"
+    | "AWS_LAMBDA_VERIFICATION"
+    | "APM_VERIFICATION"
+    | "LOG_VERIFICATION"
+    | "BUG_SNAG"
+    | "STACK_DRIVER"
+    | "STACK_DRIVER_LOG"
+    | "INSTANA"
+    | "SCALYR"
+    | "ENV_STATE"
+    | "ENV_LOOP_STATE"
+    | "ENV_RESUME_STATE"
+    | "ENV_LOOP_RESUME_STATE"
+    | "COMMAND"
+    | "APPROVAL"
+    | "APPROVAL_RESUME"
+    | "ELASTIC_LOAD_BALANCER"
+    | "JENKINS"
+    | "GCB"
+    | "BAMBOO"
+    | "ARTIFACT_COLLECTION"
+    | "ARTIFACT_CHECK"
+    | "AZURE_NODE_SELECT"
+    | "AZURE_VMSS_SETUP"
+    | "AZURE_VMSS_DEPLOY"
+    | "AZURE_VMSS_ROLLBACK"
+    | "AZURE_VMSS_SWITCH_ROUTES"
+    | "AZURE_VMSS_SWITCH_ROUTES_ROLLBACK"
+    | "AZURE_WEBAPP_SLOT_SETUP"
+    | "AZURE_WEBAPP_SLOT_SWAP"
+    | "AZURE_WEBAPP_SLOT_SHIFT_TRAFFIC"
+    | "AZURE_WEBAPP_SLOT_ROLLBACK"
+    | "AWS_NODE_SELECT"
+    | "DC_NODE_SELECT"
+    | "ROLLING_NODE_SELECT"
+    | "PHASE"
+    | "PHASE_STEP"
+    | "STAGING_ORIGINAL_EXECUTION"
+    | "AWS_CODEDEPLOY_STATE"
+    | "AWS_CODEDEPLOY_ROLLBACK"
+    | "AWS_LAMBDA_STATE"
+    | "AWS_LAMBDA_ROLLBACK"
+    | "AWS_AMI_SERVICE_SETUP"
+    | "ASG_AMI_SERVICE_ALB_SHIFT_SETUP"
+    | "AWS_AMI_SERVICE_DEPLOY"
+    | "ASG_AMI_SERVICE_ALB_SHIFT_DEPLOY"
+    | "AWS_AMI_SWITCH_ROUTES"
+    | "ASG_AMI_ALB_SHIFT_SWITCH_ROUTES"
+    | "AWS_AMI_ROLLBACK_SWITCH_ROUTES"
+    | "ASG_AMI_ROLLBACK_ALB_SHIFT_SWITCH_ROUTES"
+    | "AWS_AMI_SERVICE_ROLLBACK"
+    | "ECS_SERVICE_SETUP"
+    | "SPOTINST_SETUP"
+    | "SPOTINST_ALB_SHIFT_SETUP"
+    | "SPOTINST_DEPLOY"
+    | "SPOTINST_ALB_SHIFT_DEPLOY"
+    | "SPOTINST_LISTENER_UPDATE"
+    | "SPOTINST_LISTENER_ALB_SHIFT"
+    | "SPOTINST_ROLLBACK"
+    | "SPOTINST_LISTENER_UPDATE_ROLLBACK"
+    | "SPOTINST_LISTENER_ALB_SHIFT_ROLLBACK"
+    | "ECS_SERVICE_SETUP_ROLLBACK"
+    | "ECS_DAEMON_SERVICE_SETUP"
+    | "ECS_BG_SERVICE_SETUP"
+    | "ECS_BG_SERVICE_SETUP_ROUTE53"
+    | "ECS_SERVICE_DEPLOY"
+    | "ECS_SERVICE_ROLLBACK"
+    | "ECS_LISTENER_UPDATE"
+    | "ECS_LISTENER_UPDATE_ROLLBACK"
+    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE"
+    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE_ROLLBACK"
+    | "KUBERNETES_SETUP"
+    | "KUBERNETES_SETUP_ROLLBACK"
+    | "KUBERNETES_DEPLOY"
+    | "KUBERNETES_DEPLOY_ROLLBACK"
+    | "KUBERNETES_STEADY_STATE_CHECK"
+    | "ECS_STEADY_STATE_CHECK"
+    | "ECS_RUN_TASK"
+    | "GCP_CLUSTER_SETUP"
+    | "HELM_DEPLOY"
+    | "HELM_ROLLBACK"
+    | "PCF_SETUP"
+    | "PCF_RESIZE"
+    | "PCF_ROLLBACK"
+    | "PCF_MAP_ROUTE"
+    | "PCF_UNMAP_ROUTE"
+    | "PCF_BG_MAP_ROUTE"
+    | "PCF_PLUGIN"
+    | "TERRAFORM_PROVISION"
+    | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
+    | "ARM_CREATE_RESOURCE"
+    | "ARM_ROLLBACK"
+    | "SHELL_SCRIPT_PROVISION"
+    | "TERRAFORM_DESTROY"
+    | "CLOUD_FORMATION_CREATE_STACK"
+    | "CLOUD_FORMATION_DELETE_STACK"
+    | "KUBERNETES_SWAP_SERVICE_SELECTORS"
+    | "CLOUD_FORMATION_ROLLBACK_STACK"
+    | "TERRAFORM_ROLLBACK"
+    | "K8S_DEPLOYMENT_ROLLING"
+    | "K8S_SCALE"
+    | "K8S_DEPLOYMENT_ROLLING_ROLLBACK"
+    | "K8S_BLUE_GREEN_DEPLOY"
+    | "K8S_CANARY_DEPLOY"
+    | "K8S_DELETE"
+    | "JIRA_CREATE_UPDATE"
+    | "SERVICENOW_CREATE_UPDATE"
+    | "K8S_TRAFFIC_SPLIT"
+    | "K8S_APPLY"
+    | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES";
+  message?: string;
+  riskLevel?: "HIGH" | "MEDIUM" | "LOW" | "NA";
+  workflowExecutionId?: string;
+  stateExecutionId?: string;
+  accountId?: string;
+  cvConfigId?: string;
+  metricAnalyses?: NewRelicMetricAnalysis[];
+  analysisMinute?: number;
+  showTimeSeries?: boolean;
+  baseLineExecutionId?: string;
+  groupName?: string;
+  dependencyPath?: string;
+  mlAnalysisType?: "COMPARATIVE" | "PREDICTIVE" | "TIMESERIES_24x7";
+  progress?: number;
 }
 
 export interface NewRelicMetricAnalysisValue {
@@ -15625,19 +16096,19 @@ export interface NewRelicMetricHostAnalysisValue {
   failFastCriteriaDescription?: string;
 }
 
-export interface RestResponseDeploymentTimeSeriesAnalysis {
+export interface RestResponseSetNewRelicMetricAnalysisRecord {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: DeploymentTimeSeriesAnalysis;
+  resource?: NewRelicMetricAnalysisRecord[];
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponseTimeSeriesMLTransactionThresholds {
+export interface RestResponseListNewRelicMetricHostAnalysisValue {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: TimeSeriesMLTransactionThresholds;
+  resource?: NewRelicMetricHostAnalysisValue[];
   responseMessages?: ResponseMessage[];
 }
 
@@ -15778,6 +16249,9 @@ export interface TimeSeriesMLTransactionThresholds {
     | "PCF_PLUGIN"
     | "TERRAFORM_PROVISION"
     | "TERRAFORM_APPLY"
+    | "TERRAGRUNT_PROVISION"
+    | "TERRAGRUNT_DESTROY"
+    | "TERRAGRUNT_ROLLBACK"
     | "ARM_CREATE_RESOURCE"
     | "ARM_ROLLBACK"
     | "SHELL_SCRIPT_PROVISION"
@@ -15826,179 +16300,6 @@ export interface TimeSeriesMetricDefinition {
   thresholds?: Threshold[];
 }
 
-export interface NewRelicMetricAnalysisRecord {
-  uuid: string;
-  appId: string;
-  createdBy?: EmbeddedUser;
-  createdAt?: number;
-  lastUpdatedBy?: EmbeddedUser;
-  lastUpdatedAt: number;
-  stateType?:
-    | "SUB_WORKFLOW"
-    | "REPEAT"
-    | "FORK"
-    | "WAIT"
-    | "PAUSE"
-    | "BARRIER"
-    | "RESOURCE_CONSTRAINT"
-    | "SHELL_SCRIPT"
-    | "HTTP"
-    | "TEMPLATIZED_SECRET_MANAGER"
-    | "EMAIL"
-    | "APP_DYNAMICS"
-    | "NEW_RELIC"
-    | "NEW_RELIC_DEPLOYMENT_MARKER"
-    | "DYNA_TRACE"
-    | "PROMETHEUS"
-    | "SPLUNKV2"
-    | "ELK"
-    | "LOGZ"
-    | "SUMO"
-    | "DATA_DOG"
-    | "DATA_DOG_LOG"
-    | "CVNG"
-    | "CLOUD_WATCH"
-    | "AWS_LAMBDA_VERIFICATION"
-    | "APM_VERIFICATION"
-    | "LOG_VERIFICATION"
-    | "BUG_SNAG"
-    | "STACK_DRIVER"
-    | "STACK_DRIVER_LOG"
-    | "INSTANA"
-    | "SCALYR"
-    | "ENV_STATE"
-    | "ENV_LOOP_STATE"
-    | "ENV_RESUME_STATE"
-    | "ENV_LOOP_RESUME_STATE"
-    | "COMMAND"
-    | "APPROVAL"
-    | "APPROVAL_RESUME"
-    | "ELASTIC_LOAD_BALANCER"
-    | "JENKINS"
-    | "GCB"
-    | "BAMBOO"
-    | "ARTIFACT_COLLECTION"
-    | "ARTIFACT_CHECK"
-    | "AZURE_NODE_SELECT"
-    | "AZURE_VMSS_SETUP"
-    | "AZURE_VMSS_DEPLOY"
-    | "AZURE_VMSS_ROLLBACK"
-    | "AZURE_VMSS_SWITCH_ROUTES"
-    | "AZURE_VMSS_SWITCH_ROUTES_ROLLBACK"
-    | "AZURE_WEBAPP_SLOT_SETUP"
-    | "AZURE_WEBAPP_SLOT_SWAP"
-    | "AZURE_WEBAPP_SLOT_SHIFT_TRAFFIC"
-    | "AZURE_WEBAPP_SLOT_ROLLBACK"
-    | "AWS_NODE_SELECT"
-    | "DC_NODE_SELECT"
-    | "ROLLING_NODE_SELECT"
-    | "PHASE"
-    | "PHASE_STEP"
-    | "STAGING_ORIGINAL_EXECUTION"
-    | "AWS_CODEDEPLOY_STATE"
-    | "AWS_CODEDEPLOY_ROLLBACK"
-    | "AWS_LAMBDA_STATE"
-    | "AWS_LAMBDA_ROLLBACK"
-    | "AWS_AMI_SERVICE_SETUP"
-    | "ASG_AMI_SERVICE_ALB_SHIFT_SETUP"
-    | "AWS_AMI_SERVICE_DEPLOY"
-    | "ASG_AMI_SERVICE_ALB_SHIFT_DEPLOY"
-    | "AWS_AMI_SWITCH_ROUTES"
-    | "ASG_AMI_ALB_SHIFT_SWITCH_ROUTES"
-    | "AWS_AMI_ROLLBACK_SWITCH_ROUTES"
-    | "ASG_AMI_ROLLBACK_ALB_SHIFT_SWITCH_ROUTES"
-    | "AWS_AMI_SERVICE_ROLLBACK"
-    | "ECS_SERVICE_SETUP"
-    | "SPOTINST_SETUP"
-    | "SPOTINST_ALB_SHIFT_SETUP"
-    | "SPOTINST_DEPLOY"
-    | "SPOTINST_ALB_SHIFT_DEPLOY"
-    | "SPOTINST_LISTENER_UPDATE"
-    | "SPOTINST_LISTENER_ALB_SHIFT"
-    | "SPOTINST_ROLLBACK"
-    | "SPOTINST_LISTENER_UPDATE_ROLLBACK"
-    | "SPOTINST_LISTENER_ALB_SHIFT_ROLLBACK"
-    | "ECS_SERVICE_SETUP_ROLLBACK"
-    | "ECS_DAEMON_SERVICE_SETUP"
-    | "ECS_BG_SERVICE_SETUP"
-    | "ECS_BG_SERVICE_SETUP_ROUTE53"
-    | "ECS_SERVICE_DEPLOY"
-    | "ECS_SERVICE_ROLLBACK"
-    | "ECS_LISTENER_UPDATE"
-    | "ECS_LISTENER_UPDATE_ROLLBACK"
-    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE"
-    | "ECS_ROUTE53_DNS_WEIGHT_UPDATE_ROLLBACK"
-    | "KUBERNETES_SETUP"
-    | "KUBERNETES_SETUP_ROLLBACK"
-    | "KUBERNETES_DEPLOY"
-    | "KUBERNETES_DEPLOY_ROLLBACK"
-    | "KUBERNETES_STEADY_STATE_CHECK"
-    | "ECS_STEADY_STATE_CHECK"
-    | "ECS_RUN_TASK"
-    | "GCP_CLUSTER_SETUP"
-    | "HELM_DEPLOY"
-    | "HELM_ROLLBACK"
-    | "PCF_SETUP"
-    | "PCF_RESIZE"
-    | "PCF_ROLLBACK"
-    | "PCF_MAP_ROUTE"
-    | "PCF_UNMAP_ROUTE"
-    | "PCF_BG_MAP_ROUTE"
-    | "PCF_PLUGIN"
-    | "TERRAFORM_PROVISION"
-    | "TERRAFORM_APPLY"
-    | "ARM_CREATE_RESOURCE"
-    | "ARM_ROLLBACK"
-    | "SHELL_SCRIPT_PROVISION"
-    | "TERRAFORM_DESTROY"
-    | "CLOUD_FORMATION_CREATE_STACK"
-    | "CLOUD_FORMATION_DELETE_STACK"
-    | "KUBERNETES_SWAP_SERVICE_SELECTORS"
-    | "CLOUD_FORMATION_ROLLBACK_STACK"
-    | "TERRAFORM_ROLLBACK"
-    | "K8S_DEPLOYMENT_ROLLING"
-    | "K8S_SCALE"
-    | "K8S_DEPLOYMENT_ROLLING_ROLLBACK"
-    | "K8S_BLUE_GREEN_DEPLOY"
-    | "K8S_CANARY_DEPLOY"
-    | "K8S_DELETE"
-    | "JIRA_CREATE_UPDATE"
-    | "SERVICENOW_CREATE_UPDATE"
-    | "K8S_TRAFFIC_SPLIT"
-    | "K8S_APPLY"
-    | "CUSTOM_DEPLOYMENT_FETCH_INSTANCES";
-  message?: string;
-  riskLevel?: "HIGH" | "MEDIUM" | "LOW" | "NA";
-  workflowExecutionId?: string;
-  stateExecutionId?: string;
-  accountId?: string;
-  cvConfigId?: string;
-  metricAnalyses?: NewRelicMetricAnalysis[];
-  analysisMinute?: number;
-  showTimeSeries?: boolean;
-  baseLineExecutionId?: string;
-  groupName?: string;
-  dependencyPath?: string;
-  mlAnalysisType?: "COMPARATIVE" | "PREDICTIVE" | "TIMESERIES_24x7";
-  progress?: number;
-}
-
-export interface RestResponseSetNewRelicMetricAnalysisRecord {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: NewRelicMetricAnalysisRecord[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseListNewRelicMetricHostAnalysisValue {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: NewRelicMetricHostAnalysisValue[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface RestResponseListTimeSeriesMLTransactionThresholds {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -16025,6 +16326,32 @@ export interface TimeSeriesKeyTransactions {
   serviceId?: string;
   accountId?: string;
   keyTransactions?: string[];
+}
+
+export interface DeploymentTimeSeriesAnalysis {
+  stateExecutionId?: string;
+  customThresholdRefId?: string;
+  baseLineExecutionId?: string;
+  message?: string;
+  riskLevel?: "HIGH" | "MEDIUM" | "LOW" | "NA";
+  total?: number;
+  metricAnalyses?: NewRelicMetricAnalysis[];
+}
+
+export interface RestResponseDeploymentTimeSeriesAnalysis {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: DeploymentTimeSeriesAnalysis;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseTimeSeriesMLTransactionThresholds {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: TimeSeriesMLTransactionThresholds;
+  responseMessages?: ResponseMessage[];
 }
 
 export interface ArtifactSelection {
@@ -16228,6 +16555,7 @@ export type WebHookTriggerCondition = TriggerCondition & {
   branchName?: string;
   branchRegex?: string;
   checkFileContentChanged?: boolean;
+  webHookSecret?: string;
 };
 
 export interface RestResponsePageResponseTrigger {
@@ -16360,14 +16688,6 @@ export interface SamlLinkGroupRequest {
   samlGroupName?: string;
 }
 
-export interface RestResponseCollectionFeatureFlag {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: FeatureFlag[];
-  responseMessages?: ResponseMessage[];
-}
-
 export interface PublicUser {
   user?: User;
   inviteAccepted?: boolean;
@@ -16379,6 +16699,22 @@ export interface RestResponsePageResponsePublicUser {
   };
   resource?: PublicUser[];
   responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseCollectionFeatureFlag {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: FeatureFlag[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface UpdatePasswordRequest {
+  password?: string;
+}
+
+export interface LoginRequest {
+  authorization?: string;
 }
 
 export interface AccountPermissionSummary {
@@ -16414,6 +16750,7 @@ export interface AccountPermissionSummary {
     | "MANAGE_CONFIG_AS_CODE"
     | "MANAGE_SECRETS"
     | "MANAGE_SECRET_MANAGERS"
+    | "MANAGE_SSH_AND_WINRM"
     | "MANAGE_AUTHENTICATION_SETTINGS"
     | "MANAGE_USER_AND_USER_GROUPS_AND_API_KEYS"
     | "VIEW_USER_AND_USER_GROUPS_AND_API_KEYS"
@@ -16444,6 +16781,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16457,6 +16795,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16470,6 +16809,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16483,6 +16823,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16496,6 +16837,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16509,6 +16851,7 @@ export interface AppPermissionSummaryForUI {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT"
     )[];
   };
@@ -16534,16 +16877,46 @@ export interface UserPermissionInfo {
   };
 }
 
-export interface LoginRequest {
-  authorization?: string;
-}
-
-export interface RestResponseUserInvite {
+export interface RestResponseTwoFactorAuthenticationSettings {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: UserInvite;
+  resource?: TwoFactorAuthenticationSettings;
   responseMessages?: ResponseMessage[];
+}
+
+export interface TwoFactorAuthenticationSettings {
+  userId?: string;
+  email?: string;
+  twoFactorAuthenticationEnabled?: boolean;
+  mechanism?: "TOTP";
+  totpSecretKey?: string;
+  totpqrurl?: string;
+}
+
+export interface RestResponseTwoFactorAdminOverrideSettings {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: TwoFactorAdminOverrideSettings;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface TwoFactorAdminOverrideSettings {
+  adminOverrideTwoFactorEnabled?: boolean;
+}
+
+export interface RestResponseZendeskSsoLoginResponse {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ZendeskSsoLoginResponse;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface ZendeskSsoLoginResponse {
+  redirectUrl?: string;
+  userId?: string;
 }
 
 export interface AccountJoinRequest {
@@ -16556,6 +16929,7 @@ export interface AccountJoinRequest {
 
 export interface ResetPasswordRequest {
   email?: string;
+  isNG?: boolean;
 }
 
 export interface ResendInvitationEmailRequest {
@@ -16592,6 +16966,7 @@ export interface EnvironmentRole {
       | "EXECUTE"
       | "EXECUTE_WORKFLOW"
       | "EXECUTE_PIPELINE"
+      | "EXECUTE_WORKFLOW_ROLLBACK"
       | "DEFAULT";
   };
 }
@@ -16651,6 +17026,7 @@ export interface ImmutablePairResourceTypeAction {
     | "EXECUTE"
     | "EXECUTE_WORKFLOW"
     | "EXECUTE_PIPELINE"
+    | "EXECUTE_WORKFLOW_ROLLBACK"
     | "DEFAULT";
   value?:
     | "ALL"
@@ -16661,6 +17037,7 @@ export interface ImmutablePairResourceTypeAction {
     | "EXECUTE"
     | "EXECUTE_WORKFLOW"
     | "EXECUTE_PIPELINE"
+    | "EXECUTE_WORKFLOW_ROLLBACK"
     | "DEFAULT";
   key?:
     | "APPLICATION"
@@ -16726,40 +17103,19 @@ export interface SsoRedirectRequest {
   jwtToken?: string;
 }
 
-export interface RestResponseTwoFactorAuthenticationSettings {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: TwoFactorAuthenticationSettings;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface TwoFactorAuthenticationSettings {
-  userId?: string;
-  email?: string;
-  twoFactorAuthenticationEnabled?: boolean;
-  mechanism?: "TOTP";
-  totpSecretKey?: string;
-  totpqrurl?: string;
-}
-
-export interface RestResponseTwoFactorAdminOverrideSettings {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: TwoFactorAdminOverrideSettings;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface TwoFactorAdminOverrideSettings {
-  adminOverrideTwoFactorEnabled?: boolean;
-}
-
 export interface RestResponsePageResponseUserInvite {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
   resource?: UserInvite[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseUserInvite {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: UserInvite;
   responseMessages?: ResponseMessage[];
 }
 
@@ -16792,17 +17148,12 @@ export interface RestResponseInviteOperationResponse {
   responseMessages?: ResponseMessage[];
 }
 
-export interface RestResponseZendeskSsoLoginResponse {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ZendeskSsoLoginResponse;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface ZendeskSsoLoginResponse {
-  redirectUrl?: string;
-  userId?: string;
+export interface UserInviteDTO {
+  email: string;
+  token: string;
+  accountId: string;
+  name: string;
+  password?: string;
 }
 
 export interface RestResponseVersionPackage {
@@ -17014,6 +17365,42 @@ export interface RestResponsePageResponseWorkflow {
   responseMessages?: ResponseMessage[];
 }
 
+export interface RestResponseTrafficShiftMetadata {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: TrafficShiftMetadata;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface TrafficShiftMetadata {
+  phaseIdsWithTrafficShift?: string[];
+}
+
+export interface RestResponsePhaseStep {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: PhaseStep;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseListNotificationRule {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: NotificationRule[];
+  responseMessages?: ResponseMessage[];
+}
+
+export interface RestResponseListInstanceElement {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: InstanceElement[];
+  responseMessages?: ResponseMessage[];
+}
+
 export interface RestResponseConcurrencyStrategy {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -17055,42 +17442,6 @@ export interface WorkflowStepMeta {
   name?: string;
   favorite?: boolean;
   available?: boolean;
-}
-
-export interface RestResponseTrafficShiftMetadata {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: TrafficShiftMetadata;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface TrafficShiftMetadata {
-  phaseIdsWithTrafficShift?: string[];
-}
-
-export interface RestResponsePhaseStep {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: PhaseStep;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseListNotificationRule {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: NotificationRule[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RestResponseListInstanceElement {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: InstanceElement[];
-  responseMessages?: ResponseMessage[];
 }
 
 export interface Alert {
@@ -17540,6 +17891,38 @@ export interface AwsCurAttributes {
   s3BucketName: string;
 }
 
+export interface AwsKmsConnectorCredential {
+  type: "AssumeIAMRole" | "AssumeSTSRole" | "ManualConfig";
+  spec?: AwsKmsCredentialSpec;
+}
+
+export type AwsKmsConnectorDTO = ConnectorConfigDTO & {
+  credential?: AwsKmsConnectorCredential;
+  kmsArn?: string;
+  region?: string;
+  default?: boolean;
+};
+
+export interface AwsKmsCredentialSpec {
+  [key: string]: any;
+}
+
+export type AwsKmsCredentialSpecAssumeIAM = AwsKmsCredentialSpec & {
+  delegateSelectors: string[];
+};
+
+export type AwsKmsCredentialSpecAssumeSTS = AwsKmsCredentialSpec & {
+  delegateSelectors: string[];
+  roleArn: string;
+  externalName?: string;
+  assumeStsRoleDuration?: number;
+};
+
+export type AwsKmsCredentialSpecManualConfig = AwsKmsCredentialSpec & {
+  accessKey: string;
+  secretKey: string;
+};
+
 export type AwsManualConfigSpec = AwsCredentialSpec & {
   accessKey?: string;
   accessKeyRef?: string;
@@ -17638,9 +18021,11 @@ export interface ConnectorInfoDTO {
     | "Git"
     | "Splunk"
     | "AppDynamics"
+    | "Prometheus"
     | "Vault"
     | "DockerRegistry"
     | "Local"
+    | "AwsKms"
     | "GcpKms"
     | "Gcp"
     | "Aws"
@@ -17653,6 +18038,7 @@ export interface ConnectorInfoDTO {
     | "Codecommit"
     | "CEAws"
     | "CEAzure"
+    | "GcpCloudCost"
     | "CEK8sCluster"
     | "HttpHelmRepo"
     | "NewRelic";
@@ -17698,6 +18084,16 @@ export type DockerUserNamePasswordDTO = DockerAuthCredentialsDTO & {
   username?: string;
   usernameRef?: string;
   passwordRef: string;
+};
+
+export interface GcpBillingExportSpec {
+  projectId: string;
+  datasetId: string;
+}
+
+export type GcpCloudCostConnector = ConnectorConfigDTO & {
+  featuresEnabled?: "BILLING"[];
+  billingExportSpec?: GcpBillingExportSpec;
 };
 
 export type GcpConnector = ConnectorConfigDTO & {
@@ -17973,6 +18369,7 @@ export type NewRelicConnectorDTO = ConnectorConfigDTO & {
   newRelicAccountId: string;
   url: string;
   apiKeyRef: string;
+  delegateSelectors?: string[];
 };
 
 export interface NexusAuthCredentials {
@@ -17995,6 +18392,11 @@ export type NexusUsernamePasswordAuth = NexusAuthCredentials & {
   username?: string;
   usernameRef?: string;
   passwordRef: string;
+};
+
+export type PrometheusConnectorDTO = ConnectorConfigDTO & {
+  url: string;
+  delegateSelectors?: string[];
 };
 
 export interface SplunkConnectorDTO {
@@ -18029,10 +18431,12 @@ export interface DataCollectionRequest {
     | "STACKDRIVER_DASHBOARD_GET"
     | "STACKDRIVER_SAMPLE_DATA"
     | "APPDYNAMICS_FETCH_APPS"
-    | "APPDYNAMICS_FETCH_TIERS";
-  dsl?: string;
+    | "APPDYNAMICS_FETCH_TIERS"
+    | "APPDYNAMICS_GET_METRIC_DATA"
+    | "NEWRELIC_APPS_REQUEST"
+    | "NEWRELIC_VALIDATION_REQUEST";
   baseUrl?: string;
-  connectorConfigDTO?: ConnectorConfigDTO;
+  dsl?: string;
 }
 
 export interface CVNGPerpetualTaskDTO {
@@ -18075,10 +18479,17 @@ export interface VerificationJobDTO {
   projectIdentifier?: string;
   orgIdentifier?: string;
   activitySourceIdentifier?: string;
-  dataSources?: ("APP_DYNAMICS" | "SPLUNK" | "STACKDRIVER" | "KUBERNETES")[];
+  dataSources?: (
+    | "APP_DYNAMICS"
+    | "SPLUNK"
+    | "STACKDRIVER"
+    | "KUBERNETES"
+    | "NEW_RELIC"
+  )[];
   monitoringSources?: string[];
   verificationJobUrl?: string;
   duration?: string;
+  allMonitoringSourcesEnabled?: boolean;
   type?: "TEST" | "CANARY" | "BLUE_GREEN" | "HEALTH";
   defaultJob?: boolean;
 }
@@ -18210,6 +18621,8 @@ export interface GovernanceConfig {
   lastUpdatedBy?: EmbeddedUser;
   timeRangeBasedFreezeConfigs?: TimeRangeBasedFreezeConfig[];
   weeklyFreezeConfigs?: WeeklyFreezeConfig[];
+  enableNextIterations?: boolean;
+  enableNextCloseIterations?: boolean;
   nextIterations?: number[];
   nextCloseIterations?: number[];
 }
@@ -18381,6 +18794,12 @@ export interface AwsSecretsManagerConfig {
   secretKey?: string;
   region?: string;
   secretNamePrefix?: string;
+  assumeIamRoleOnDelegate?: boolean;
+  assumeStsRoleOnDelegate?: boolean;
+  assumeStsRoleDuration?: number;
+  roleArn?: string;
+  externalName?: string;
+  delegateSelectors?: string[];
   uuid: string;
   encryptionType?:
     | "LOCAL"
@@ -18480,8 +18899,8 @@ export interface CustomSecretsManagerConfig {
   usageRestrictions?: UsageRestrictions;
   scopedToAccount?: boolean;
   templatizedFields?: string[];
-  validationCriteria?: string;
   encryptionServiceUrl?: string;
+  validationCriteria?: string;
   connectorTemplatized?: boolean;
   default?: boolean;
   templatized?: boolean;
@@ -18608,9 +19027,9 @@ export interface CyberArkConfig {
   usageRestrictions?: UsageRestrictions;
   scopedToAccount?: boolean;
   templatizedFields?: string[];
-  validationCriteria?: string;
-  encryptionServiceUrl?: string;
   certValidationRequired?: boolean;
+  encryptionServiceUrl?: string;
+  validationCriteria?: string;
   default?: boolean;
   templatized?: boolean;
 }
@@ -18621,6 +19040,12 @@ export interface KmsConfig {
   secretKey?: string;
   kmsArn?: string;
   region?: string;
+  assumeIamRoleOnDelegate?: boolean;
+  assumeStsRoleOnDelegate?: boolean;
+  assumeStsRoleDuration?: number;
+  roleArn?: string;
+  externalName?: string;
+  delegateSelectors?: string[];
   uuid: string;
   encryptionType?:
     | "LOCAL"
@@ -18697,6 +19122,7 @@ export interface SSHVaultConfig {
   secretEngineName?: string;
   renewalInterval?: number;
   engineManuallyEntered?: boolean;
+  namespace?: string;
   renewedAt?: number;
   certValidationRequired?: boolean;
   default?: boolean;
@@ -18867,6 +19293,7 @@ export interface EncryptedData {
   nextMigrationIteration?: number;
   nextAwsToGcpKmsMigrationIteration?: number;
   nextLocalToGcpKmsMigrationIteration?: number;
+  nextAwsKmsToGcpKmsMigrationIteration?: number;
   base64Encoded?: boolean;
   encryptedBy?: string;
   setupUsage?: number;
@@ -19031,8 +19458,8 @@ export interface SecretManagerConfig {
   default?: boolean;
   templatized?: boolean;
   name?: string;
-  validationCriteria?: string;
   encryptionServiceUrl?: string;
+  validationCriteria?: string;
 }
 
 export interface RestResponseListSecretChangeLog {
@@ -19219,6 +19646,7 @@ export interface VaultConfig {
   secretEngineName?: string;
   renewalInterval?: number;
   engineManuallyEntered?: boolean;
+  namespace?: string;
   renewedAt?: number;
   readOnly?: boolean;
   certValidationRequired?: boolean;
@@ -19285,6 +19713,14 @@ export interface TemplateFolder {
   keywords?: string[];
 }
 
+export interface RestResponsePageResponseTemplate {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: Template[];
+  responseMessages?: ResponseMessage[];
+}
+
 export interface RestResponsePageResponseTemplateVersion {
   metaData?: {
     [key: string]: { [key: string]: any };
@@ -19309,14 +19745,6 @@ export interface TemplateVersion {
   createdAt?: number;
   lastUpdatedBy?: EmbeddedUser;
   lastUpdatedAt: number;
-}
-
-export interface RestResponsePageResponseTemplate {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: Template[];
-  responseMessages?: ResponseMessage[];
 }
 
 export interface CEView {
@@ -19398,6 +19826,14 @@ export interface ViewVisualization {
   chartType?: "STACKED_TIME_SERIES" | "STACKED_LINE_CHART";
 }
 
+export interface RestResponseViewCustomField {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: ViewCustomField;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface ViewCustomField {
   uuid?: string;
   accountId?: string;
@@ -19410,14 +19846,6 @@ export interface ViewCustomField {
   viewFields?: ViewField[];
   createdAt?: number;
   lastUpdatedAt?: number;
-}
-
-export interface RestResponseViewCustomField {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: ViewCustomField;
-  responseMessages?: ResponseMessage[];
 }
 
 export interface RestResponseYamlHistory {
@@ -19718,6 +20146,8 @@ export type HarnessTagRequestBody = HarnessTag;
 
 export type HarnessTagLinkRequestBody = HarnessTagLink;
 
+export type HarnessUserGroupDTORequestBody = HarnessUserGroupDTO;
+
 export type PipelineRequestBody = Pipeline;
 
 export type ResourceConstraintRequestBody = ResourceConstraint;
@@ -19744,9 +20174,7 @@ export type ServiceVariableRequestBody = ServiceVariable;
 
 export type SettingAttributeRequestBody = SettingAttribute;
 
-export type Update27RequestBody = void;
-
-export type UpdatePasswordRequestRequestBody = UpdatePasswordRequest;
+export type Update25RequestBody = void;
 
 export type StackDriverSetupTestNodeDataRequestBody = StackDriverSetupTestNodeData;
 
@@ -19907,7 +20335,7 @@ export type UpdatePasswordProps = Omit<
     RestResponse,
     unknown,
     void,
-    UpdatePasswordRequestRequestBody,
+    UpdatePasswordRequest,
     UpdatePasswordPathParams
   >,
   "path" | "verb"
@@ -19919,7 +20347,7 @@ export const UpdatePassword = ({ token, ...props }: UpdatePasswordProps) => (
     RestResponse,
     unknown,
     void,
-    UpdatePasswordRequestRequestBody,
+    UpdatePasswordRequest,
     UpdatePasswordPathParams
   >
     verb="POST"
@@ -19934,7 +20362,7 @@ export type UseUpdatePasswordProps = Omit<
     RestResponse,
     unknown,
     void,
-    UpdatePasswordRequestRequestBody,
+    UpdatePasswordRequest,
     UpdatePasswordPathParams
   >,
   "path" | "verb"
@@ -19949,7 +20377,7 @@ export const useUpdatePassword = ({
     RestResponse,
     unknown,
     void,
-    UpdatePasswordRequestRequestBody,
+    UpdatePasswordRequest,
     UpdatePasswordPathParams
   >(
     "POST",
@@ -20035,3 +20463,60 @@ export const useTwoFactorLogin = (props: UseTwoFactorLoginProps) =>
       ...props
     }
   );
+
+export interface CompleteInviteAndSignIn1QueryParams {
+  accountId?: string;
+}
+
+export type CompleteInviteAndSignIn1Props = Omit<
+  MutateProps<
+    RestResponseUser,
+    unknown,
+    CompleteInviteAndSignIn1QueryParams,
+    UserInviteDTO,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const CompleteInviteAndSignIn1 = (
+  props: CompleteInviteAndSignIn1Props
+) => (
+  <Mutate<
+    RestResponseUser,
+    unknown,
+    CompleteInviteAndSignIn1QueryParams,
+    UserInviteDTO,
+    void
+  >
+    verb="PUT"
+    path={`/users/invites/ngsignin`}
+    base={window.location.pathname.replace("auth/", "") + "gateway/api"}
+    {...props}
+  />
+);
+
+export type UseCompleteInviteAndSignIn1Props = Omit<
+  UseMutateProps<
+    RestResponseUser,
+    unknown,
+    CompleteInviteAndSignIn1QueryParams,
+    UserInviteDTO,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useCompleteInviteAndSignIn1 = (
+  props: UseCompleteInviteAndSignIn1Props
+) =>
+  useMutate<
+    RestResponseUser,
+    unknown,
+    CompleteInviteAndSignIn1QueryParams,
+    UserInviteDTO,
+    void
+  >("PUT", `/users/invites/ngsignin`, {
+    base: window.location.pathname.replace("auth/", "") + "gateway/api",
+    ...props
+  });

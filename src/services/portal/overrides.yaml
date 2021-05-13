@@ -5,6 +5,7 @@ allowpaths:
   - "/users/reset-password/{token}"
   - "/users/harness-local-login"
   - "/users/two-factor-login"
+  - "/users/invites/ngsignin"
 operationIdOverrides:
   /users/login: login
   /users/logintype: loginType
