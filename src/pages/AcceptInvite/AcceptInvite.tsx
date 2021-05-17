@@ -25,14 +25,16 @@ interface AcceptInviteFormData {
 }
 
 interface AcceptInviteQueryParams {
-  token?: string;
-  accountIdentifier?: string;
+  token: string;
+  accountIdentifier: string;
+  email: string;
 }
 
 const SignUp: React.FC = () => {
   const {
-    token = "",
-    accountIdentifier = ""
+    token,
+    accountIdentifier,
+    email
   } = useQueryParams<AcceptInviteQueryParams>();
 
   const {
@@ -87,8 +89,9 @@ const SignUp: React.FC = () => {
               <Field
                 name="email"
                 label={"Email"}
+                initialValue={email}
                 placeholder="email@work.com"
-                disabled={loading}
+                disabled={true}
                 validate={validateEmail}
               />
               <Field
