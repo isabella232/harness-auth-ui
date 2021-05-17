@@ -19,7 +19,7 @@ export enum AuthPage {
 
 interface AuthFooterProps {
   page: AuthPage;
-  hideOAuth: boolean;
+  hideOAuth?: boolean;
 }
 
 const AuthFooter: React.FC<AuthFooterProps> = ({ page, hideOAuth }) => {
@@ -54,7 +54,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page, hideOAuth }) => {
 
   return (
     <>
-      {hideOAuth ? null : (
+      {hideOAuth === true ? null : (
         <>
           <h2 className={css.lineMessage}>
             <span className={css.message}>
