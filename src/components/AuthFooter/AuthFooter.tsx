@@ -19,9 +19,10 @@ export enum AuthPage {
 
 interface AuthFooterProps {
   page: AuthPage;
+  hideOAuth: boolean;
 }
 
-const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
+const AuthFooter: React.FC<AuthFooterProps> = ({ page, hideOAuth }) => {
   const history = useHistory();
 
   const isSignup = page === AuthPage.SignUp;
@@ -53,62 +54,63 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page }) => {
 
   return (
     <>
-      <h2 className={css.lineMessage}>
-        <span className={css.message}>
-          {isSignup ? "or sign up with" : "or login with"}
-        </span>
-      </h2>
-
-      <div>
-        <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
-          {OAuthProviders.map((oAuthProvider: OAuthProviderType) =>
-            getOAuthLink(isSignup, oAuthProvider)
-          )}
-        </div>
-        {isSignup ? (
-          <div className={css.disclaimer}>
-            By signing up you agree to our&nbsp;
-            <a
-              className={css.externalLink}
-              href={URLS.PRIVACY_AGREEMENT}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Privacy Policy&nbsp;
-            </a>
-            and our&nbsp;
-            <a
-              className={css.externalLink}
-              href={URLS.SUBSCRIPTION_TERMS}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Terms of Use
-            </a>
+      {hideOAuth ? null : (
+        <>
+          <h2 className={css.lineMessage}>
+            <span className={css.message}>
+              {isSignup ? "or sign up with" : "or login with"}
+            </span>
+          </h2>
+          <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
+            {OAuthProviders.map((oAuthProvider: OAuthProviderType) =>
+              getOAuthLink(isSignup, oAuthProvider)
+            )}
           </div>
-        ) : (
-          <>
-            <button
-              className={cx("button", css.ssoButton)}
-              onClick={() => {
-                history.push(RouteDefinitions.toSSOSignIn());
-              }}
-            >
-              <Text icon="sso" iconProps={{ size: 24 }}>
-                Single Sign-On
-              </Text>
-            </button>
-            <button
-              className={cx("button", css.ssoButton)}
-              onClick={() => {
-                history.push(RouteDefinitions.toLocalLogin());
-              }}
-            >
-              <Text>Harness Local Login</Text>
-            </button>
-          </>
-        )}
-      </div>
+        </>
+      )}
+      {isSignup ? (
+        <div className={css.disclaimer}>
+          By signing up, you agree to our&nbsp;
+          <a
+            className={css.externalLink}
+            href={URLS.PRIVACY_AGREEMENT}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Privacy Policy&nbsp;
+          </a>
+          and our&nbsp;
+          <a
+            className={css.externalLink}
+            href={URLS.SUBSCRIPTION_TERMS}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Terms of Use
+          </a>
+        </div>
+      ) : (
+        <>
+          <button
+            className={cx("button", css.ssoButton)}
+            onClick={() => {
+              history.push(RouteDefinitions.toSSOSignIn());
+            }}
+          >
+            <Text icon="sso" iconProps={{ size: 24 }}>
+              Single Sign-On
+            </Text>
+          </button>
+          <button
+            className={cx("button", css.ssoButton)}
+            onClick={() => {
+              history.push(RouteDefinitions.toLocalLogin());
+            }}
+          >
+            <Text>Harness Local Login</Text>
+          </button>
+        </>
+      )}
     </>
   );
 };

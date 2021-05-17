@@ -108,7 +108,7 @@ const SignUp: React.FC = () => {
             </form>
           )}
         />
-        <AuthFooter page={AuthPage.SignUp} />
+        <AuthFooter page={AuthPage.SignUp} hideOAuth={true} />
       </div>
     </BasicLayout>
   );
