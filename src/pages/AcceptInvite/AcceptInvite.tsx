@@ -89,7 +89,7 @@ const SignUp: React.FC = () => {
               <Field
                 name="email"
                 label={"Email"}
-                initialValue={email}
+                initialValue={decodeURIComponent(email || "")}
                 placeholder="email@work.com"
                 disabled={true}
                 validate={validateEmail}
