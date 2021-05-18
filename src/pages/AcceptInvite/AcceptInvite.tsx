@@ -82,7 +82,7 @@ const SignUp: React.FC = () => {
               <Field
                 name="name"
                 label="Name"
-                placeholder="John Doe"
+                placeholder="Your Name"
                 disabled={loading}
                 validate={validateName}
               />
