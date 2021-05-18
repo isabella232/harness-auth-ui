@@ -87,96 +87,94 @@ exports[`SignIn render 1`] = `
               or login with
             </span>
           </h2>
-          <div>
-            <div
-              class="layout-horizontal spacing-auto oAuthIcons"
+          <div
+            class="layout-horizontal spacing-auto oAuthIcons"
+          >
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
             >
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-            </div>
-            <button
-              class="button ssoButton"
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
             >
-              <span
-                class="text"
-              >
-                <img
-                  class="icon"
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-                Single Sign-On
-              </span>
-            </button>
-            <button
-              class="button ssoButton"
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
             >
-              <span
-                class="text"
-              >
-                Harness Local Login
-              </span>
-            </button>
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
           </div>
+          <button
+            class="button ssoButton"
+          >
+            <span
+              class="text"
+            >
+              <img
+                class="icon"
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+              Single Sign-On
+            </span>
+          </button>
+          <button
+            class="button ssoButton"
+          >
+            <span
+              class="text"
+            >
+              Harness Local Login
+            </span>
+          </button>
           <div
             class="footer"
           >

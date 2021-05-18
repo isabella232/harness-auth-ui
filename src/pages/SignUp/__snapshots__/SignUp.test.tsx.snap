@@ -90,93 +90,91 @@ exports[`SignUp render 1`] = `
               or sign up with
             </span>
           </h2>
-          <div>
-            <div
-              class="layout-horizontal spacing-auto oAuthIcons"
+          <div
+            class="layout-horizontal spacing-auto oAuthIcons"
+          >
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=github&action=signup&isNG=true"
             >
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-            </div>
-            <div
-              class="disclaimer"
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket&action=signup&isNG=true"
             >
-              By signing up you agree to our 
-              <a
-                class="externalLink"
-                href="https://harness.io/privacy/"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Privacy Policy 
-              </a>
-              and our 
-              <a
-                class="externalLink"
-                href="https://harness.io/subscriptionterms/"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Terms of Use
-              </a>
-            </div>
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=google&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+          </div>
+          <div
+            class="disclaimer"
+          >
+            By signing up, you agree to our 
+            <a
+              class="externalLink"
+              href="https://harness.io/privacy/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Privacy Policy 
+            </a>
+            and our 
+            <a
+              class="externalLink"
+              href="https://harness.io/subscriptionterms/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Terms of Use
+            </a>
           </div>
         </div>
       </div>
@@ -285,93 +283,91 @@ exports[`SignUp telemetry 1`] = `
               or sign up with
             </span>
           </h2>
-          <div>
-            <div
-              class="layout-horizontal spacing-auto oAuthIcons"
+          <div
+            class="layout-horizontal spacing-auto oAuthIcons"
+          >
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=github&action=signup&isNG=true"
             >
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=github&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=google&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-              <a
-                class="iconContainer"
-                href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure&action=signup&isNG=true"
-              >
-                <img
-                  height="24"
-                  src="test-file-stub"
-                  width="24"
-                />
-              </a>
-            </div>
-            <div
-              class="disclaimer"
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket&action=signup&isNG=true"
             >
-              By signing up you agree to our 
-              <a
-                class="externalLink"
-                href="https://harness.io/privacy/"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Privacy Policy 
-              </a>
-              and our 
-              <a
-                class="externalLink"
-                href="https://harness.io/subscriptionterms/"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Terms of Use
-              </a>
-            </div>
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=google&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+            <a
+              class="iconContainer"
+              href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure&action=signup&isNG=true"
+            >
+              <img
+                height="24"
+                src="test-file-stub"
+                width="24"
+              />
+            </a>
+          </div>
+          <div
+            class="disclaimer"
+          >
+            By signing up, you agree to our 
+            <a
+              class="externalLink"
+              href="https://harness.io/privacy/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Privacy Policy 
+            </a>
+            and our 
+            <a
+              class="externalLink"
+              href="https://harness.io/subscriptionterms/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Terms of Use
+            </a>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React, { FocusEvent } from "react";
 import cx from "classnames";
 
-import { Field as FormikField } from "react-final-form";
+import { Field as FinalField } from "react-final-form";
 
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 
@@ -16,14 +16,24 @@ interface FieldProps {
   placeholder: string;
   type?: string;
   disabled?: boolean;
+  initialValue?: string;
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
 }
 
 const Field: React.FC<FieldProps> = (props) => {
-  const { name, label, validate, disabled, placeholder, type, onBlur } = props;
+  const {
+    name,
+    label,
+    validate,
+    disabled,
+    placeholder,
+    type,
+    onBlur,
+    initialValue
+  } = props;
 
   return (
-    <FormikField name={name} validate={validate} className>
+    <FinalField name={name} validate={validate} initialValue={initialValue}>
       {({ input, meta }) => {
         const showError = meta.error && meta.touched;
 
@@ -47,7 +57,7 @@ const Field: React.FC<FieldProps> = (props) => {
           </div>
         );
       }}
-    </FormikField>
+    </FinalField>
   );
 };
 

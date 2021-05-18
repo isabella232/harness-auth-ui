@@ -1,5 +1,11 @@
 import { regexEmail } from "utils/StringUtils";
 
+export function validateName(name: string): string | undefined {
+  if (!name) {
+    return "Name is required";
+  }
+}
+
 export function validateEmail(email: string): string | undefined {
   if (!email) {
     return "An email is required";

@@ -11,6 +11,7 @@ import SSOSignIn from "./pages/SSOSignIn/SSOSignIn";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
+import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
 
 export function App() {
   return (
@@ -24,6 +25,7 @@ export function App() {
         <Route path={routes.toResetPassword()} component={ResetPassword} />
         <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
         <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
+        <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
         <Route path="/" exact>
           <Redirect to={routes.toSignIn()} />
         </Route>
