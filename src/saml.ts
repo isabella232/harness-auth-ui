@@ -34,8 +34,8 @@ function saml(): void {
         const base = `${baseUrl}ng/#/account/${accountId}`;
 
         const completeLink = module
-          ? `${base}/${module}/home/trial`
-          : `${base}/purpose`;
+          ? `${base}/${module}/home?source=signup`
+          : `${base}/purpose?source=signup`;
 
         window.location.href = completeLink;
 
