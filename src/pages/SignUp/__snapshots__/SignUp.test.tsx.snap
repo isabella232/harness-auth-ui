@@ -22,6 +22,24 @@ exports[`SignUp render 1`] = `
               src="test-file-stub"
               width="120"
             />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Sign In
+              </span>
+            </a>
           </div>
           <div
             class="title"
@@ -68,7 +86,7 @@ exports[`SignUp render 1`] = `
             <div
               class="g-recaptcha"
               data-badge="bottomright"
-              data-sitekey=""
+              data-sitekey="1234"
               data-size="invisible"
               data-tabindex="0"
               data-theme="light"
@@ -215,6 +233,24 @@ exports[`SignUp telemetry 1`] = `
               src="test-file-stub"
               width="120"
             />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Sign In
+              </span>
+            </a>
           </div>
           <div
             class="title"
@@ -261,7 +297,7 @@ exports[`SignUp telemetry 1`] = `
             <div
               class="g-recaptcha"
               data-badge="bottomright"
-              data-sitekey=""
+              data-sitekey="1234"
               data-size="invisible"
               data-tabindex="0"
               data-theme="light"
