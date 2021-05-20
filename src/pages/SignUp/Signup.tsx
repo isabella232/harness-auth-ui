@@ -31,10 +31,13 @@ const SignUp: React.FC = () => {
   const captchaRef = useRef<Recaptcha>(null);
   const { module } = useQueryParams<{ module?: string }>();
 
+  const [captchaExecuting, setCaptchaExecuting] = useState(false);
+
   useEffect(() => {
     const { email, password } = signupData;
 
     if (email && password && captchaToken) {
+      setCaptchaExecuting(false);
       handleSignup(signupData, captchaToken);
     }
   }, [captchaToken]);
@@ -55,17 +58,30 @@ const SignUp: React.FC = () => {
     }
   };
 
+  // Hack since react-recaptcha has bugs with manual execution
+  const manuallyExcecuteRecaptcha = (): boolean => {
+    if (captchaRef.current && window.grecaptcha?.execute) {
+      window.grecaptcha.execute();
+      setCaptchaExecuting(true);
+      return true;
+    }
+
+    handleError("Captcha failed to execute");
+    return false;
+  };
+
   const onSubmit = (data: SignUpFormData) => {
-    captchaRef.current?.execute();
-    setSignupData(data);
-    telemetry.track({
-      event: "Signup submit",
-      properties: {
-        category: "SIGNUP",
-        userId: data.email,
-        groupId: ""
-      }
-    });
+    if (manuallyExcecuteRecaptcha()) {
+      setSignupData(data);
+      telemetry.track({
+        event: "Signup submit",
+        properties: {
+          category: "SIGNUP",
+          userId: data.email,
+          groupId: ""
+        }
+      });
+    }
   };
 
   const emailField = (
@@ -73,7 +89,7 @@ const SignUp: React.FC = () => {
       name="email"
       label={"Email"}
       placeholder="email@work.com"
-      disabled={loading}
+      disabled={loading || captchaExecuting}
       validate={validateEmail}
       onBlur={(e: FocusEvent<HTMLInputElement>) => {
         telemetry.track({
@@ -94,7 +110,7 @@ const SignUp: React.FC = () => {
       label="Password"
       type="password"
       placeholder="Password"
-      disabled={loading}
+      disabled={loading || captchaExecuting}
       validate={validatePassword}
     />
   );
@@ -143,7 +159,7 @@ const SignUp: React.FC = () => {
                 type="submit"
                 value="Sign Up"
                 className="button primary"
-                disabled={loading}
+                disabled={loading || captchaExecuting}
               />
             </form>
           )}
