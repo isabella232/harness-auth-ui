@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, FocusEvent } from "react";
 import cx from "classnames";
+import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
 import Recaptcha from "react-recaptcha";
 
@@ -8,6 +9,8 @@ import { useSignup } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
+import Text from "components/Text/Text";
+import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
@@ -111,6 +114,10 @@ const SignUp: React.FC = () => {
       <div className={cx(css.signup)}>
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
+          <div style={{ flex: 1 }}></div>
+          <Link to={RouteDefinitions.toSignIn()}>
+            <Text icon="leftArrow">Sign In</Text>
+          </Link>
         </div>
         <div className={css.title}>Sign Up</div>
         <div className={css.subtitle}>and get ship done.</div>
@@ -124,7 +131,7 @@ const SignUp: React.FC = () => {
               {emailField}
               {passwordField}
               <Recaptcha
-                sitekey={window.invisibleCaptchaToken || ""}
+                sitekey={window.invisibleCaptchaToken || "1234"}
                 size="invisible"
                 ref={captchaRef}
                 verifyCallback={(captchaToken: string) => {
