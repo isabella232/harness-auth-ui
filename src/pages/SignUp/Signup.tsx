@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, FocusEvent } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
-import Recaptcha from "react-recaptcha";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useSignup } from "services/ng";
@@ -28,7 +28,7 @@ const SignUp: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [signupData, setSignupData] = useState({ email: "", password: "" });
   const { mutate: signup, loading } = useSignup({});
-  const captchaRef = useRef<Recaptcha>(null);
+  const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
 
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
@@ -58,10 +58,9 @@ const SignUp: React.FC = () => {
     }
   };
 
-  // Hack since react-recaptcha has bugs with manual execution
   const manuallyExcecuteRecaptcha = (): boolean => {
-    if (captchaRef.current && window.grecaptcha?.execute) {
-      window.grecaptcha.execute();
+    if (captchaRef.current?.execute) {
+      captchaRef.current.execute();
       setCaptchaExecuting(true);
       return true;
     }
@@ -146,14 +145,11 @@ const SignUp: React.FC = () => {
             >
               {emailField}
               {passwordField}
-              <Recaptcha
-                sitekey={window.invisibleCaptchaToken || "1234"}
-                size="invisible"
+              <ReCAPTCHA
                 ref={captchaRef}
-                verifyCallback={(captchaToken: string) => {
-                  setCaptchaToken(captchaToken);
-                }}
-                onloadCallback={() => void 0}
+                sitekey={window.invisibleCaptchaToken || ""}
+                size="invisible"
+                onChange={setCaptchaToken}
               />
               <input
                 type="submit"
