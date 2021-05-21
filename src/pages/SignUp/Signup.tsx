@@ -71,6 +71,7 @@ const SignUp: React.FC = () => {
 
   const onSubmit = (data: SignUpFormData) => {
     if (manuallyExcecuteRecaptcha()) {
+      data.email = data.email.toLowerCase();
       setSignupData(data);
       telemetry.track({
         event: "Signup submit",
@@ -147,7 +148,7 @@ const SignUp: React.FC = () => {
               {passwordField}
               <ReCAPTCHA
                 ref={captchaRef}
-                sitekey={window.invisibleCaptchaToken || ""}
+                sitekey={window.invisibleCaptchaToken || "1234"}
                 size="invisible"
                 onChange={setCaptchaToken}
               />
