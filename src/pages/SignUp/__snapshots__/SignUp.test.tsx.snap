@@ -22,6 +22,24 @@ exports[`SignUp render 1`] = `
               src="test-file-stub"
               width="120"
             />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Sign In
+              </span>
+            </a>
           </div>
           <div
             class="title"
@@ -65,16 +83,7 @@ exports[`SignUp render 1`] = `
                 value=""
               />
             </div>
-            <div
-              class="g-recaptcha"
-              data-badge="bottomright"
-              data-sitekey=""
-              data-size="invisible"
-              data-tabindex="0"
-              data-theme="light"
-              data-type="image"
-              id="g-recaptcha"
-            />
+            <div />
             <input
               class="button primary"
               type="submit"
@@ -215,6 +224,24 @@ exports[`SignUp telemetry 1`] = `
               src="test-file-stub"
               width="120"
             />
+            <div
+              style="flex: 1;"
+            />
+            <a
+              href="/signin"
+            >
+              <span
+                class="text"
+              >
+                <img
+                  class="icon"
+                  height="16"
+                  src="test-file-stub"
+                  width="16"
+                />
+                Sign In
+              </span>
+            </a>
           </div>
           <div
             class="title"
@@ -237,6 +264,7 @@ exports[`SignUp telemetry 1`] = `
               </label>
               <input
                 class=""
+                disabled=""
                 id="email"
                 name="email"
                 placeholder="email@work.com"
@@ -251,6 +279,7 @@ exports[`SignUp telemetry 1`] = `
               </label>
               <input
                 class=""
+                disabled=""
                 id="password"
                 name="password"
                 placeholder="Password"
@@ -258,18 +287,10 @@ exports[`SignUp telemetry 1`] = `
                 value="12345678"
               />
             </div>
-            <div
-              class="g-recaptcha"
-              data-badge="bottomright"
-              data-sitekey=""
-              data-size="invisible"
-              data-tabindex="0"
-              data-theme="light"
-              data-type="image"
-              id="g-recaptcha"
-            />
+            <div />
             <input
               class="button primary"
+              disabled=""
               type="submit"
               value="Sign Up"
             />

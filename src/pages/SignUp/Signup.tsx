@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState, FocusEvent } from "react";
 import cx from "classnames";
+import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
-import Recaptcha from "react-recaptcha";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useSignup } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
+import Text from "components/Text/Text";
+import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
@@ -25,13 +28,16 @@ const SignUp: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [signupData, setSignupData] = useState({ email: "", password: "" });
   const { mutate: signup, loading } = useSignup({});
-  const captchaRef = useRef<Recaptcha>(null);
+  const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
+
+  const [captchaExecuting, setCaptchaExecuting] = useState(false);
 
   useEffect(() => {
     const { email, password } = signupData;
 
     if (email && password && captchaToken) {
+      setCaptchaExecuting(false);
       handleSignup(signupData, captchaToken);
     }
   }, [captchaToken]);
@@ -52,17 +58,30 @@ const SignUp: React.FC = () => {
     }
   };
 
+  const manuallyExcecuteRecaptcha = (): boolean => {
+    if (captchaRef.current?.execute) {
+      captchaRef.current.execute();
+      setCaptchaExecuting(true);
+      return true;
+    }
+
+    handleError("Captcha failed to execute");
+    return false;
+  };
+
   const onSubmit = (data: SignUpFormData) => {
-    captchaRef.current?.execute();
-    setSignupData(data);
-    telemetry.track({
-      event: "Signup submit",
-      properties: {
-        category: "SIGNUP",
-        userId: data.email,
-        groupId: ""
-      }
-    });
+    if (manuallyExcecuteRecaptcha()) {
+      data.email = data.email.toLowerCase();
+      setSignupData(data);
+      telemetry.track({
+        event: "Signup submit",
+        properties: {
+          category: "SIGNUP",
+          userId: data.email,
+          groupId: ""
+        }
+      });
+    }
   };
 
   const emailField = (
@@ -70,7 +89,7 @@ const SignUp: React.FC = () => {
       name="email"
       label={"Email"}
       placeholder="email@work.com"
-      disabled={loading}
+      disabled={loading || captchaExecuting}
       validate={validateEmail}
       onBlur={(e: FocusEvent<HTMLInputElement>) => {
         telemetry.track({
@@ -91,7 +110,7 @@ const SignUp: React.FC = () => {
       label="Password"
       type="password"
       placeholder="Password"
-      disabled={loading}
+      disabled={loading || captchaExecuting}
       validate={validatePassword}
     />
   );
@@ -111,6 +130,10 @@ const SignUp: React.FC = () => {
       <div className={cx(css.signup)}>
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
+          <div style={{ flex: 1 }}></div>
+          <Link to={RouteDefinitions.toSignIn()}>
+            <Text icon="leftArrow">Sign In</Text>
+          </Link>
         </div>
         <div className={css.title}>Sign Up</div>
         <div className={css.subtitle}>and get ship done.</div>
@@ -123,20 +146,17 @@ const SignUp: React.FC = () => {
             >
               {emailField}
               {passwordField}
-              <Recaptcha
-                sitekey={window.invisibleCaptchaToken || ""}
-                size="invisible"
+              <ReCAPTCHA
                 ref={captchaRef}
-                verifyCallback={(captchaToken: string) => {
-                  setCaptchaToken(captchaToken);
-                }}
-                onloadCallback={() => void 0}
+                sitekey={window.invisibleCaptchaToken || "1234"}
+                size="invisible"
+                onChange={setCaptchaToken}
               />
               <input
                 type="submit"
                 value="Sign Up"
                 className="button primary"
-                disabled={loading}
+                disabled={loading || captchaExecuting}
               />
             </form>
           )}

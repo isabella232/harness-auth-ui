@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -12,7 +13,6 @@ import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
 import { handleLoginSuccess } from "utils/LoginUtils";
-import Recaptcha from "react-recaptcha";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -30,7 +30,7 @@ const SignIn: React.FC = () => {
   const { mutate: login, loading } = useLogin({
     queryParams: { captcha: captchaReponse }
   });
-  const captchaRef = useRef<Recaptcha>(null);
+  const captchaRef = useRef<ReCAPTCHA>(null);
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
 
@@ -121,14 +121,14 @@ const SignIn: React.FC = () => {
             />
           </div>
           {showCaptcha ? (
-            <Recaptcha
+            <ReCAPTCHA
               sitekey={window.captchaToken || ""}
-              render="explicit"
               ref={captchaRef}
-              verifyCallback={(_captchaResponse: string) => {
-                setCaptchaResponse(_captchaResponse);
+              onChange={(token: string | null) => {
+                if (token) {
+                  setCaptchaResponse(token);
+                }
               }}
-              onloadCallback={() => void 0}
             />
           ) : null}
           <input
