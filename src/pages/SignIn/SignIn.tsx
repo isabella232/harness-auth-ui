@@ -13,6 +13,7 @@ import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 const SignIn: React.FC = () => {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
+  const baseUrl = window.location.pathname.replace("/auth", "");
 
   useEffect(() => {
     const errorCode = urlParams.get("errorCode");
@@ -43,7 +44,7 @@ const SignIn: React.FC = () => {
         <div className={css.subtitle}>and get ship done.</div>
         <form
           className="layout-vertical spacing-medium"
-          action={`${window.location.pathname}gateway/api/users/new-login`}
+          action={`${baseUrl}gateway/api/users/new-login`}
           method="POST"
         >
           <div className="layout-vertical spacing-small">
