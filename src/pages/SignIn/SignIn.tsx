@@ -28,6 +28,8 @@ const SignIn: React.FC = () => {
       case "invalidsso":
         toast.error("Invalid SSO Login.");
         return;
+      case "INVALID_CREDENTIALS":
+        toast.error("Your email or password is incorrect.");
     }
   }, []);
 
@@ -41,7 +43,7 @@ const SignIn: React.FC = () => {
         <div className={css.subtitle}>and get ship done.</div>
         <form
           className="layout-vertical spacing-medium"
-          action="/api/users/new-login"
+          action={`${window.location.pathname}gateway/api/users/new-login`}
           method="POST"
         >
           <div className="layout-vertical spacing-small">
