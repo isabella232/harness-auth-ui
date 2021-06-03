@@ -110,6 +110,7 @@ const SignIn: React.FC = () => {
             <Link
               to={RouteDefinitions.toForgotPassword()}
               className={css.forgotLink}
+              tabIndex={-1}
             >
               Forgot Password?
             </Link>
