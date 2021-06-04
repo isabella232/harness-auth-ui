@@ -63,6 +63,7 @@ exports[`SignIn render 1`] = `
               <a
                 class="forgotLink"
                 href="/forgot-password"
+                tabindex="-1"
               >
                 Forgot Password?
               </a>
