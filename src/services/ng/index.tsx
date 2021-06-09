@@ -3,40 +3,12 @@
 import React from "react";
 import { Mutate, MutateProps, useMutate, UseMutateProps } from "restful-react";
 export const SPEC_VERSION = "2.0";
-export interface Account {
-  uuid: string;
-  appId: string;
-  createdBy?: EmbeddedUser;
-  createdAt?: number;
-  lastUpdatedBy?: EmbeddedUser;
-  lastUpdatedAt: number;
-  companyName: string;
-  accountName: string;
-  whitelistedDomains?: string[];
-  licenseId?: string;
-  dataRetentionDurationMs?: number;
-  licenseInfo?: LicenseInfo;
-  ceLicenseInfo?: CeLicenseInfo;
-  accountEvents?: AccountEvent[];
-  subdomainUrl?: string;
-  twoFactorAdminEnforced?: boolean;
-  forImport?: boolean;
-  migratedToClusterUrl?: string;
+export interface AccountDTO {
+  identifier?: string;
+  name?: string;
+  companyName?: string;
+  cluster?: string;
   defaultExperience?: "NG" | "CG";
-  localEncryptionEnabled?: boolean;
-  delegateConfiguration?: DelegateConfiguration;
-  techStacks?: TechStack[];
-  oauthEnabled?: boolean;
-  accountPreferences?: AccountPreferences;
-  cloudCostEnabled?: boolean;
-  ceAutoCollectK8sEvents?: boolean;
-  trialSignupOptions?: TrialSignupOptions;
-  serviceGuardLimit?: number;
-  defaults?: {
-    [key: string]: string;
-  };
-  harnessSupportAccessAllowed?: boolean;
-  povAccount?: boolean;
 }
 
 export interface Response {
@@ -46,9 +18,9 @@ export interface Response {
   correlationId?: string;
 }
 
-export interface ResponseAccount {
+export interface ResponseAccountDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: Account;
+  data?: AccountDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -75,6 +47,7 @@ export interface Failure {
     | "EMAIL_NOT_VERIFIED"
     | "EMAIL_VERIFICATION_TOKEN_NOT_FOUND"
     | "INVALID_TOKEN"
+    | "REVOKED_TOKEN"
     | "INVALID_CAPTCHA_TOKEN"
     | "NOT_ACCOUNT_MGR_NOR_HAS_ALL_APP_ACCESS"
     | "EXPIRED_TOKEN"
@@ -82,7 +55,9 @@ export interface Failure {
     | "ACCESS_DENIED"
     | "NG_ACCESS_DENIED"
     | "INVALID_CREDENTIAL"
+    | "INVALID_CREDENTIALS_THIRD_PARTY"
     | "INVALID_KEY"
+    | "INVALID_CONNECTOR_TYPE"
     | "INVALID_KEYPATH"
     | "INVALID_VARIABLE"
     | "UNKNOWN_HOST"
@@ -90,6 +65,7 @@ export interface Failure {
     | "INVALID_PORT"
     | "SSH_SESSION_TIMEOUT"
     | "SOCKET_CONNECTION_ERROR"
+    | "CONNECTION_ERROR"
     | "SOCKET_CONNECTION_TIMEOUT"
     | "CONNECTION_TIMEOUT"
     | "SSH_CONNECTION_ERROR"
@@ -114,6 +90,10 @@ export interface Failure {
     | "PLATFORM_SOFTWARE_DELETE_ERROR"
     | "INVALID_CSV_FILE"
     | "INVALID_REQUEST"
+    | "SCHEMA_VALIDATION_FAILED"
+    | "FILTER_CREATION_ERROR"
+    | "INVALID_YAML_ERROR"
+    | "PLAN_CREATION_ERROR"
     | "INVALID_INFRA_STATE"
     | "PIPELINE_ALREADY_TRIGGERED"
     | "NON_EXISTING_PIPELINE"
@@ -170,7 +150,13 @@ export interface Failure {
     | "AWS_ACCESS_DENIED"
     | "AWS_CLUSTER_NOT_FOUND"
     | "AWS_SERVICE_NOT_FOUND"
+    | "IMAGE_NOT_FOUND"
+    | "ILLEGAL_ARGUMENT"
+    | "IMAGE_TAG_NOT_FOUND"
+    | "DELEGATE_NOT_AVAILABLE"
     | "INVALID_YAML_PAYLOAD"
+    | "AUTHENTICATION_ERROR"
+    | "AUTHORIZATION_ERROR"
     | "UNRECOGNIZED_YAML_FIELDS"
     | "COULD_NOT_MAP_BEFORE_YAML"
     | "MISSING_BEFORE_YAML"
@@ -184,6 +170,7 @@ export interface Failure {
     | "ARTIFACT_SERVER_ERROR"
     | "ENCRYPT_DECRYPT_ERROR"
     | "SECRET_MANAGEMENT_ERROR"
+    | "SECRET_NOT_FOUND"
     | "KMS_OPERATION_ERROR"
     | "GCP_KMS_OPERATION_ERROR"
     | "VAULT_OPERATION_ERROR"
@@ -221,6 +208,7 @@ export interface Failure {
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
+    | "FILE_NOT_FOUND_ERROR"
     | "USAGE_LIMITS_EXCEEDED"
     | "EVENT_PUBLISH_FAILED"
     | "JIRA_ERROR"
@@ -252,6 +240,7 @@ export interface Failure {
     | "INVALID_AZURE_VAULT_CONFIGURATION"
     | "USER_NOT_AUTHORIZED_DUE_TO_USAGE_RESTRICTIONS"
     | "INVALID_ROLLBACK"
+    | "DATA_COLLECTION_ERROR"
     | "SUMO_DATA_COLLECTION_ERROR"
     | "DEPLOYMENT_GOVERNANCE_ERROR"
     | "BATCH_PROCESSING_ERROR"
@@ -306,7 +295,21 @@ export interface Failure {
     | "CONNECTOR_NOT_FOUND_EXCEPTION"
     | "GCP_SERVER_ERROR"
     | "HTTP_RESPONSE_EXCEPTION"
-    | "DATA";
+    | "SCM_NOT_FOUND_ERROR"
+    | "SCM_CONFLICT_ERROR"
+    | "SCM_UNPROCESSABLE_ENTITY"
+    | "PROCESS_EXECUTION_EXCEPTION"
+    | "SCM_UNAUTHORIZED"
+    | "DATA"
+    | "CONTEXT"
+    | "PR_CREATION_ERROR"
+    | "URL_NOT_REACHABLE"
+    | "URL_NOT_PROVIDED"
+    | "ENGINE_EXPRESSION_EVALUATION_ERROR"
+    | "ENGINE_FUNCTOR_ERROR"
+    | "JIRA_CLIENT_ERROR"
+    | "SCM_NOT_MODIFIED"
+    | "JIRA_STEP_ERROR";
   message?: string;
   correlationId?: string;
   errors?: ValidationError[];
@@ -339,6 +342,7 @@ export interface Error {
     | "EMAIL_NOT_VERIFIED"
     | "EMAIL_VERIFICATION_TOKEN_NOT_FOUND"
     | "INVALID_TOKEN"
+    | "REVOKED_TOKEN"
     | "INVALID_CAPTCHA_TOKEN"
     | "NOT_ACCOUNT_MGR_NOR_HAS_ALL_APP_ACCESS"
     | "EXPIRED_TOKEN"
@@ -346,7 +350,9 @@ export interface Error {
     | "ACCESS_DENIED"
     | "NG_ACCESS_DENIED"
     | "INVALID_CREDENTIAL"
+    | "INVALID_CREDENTIALS_THIRD_PARTY"
     | "INVALID_KEY"
+    | "INVALID_CONNECTOR_TYPE"
     | "INVALID_KEYPATH"
     | "INVALID_VARIABLE"
     | "UNKNOWN_HOST"
@@ -354,6 +360,7 @@ export interface Error {
     | "INVALID_PORT"
     | "SSH_SESSION_TIMEOUT"
     | "SOCKET_CONNECTION_ERROR"
+    | "CONNECTION_ERROR"
     | "SOCKET_CONNECTION_TIMEOUT"
     | "CONNECTION_TIMEOUT"
     | "SSH_CONNECTION_ERROR"
@@ -378,6 +385,10 @@ export interface Error {
     | "PLATFORM_SOFTWARE_DELETE_ERROR"
     | "INVALID_CSV_FILE"
     | "INVALID_REQUEST"
+    | "SCHEMA_VALIDATION_FAILED"
+    | "FILTER_CREATION_ERROR"
+    | "INVALID_YAML_ERROR"
+    | "PLAN_CREATION_ERROR"
     | "INVALID_INFRA_STATE"
     | "PIPELINE_ALREADY_TRIGGERED"
     | "NON_EXISTING_PIPELINE"
@@ -434,7 +445,13 @@ export interface Error {
     | "AWS_ACCESS_DENIED"
     | "AWS_CLUSTER_NOT_FOUND"
     | "AWS_SERVICE_NOT_FOUND"
+    | "IMAGE_NOT_FOUND"
+    | "ILLEGAL_ARGUMENT"
+    | "IMAGE_TAG_NOT_FOUND"
+    | "DELEGATE_NOT_AVAILABLE"
     | "INVALID_YAML_PAYLOAD"
+    | "AUTHENTICATION_ERROR"
+    | "AUTHORIZATION_ERROR"
     | "UNRECOGNIZED_YAML_FIELDS"
     | "COULD_NOT_MAP_BEFORE_YAML"
     | "MISSING_BEFORE_YAML"
@@ -448,6 +465,7 @@ export interface Error {
     | "ARTIFACT_SERVER_ERROR"
     | "ENCRYPT_DECRYPT_ERROR"
     | "SECRET_MANAGEMENT_ERROR"
+    | "SECRET_NOT_FOUND"
     | "KMS_OPERATION_ERROR"
     | "GCP_KMS_OPERATION_ERROR"
     | "VAULT_OPERATION_ERROR"
@@ -485,6 +503,7 @@ export interface Error {
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
+    | "FILE_NOT_FOUND_ERROR"
     | "USAGE_LIMITS_EXCEEDED"
     | "EVENT_PUBLISH_FAILED"
     | "JIRA_ERROR"
@@ -516,6 +535,7 @@ export interface Error {
     | "INVALID_AZURE_VAULT_CONFIGURATION"
     | "USER_NOT_AUTHORIZED_DUE_TO_USAGE_RESTRICTIONS"
     | "INVALID_ROLLBACK"
+    | "DATA_COLLECTION_ERROR"
     | "SUMO_DATA_COLLECTION_ERROR"
     | "DEPLOYMENT_GOVERNANCE_ERROR"
     | "BATCH_PROCESSING_ERROR"
@@ -570,7 +590,21 @@ export interface Error {
     | "CONNECTOR_NOT_FOUND_EXCEPTION"
     | "GCP_SERVER_ERROR"
     | "HTTP_RESPONSE_EXCEPTION"
-    | "DATA";
+    | "SCM_NOT_FOUND_ERROR"
+    | "SCM_CONFLICT_ERROR"
+    | "SCM_UNPROCESSABLE_ENTITY"
+    | "PROCESS_EXECUTION_EXCEPTION"
+    | "SCM_UNAUTHORIZED"
+    | "DATA"
+    | "CONTEXT"
+    | "PR_CREATION_ERROR"
+    | "URL_NOT_REACHABLE"
+    | "URL_NOT_PROVIDED"
+    | "ENGINE_EXPRESSION_EVALUATION_ERROR"
+    | "ENGINE_FUNCTOR_ERROR"
+    | "JIRA_CLIENT_ERROR"
+    | "SCM_NOT_MODIFIED"
+    | "JIRA_STEP_ERROR";
   message?: string;
   correlationId?: string;
   detailedMessage?: string;
@@ -598,6 +632,7 @@ export interface ResponseMessage {
     | "EMAIL_NOT_VERIFIED"
     | "EMAIL_VERIFICATION_TOKEN_NOT_FOUND"
     | "INVALID_TOKEN"
+    | "REVOKED_TOKEN"
     | "INVALID_CAPTCHA_TOKEN"
     | "NOT_ACCOUNT_MGR_NOR_HAS_ALL_APP_ACCESS"
     | "EXPIRED_TOKEN"
@@ -605,7 +640,9 @@ export interface ResponseMessage {
     | "ACCESS_DENIED"
     | "NG_ACCESS_DENIED"
     | "INVALID_CREDENTIAL"
+    | "INVALID_CREDENTIALS_THIRD_PARTY"
     | "INVALID_KEY"
+    | "INVALID_CONNECTOR_TYPE"
     | "INVALID_KEYPATH"
     | "INVALID_VARIABLE"
     | "UNKNOWN_HOST"
@@ -613,6 +650,7 @@ export interface ResponseMessage {
     | "INVALID_PORT"
     | "SSH_SESSION_TIMEOUT"
     | "SOCKET_CONNECTION_ERROR"
+    | "CONNECTION_ERROR"
     | "SOCKET_CONNECTION_TIMEOUT"
     | "CONNECTION_TIMEOUT"
     | "SSH_CONNECTION_ERROR"
@@ -637,6 +675,10 @@ export interface ResponseMessage {
     | "PLATFORM_SOFTWARE_DELETE_ERROR"
     | "INVALID_CSV_FILE"
     | "INVALID_REQUEST"
+    | "SCHEMA_VALIDATION_FAILED"
+    | "FILTER_CREATION_ERROR"
+    | "INVALID_YAML_ERROR"
+    | "PLAN_CREATION_ERROR"
     | "INVALID_INFRA_STATE"
     | "PIPELINE_ALREADY_TRIGGERED"
     | "NON_EXISTING_PIPELINE"
@@ -693,7 +735,13 @@ export interface ResponseMessage {
     | "AWS_ACCESS_DENIED"
     | "AWS_CLUSTER_NOT_FOUND"
     | "AWS_SERVICE_NOT_FOUND"
+    | "IMAGE_NOT_FOUND"
+    | "ILLEGAL_ARGUMENT"
+    | "IMAGE_TAG_NOT_FOUND"
+    | "DELEGATE_NOT_AVAILABLE"
     | "INVALID_YAML_PAYLOAD"
+    | "AUTHENTICATION_ERROR"
+    | "AUTHORIZATION_ERROR"
     | "UNRECOGNIZED_YAML_FIELDS"
     | "COULD_NOT_MAP_BEFORE_YAML"
     | "MISSING_BEFORE_YAML"
@@ -707,6 +755,7 @@ export interface ResponseMessage {
     | "ARTIFACT_SERVER_ERROR"
     | "ENCRYPT_DECRYPT_ERROR"
     | "SECRET_MANAGEMENT_ERROR"
+    | "SECRET_NOT_FOUND"
     | "KMS_OPERATION_ERROR"
     | "GCP_KMS_OPERATION_ERROR"
     | "VAULT_OPERATION_ERROR"
@@ -744,6 +793,7 @@ export interface ResponseMessage {
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
+    | "FILE_NOT_FOUND_ERROR"
     | "USAGE_LIMITS_EXCEEDED"
     | "EVENT_PUBLISH_FAILED"
     | "JIRA_ERROR"
@@ -775,6 +825,7 @@ export interface ResponseMessage {
     | "INVALID_AZURE_VAULT_CONFIGURATION"
     | "USER_NOT_AUTHORIZED_DUE_TO_USAGE_RESTRICTIONS"
     | "INVALID_ROLLBACK"
+    | "DATA_COLLECTION_ERROR"
     | "SUMO_DATA_COLLECTION_ERROR"
     | "DEPLOYMENT_GOVERNANCE_ERROR"
     | "BATCH_PROCESSING_ERROR"
@@ -829,7 +880,21 @@ export interface ResponseMessage {
     | "CONNECTOR_NOT_FOUND_EXCEPTION"
     | "GCP_SERVER_ERROR"
     | "HTTP_RESPONSE_EXCEPTION"
-    | "DATA";
+    | "SCM_NOT_FOUND_ERROR"
+    | "SCM_CONFLICT_ERROR"
+    | "SCM_UNPROCESSABLE_ENTITY"
+    | "PROCESS_EXECUTION_EXCEPTION"
+    | "SCM_UNAUTHORIZED"
+    | "DATA"
+    | "CONTEXT"
+    | "PR_CREATION_ERROR"
+    | "URL_NOT_REACHABLE"
+    | "URL_NOT_PROVIDED"
+    | "ENGINE_EXPRESSION_EVALUATION_ERROR"
+    | "ENGINE_FUNCTOR_ERROR"
+    | "JIRA_CLIENT_ERROR"
+    | "SCM_NOT_MODIFIED"
+    | "JIRA_STEP_ERROR";
   level?: "INFO" | "ERROR";
   message?: string;
   exception?: Throwable;
@@ -925,2481 +990,63 @@ export interface ResponseListServiceDefinitionType {
   correlationId?: string;
 }
 
-export interface NGPipelineValidationInfo {
-  pipelineYaml?: string;
-  uuidToErrorResponseMap?: {
-    [key: string]: VisitorErrorResponseWrapper;
-  };
-  errorResponse?: boolean;
+export interface ConnectorCatalogueItem {
+  category?:
+    | "CLOUD_PROVIDER"
+    | "SECRET_MANAGER"
+    | "CLOUD_COST"
+    | "ARTIFACTORY"
+    | "CODE_REPO"
+    | "MONITORING"
+    | "TICKETING";
+  connectors?: (
+    | "K8sCluster"
+    | "Git"
+    | "Splunk"
+    | "AppDynamics"
+    | "Prometheus"
+    | "Dynatrace"
+    | "Vault"
+    | "AzureKeyVault"
+    | "DockerRegistry"
+    | "Local"
+    | "AwsKms"
+    | "GcpKms"
+    | "Gcp"
+    | "Aws"
+    | "Artifactory"
+    | "Jira"
+    | "Nexus"
+    | "Github"
+    | "Gitlab"
+    | "Bitbucket"
+    | "Codecommit"
+    | "CEAws"
+    | "CEAzure"
+    | "GcpCloudCost"
+    | "CEK8sCluster"
+    | "HttpHelmRepo"
+    | "NewRelic"
+    | "Datadog"
+    | "SumoLogic"
+  )[];
 }
 
-export interface ResponseNGPipelineValidationInfo {
+export interface ConnectorCatalogueResponse {
+  catalogue?: ConnectorCatalogueItem[];
+}
+
+export interface ResponseConnectorCatalogueResponse {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: NGPipelineValidationInfo;
+  data?: ConnectorCatalogueResponse;
   metaData?: { [key: string]: any };
   correlationId?: string;
-}
-
-export interface VisitorErrorResponse {
-  fieldName?: string;
-  message?: string;
-}
-
-export interface VisitorErrorResponseWrapper {
-  errors?: VisitorErrorResponse[];
-}
-
-export interface ByteString {
-  empty?: boolean;
-  validUtf8?: boolean;
-}
-
-export interface Commit {
-  unknownFields?: UnknownFieldSet;
-  message?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserCommit;
-  defaultInstanceForType?: Commit;
-  messageBytes?: ByteString;
-  link?: string;
-  author?: Signature;
-  authorOrBuilder?: SignatureOrBuilder;
-  shaBytes?: ByteString;
-  linkBytes?: ByteString;
-  sha?: string;
-  committer?: Signature;
-  committerOrBuilder?: SignatureOrBuilder;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface CommitOrBuilder {
-  message?: string;
-  messageBytes?: ByteString;
-  link?: string;
-  author?: Signature;
-  authorOrBuilder?: SignatureOrBuilder;
-  shaBytes?: ByteString;
-  linkBytes?: ByteString;
-  sha?: string;
-  committer?: Signature;
-  committerOrBuilder?: SignatureOrBuilder;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Descriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  containingType?: Descriptor;
-  nestedTypes?: Descriptor[];
-  enumTypes?: EnumDescriptor[];
-  fields?: FieldDescriptor[];
-  extensions?: FieldDescriptor[];
-  oneofs?: OneofDescriptor[];
-  name?: string;
-  options?: MessageOptions;
-  extendable?: boolean;
-}
-
-export interface EnumDescriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  containingType?: Descriptor;
-  values?: EnumValueDescriptor[];
-  name?: string;
-  options?: EnumOptions;
-}
-
-export interface EnumOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserEnumOptions;
-  defaultInstanceForType?: EnumOptions;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  allowAlias?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface EnumValueDescriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  type?: EnumDescriptor;
-  name?: string;
-  number?: number;
-  options?: EnumValueOptions;
-}
-
-export interface EnumValueOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserEnumValueOptions;
-  defaultInstanceForType?: EnumValueOptions;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionMetadata {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserExecutionMetadata;
-  defaultInstanceForType?: ExecutionMetadata;
-  yaml?: string;
-  runSequence?: number;
-  triggerInfo?: ExecutionTriggerInfo;
-  triggerInfoOrBuilder?: ExecutionTriggerInfoOrBuilder;
-  triggerPayload?: TriggerPayload;
-  triggerPayloadOrBuilder?: TriggerPayloadOrBuilder;
-  pipelineIdentifier?: string;
-  pipelineIdentifierBytes?: ByteString;
-  inputSetYaml?: string;
-  inputSetYamlBytes?: ByteString;
-  executionUuid?: string;
-  executionUuidBytes?: ByteString;
-  yamlBytes?: ByteString;
-  principalInfoOrBuilder?: ExecutionPrincipalInfoOrBuilder;
-  processedYaml?: string;
-  processedYamlBytes?: ByteString;
-  principalInfo?: ExecutionPrincipalInfo;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionPrincipalInfo {
-  unknownFields?: UnknownFieldSet;
-  principal?: string;
-  principalBytes?: ByteString;
-  principalTypeValue?: number;
-  principalType?:
-    | "UNKNOWN"
-    | "USER"
-    | "USER_GROUP"
-    | "API_KEY"
-    | "SERVICE"
-    | "UNRECOGNIZED";
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserExecutionPrincipalInfo;
-  defaultInstanceForType?: ExecutionPrincipalInfo;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionPrincipalInfoOrBuilder {
-  principal?: string;
-  principalBytes?: ByteString;
-  principalTypeValue?: number;
-  principalType?:
-    | "UNKNOWN"
-    | "USER"
-    | "USER_GROUP"
-    | "API_KEY"
-    | "SERVICE"
-    | "UNRECOGNIZED";
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ExecutionTriggerInfo {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserExecutionTriggerInfo;
-  defaultInstanceForType?: ExecutionTriggerInfo;
-  triggerTypeValue?: number;
-  triggerType?:
-    | "NOOP"
-    | "MANUAL"
-    | "WEBHOOK"
-    | "WEBHOOK_CUSTOM"
-    | "SCHEDULER_CRON"
-    | "UNRECOGNIZED";
-  triggeredBy?: TriggeredBy;
-  triggeredByOrBuilder?: TriggeredByOrBuilder;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionTriggerInfoOrBuilder {
-  triggerTypeValue?: number;
-  triggerType?:
-    | "NOOP"
-    | "MANUAL"
-    | "WEBHOOK"
-    | "WEBHOOK_CUSTOM"
-    | "SCHEDULER_CRON"
-    | "UNRECOGNIZED";
-  triggeredBy?: TriggeredBy;
-  triggeredByOrBuilder?: TriggeredByOrBuilder;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface FieldDescriptor {
-  index?: number;
-  fullName?: string;
-  jsonName?: string;
-  file?: FileDescriptor;
-  extensionScope?: Descriptor;
-  type?:
-    | "DOUBLE"
-    | "FLOAT"
-    | "INT64"
-    | "UINT64"
-    | "INT32"
-    | "FIXED64"
-    | "FIXED32"
-    | "BOOL"
-    | "STRING"
-    | "GROUP"
-    | "MESSAGE"
-    | "BYTES"
-    | "UINT32"
-    | "ENUM"
-    | "SFIXED32"
-    | "SFIXED64"
-    | "SINT32"
-    | "SINT64";
-  containingType?: Descriptor;
-  messageType?: Descriptor;
-  containingOneof?: OneofDescriptor;
-  enumType?: EnumDescriptor;
-  defaultValue?: { [key: string]: any };
-  packed?: boolean;
-  name?: string;
-  number?: number;
-  required?: boolean;
-  optional?: boolean;
-  repeated?: boolean;
-  javaType?:
-    | "INT"
-    | "LONG"
-    | "FLOAT"
-    | "DOUBLE"
-    | "BOOLEAN"
-    | "STRING"
-    | "BYTE_STRING"
-    | "ENUM"
-    | "MESSAGE";
-  mapField?: boolean;
-  options?: FieldOptions;
-  extension?: boolean;
-  liteJavaType?:
-    | "INT"
-    | "LONG"
-    | "FLOAT"
-    | "DOUBLE"
-    | "BOOLEAN"
-    | "STRING"
-    | "BYTE_STRING"
-    | "ENUM"
-    | "MESSAGE";
-  liteType?:
-    | "DOUBLE"
-    | "FLOAT"
-    | "INT64"
-    | "UINT64"
-    | "INT32"
-    | "FIXED64"
-    | "FIXED32"
-    | "BOOL"
-    | "STRING"
-    | "GROUP"
-    | "MESSAGE"
-    | "BYTES"
-    | "UINT32"
-    | "ENUM"
-    | "SFIXED32"
-    | "SFIXED64"
-    | "SINT32"
-    | "SINT64";
-  packable?: boolean;
-}
-
-export interface FieldOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserFieldOptions;
-  defaultInstanceForType?: FieldOptions;
-  lazy?: boolean;
-  ctype?: "STRING" | "CORD" | "STRING_PIECE";
-  jstype?: "JS_NORMAL" | "JS_STRING" | "JS_NUMBER";
-  weak?: boolean;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  packed?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface FileDescriptor {
-  messageTypes?: Descriptor[];
-  enumTypes?: EnumDescriptor[];
-  services?: ServiceDescriptor[];
-  extensions?: FieldDescriptor[];
-  dependencies?: FileDescriptor[];
-  publicDependencies?: FileDescriptor[];
-  name?: string;
-  package?: string;
-  file?: FileDescriptor;
-  fullName?: string;
-  syntax?: "UNKNOWN" | "PROTO2" | "PROTO3";
-  options?: FileOptions;
-}
-
-export interface FileOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserFileOptions;
-  defaultInstanceForType?: FileOptions;
-  javaPackageBytes?: ByteString;
-  javaOuterClassname?: string;
-  javaPackage?: string;
-  javaOuterClassnameBytes?: ByteString;
-  javaMultipleFiles?: boolean;
-  javaGenerateEqualsAndHash?: boolean;
-  optimizeFor?: "SPEED" | "CODE_SIZE" | "LITE_RUNTIME";
-  goPackage?: string;
-  goPackageBytes?: ByteString;
-  ccGenericServices?: boolean;
-  javaGenericServices?: boolean;
-  pyGenericServices?: boolean;
-  phpGenericServices?: boolean;
-  ccEnableArenas?: boolean;
-  objcClassPrefix?: string;
-  objcClassPrefixBytes?: ByteString;
-  csharpNamespace?: string;
-  csharpNamespaceBytes?: ByteString;
-  swiftPrefix?: string;
-  swiftPrefixBytes?: ByteString;
-  phpClassPrefix?: string;
-  phpClassPrefixBytes?: ByteString;
-  phpNamespace?: string;
-  phpNamespaceBytes?: ByteString;
-  phpMetadataNamespace?: string;
-  phpMetadataNamespaceBytes?: ByteString;
-  rubyPackage?: string;
-  rubyPackageBytes?: ByteString;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  javaStringCheckUtf8?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface Label {
-  unknownFields?: UnknownFieldSet;
-  name?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserLabel;
-  defaultInstanceForType?: Label;
-  color?: string;
-  colorBytes?: ByteString;
-  nameBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface LabelOrBuilder {
-  name?: string;
-  color?: string;
-  colorBytes?: ByteString;
-  nameBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Message {
-  parserForType?: ParserMessage;
-  serializedSize?: number;
-  initialized?: boolean;
-  defaultInstanceForType?: MessageLite;
-  unknownFields?: UnknownFieldSet;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface MessageLite {
-  serializedSize?: number;
-  parserForType?: ParserMessageLite;
-  initialized?: boolean;
-  defaultInstanceForType?: MessageLite;
-}
-
-export interface MessageOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserMessageOptions;
-  defaultInstanceForType?: MessageOptions;
-  noStandardDescriptorAccessor?: boolean;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  mapEntry?: boolean;
-  messageSetWireFormat?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface MethodDescriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  service?: ServiceDescriptor;
-  inputType?: Descriptor;
-  outputType?: Descriptor;
-  name?: string;
-  options?: MethodOptions;
-  clientStreaming?: boolean;
-  serverStreaming?: boolean;
-}
-
-export interface MethodOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserMethodOptions;
-  defaultInstanceForType?: MethodOptions;
-  idempotencyLevel?: "IDEMPOTENCY_UNKNOWN" | "NO_SIDE_EFFECTS" | "IDEMPOTENT";
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface NGPipelineError {
-  fieldName?: string;
-  message?: string;
-  identifierOfErrorSource?: string;
-}
-
-export interface NGPipelineErrorResponse {
-  errors?: NGPipelineError[];
-}
-
-export interface NGPipelineErrorWrapper {
-  errorPipelineYaml?: string;
-  uuidToErrorResponseMap?: {
-    [key: string]: NGPipelineErrorResponse;
-  };
-}
-
-export interface NGPipelineExecutionResponse {
-  planExecution?: PlanExecution;
-  pipelineErrorResponse?: NGPipelineErrorWrapper;
-  errorResponse?: boolean;
-}
-
-export interface NamePart {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserNamePart;
-  defaultInstanceForType?: NamePart;
-  namePart?: string;
-  namePartBytes?: ByteString;
-  isExtension?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface NamePartOrBuilder {
-  namePart?: string;
-  namePartBytes?: ByteString;
-  isExtension?: boolean;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface OneofDescriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  containingType?: Descriptor;
-  fieldCount?: number;
-  fields?: FieldDescriptor[];
-  name?: string;
-  options?: OneofOptions;
-}
-
-export interface OneofOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserOneofOptions;
-  defaultInstanceForType?: OneofOptions;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ParsedPayload {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserParsedPayload;
-  defaultInstanceForType?: ParsedPayload;
-  push?: PushHook;
-  pr?: PullRequestHook;
-  pushOrBuilder?: PushHookOrBuilder;
-  prOrBuilder?: PullRequestHookOrBuilder;
-  payloadCase?: "PR" | "PUSH" | "PAYLOAD_NOT_SET";
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ParsedPayloadOrBuilder {
-  push?: PushHook;
-  pr?: PullRequestHook;
-  pushOrBuilder?: PushHookOrBuilder;
-  prOrBuilder?: PullRequestHookOrBuilder;
-  payloadCase?: "PR" | "PUSH" | "PAYLOAD_NOT_SET";
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Parser {
-  [key: string]: any;
-}
-
-export interface ParserCommit {
-  [key: string]: any;
-}
-
-export interface ParserEnumOptions {
-  [key: string]: any;
-}
-
-export interface ParserEnumValueOptions {
-  [key: string]: any;
-}
-
-export interface ParserExecutionMetadata {
-  [key: string]: any;
-}
-
-export interface ParserExecutionPrincipalInfo {
-  [key: string]: any;
-}
-
-export interface ParserExecutionTriggerInfo {
-  [key: string]: any;
-}
-
-export interface ParserFieldOptions {
-  [key: string]: any;
-}
-
-export interface ParserFileOptions {
-  [key: string]: any;
-}
-
-export interface ParserLabel {
-  [key: string]: any;
-}
-
-export interface ParserMessage {
-  [key: string]: any;
-}
-
-export interface ParserMessageLite {
-  [key: string]: any;
-}
-
-export interface ParserMessageOptions {
-  [key: string]: any;
-}
-
-export interface ParserMethodOptions {
-  [key: string]: any;
-}
-
-export interface ParserNamePart {
-  [key: string]: any;
-}
-
-export interface ParserOneofOptions {
-  [key: string]: any;
-}
-
-export interface ParserParsedPayload {
-  [key: string]: any;
-}
-
-export interface ParserPerm {
-  [key: string]: any;
-}
-
-export interface ParserPullRequest {
-  [key: string]: any;
-}
-
-export interface ParserPullRequestHook {
-  [key: string]: any;
-}
-
-export interface ParserPushHook {
-  [key: string]: any;
-}
-
-export interface ParserReference {
-  [key: string]: any;
-}
-
-export interface ParserRepository {
-  [key: string]: any;
-}
-
-export interface ParserServiceOptions {
-  [key: string]: any;
-}
-
-export interface ParserSignature {
-  [key: string]: any;
-}
-
-export interface ParserTimestamp {
-  [key: string]: any;
-}
-
-export interface ParserTriggerPayload {
-  [key: string]: any;
-}
-
-export interface ParserTriggeredBy {
-  [key: string]: any;
-}
-
-export interface ParserUninterpretedOption {
-  [key: string]: any;
-}
-
-export interface ParserUser {
-  [key: string]: any;
-}
-
-export interface Perm {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserPerm;
-  defaultInstanceForType?: Perm;
-  push?: boolean;
-  pull?: boolean;
-  admin?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface PermOrBuilder {
-  push?: boolean;
-  pull?: boolean;
-  admin?: boolean;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface PlanExecution {
-  uuid?: string;
-  createdAt?: number;
-  setupAbstractions?: {
-    [key: string]: string;
-  };
-  validUntil?: string;
-  status?:
-    | "NO_OP"
-    | "RUNNING"
-    | "INTERVENTION_WAITING"
-    | "TIMED_WAITING"
-    | "ASYNC_WAITING"
-    | "TASK_WAITING"
-    | "DISCONTINUING"
-    | "PAUSING"
-    | "QUEUED"
-    | "SKIPPED"
-    | "PAUSED"
-    | "ABORTED"
-    | "ERRORED"
-    | "FAILED"
-    | "EXPIRED"
-    | "SUSPENDED"
-    | "SUCCEEDED"
-    | "IGNORE_FAILED"
-    | "APPROVAL_WAITING"
-    | "RESOURCE_WAITING"
-    | "APPROVAL_REJECTED"
-    | "UNRECOGNIZED";
-  startTs?: number;
-  endTs?: number;
-  metadata?: ExecutionMetadata;
-  lastUpdatedAt?: number;
-  version?: number;
-  nextIteration?: number;
-}
-
-export interface PullRequest {
-  unknownFields?: UnknownFieldSet;
-  target?: string;
-  ref?: string;
-  number?: number;
-  title?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserPullRequest;
-  defaultInstanceForType?: PullRequest;
-  titleBytes?: ByteString;
-  bodyBytes?: ByteString;
-  fork?: string;
-  sourceBytes?: ByteString;
-  targetBytes?: ByteString;
-  forkBytes?: ByteString;
-  closed?: boolean;
-  merged?: boolean;
-  baseOrBuilder?: ReferenceOrBuilder;
-  headOrBuilder?: ReferenceOrBuilder;
-  labelsList?: Label[];
-  labelsCount?: number;
-  labelsOrBuilderList?: LabelOrBuilder[];
-  base?: Reference;
-  head?: Reference;
-  source?: string;
-  body?: string;
-  refBytes?: ByteString;
-  link?: string;
-  created?: Timestamp;
-  author?: User;
-  authorOrBuilder?: UserOrBuilder;
-  shaBytes?: ByteString;
-  linkBytes?: ByteString;
-  createdOrBuilder?: TimestampOrBuilder;
-  updated?: Timestamp;
-  updatedOrBuilder?: TimestampOrBuilder;
-  sha?: string;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface PullRequestHook {
-  unknownFields?: UnknownFieldSet;
-  action?:
-    | "UNKNOWN"
-    | "CREATE"
-    | "UPDATE"
-    | "DELETE"
-    | "OPEN"
-    | "REOPEN"
-    | "CLOSE"
-    | "LABEL"
-    | "UNLABEL"
-    | "SYNC"
-    | "MERGE"
-    | "UNRECOGNIZED";
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserPullRequestHook;
-  defaultInstanceForType?: PullRequestHook;
-  repo?: Repository;
-  pr?: PullRequest;
-  prOrBuilder?: PullRequestOrBuilder;
-  actionValue?: number;
-  repoOrBuilder?: RepositoryOrBuilder;
-  sender?: User;
-  senderOrBuilder?: UserOrBuilder;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface PullRequestHookOrBuilder {
-  action?:
-    | "UNKNOWN"
-    | "CREATE"
-    | "UPDATE"
-    | "DELETE"
-    | "OPEN"
-    | "REOPEN"
-    | "CLOSE"
-    | "LABEL"
-    | "UNLABEL"
-    | "SYNC"
-    | "MERGE"
-    | "UNRECOGNIZED";
-  repo?: Repository;
-  pr?: PullRequest;
-  prOrBuilder?: PullRequestOrBuilder;
-  actionValue?: number;
-  repoOrBuilder?: RepositoryOrBuilder;
-  sender?: User;
-  senderOrBuilder?: UserOrBuilder;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface PullRequestOrBuilder {
-  target?: string;
-  ref?: string;
-  number?: number;
-  title?: string;
-  titleBytes?: ByteString;
-  bodyBytes?: ByteString;
-  fork?: string;
-  sourceBytes?: ByteString;
-  targetBytes?: ByteString;
-  forkBytes?: ByteString;
-  closed?: boolean;
-  merged?: boolean;
-  baseOrBuilder?: ReferenceOrBuilder;
-  headOrBuilder?: ReferenceOrBuilder;
-  labelsList?: Label[];
-  labelsCount?: number;
-  labelsOrBuilderList?: LabelOrBuilder[];
-  base?: Reference;
-  head?: Reference;
-  source?: string;
-  body?: string;
-  refBytes?: ByteString;
-  link?: string;
-  created?: Timestamp;
-  author?: User;
-  authorOrBuilder?: UserOrBuilder;
-  shaBytes?: ByteString;
-  linkBytes?: ByteString;
-  createdOrBuilder?: TimestampOrBuilder;
-  updated?: Timestamp;
-  updatedOrBuilder?: TimestampOrBuilder;
-  sha?: string;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface PushHook {
-  unknownFields?: UnknownFieldSet;
-  ref?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserPushHook;
-  defaultInstanceForType?: PushHook;
-  after?: string;
-  baseRef?: string;
-  baseRefBytes?: ByteString;
-  repo?: Repository;
-  refBytes?: ByteString;
-  repoOrBuilder?: RepositoryOrBuilder;
-  before?: string;
-  beforeBytes?: ByteString;
-  afterBytes?: ByteString;
-  commit?: Commit;
-  commitOrBuilder?: CommitOrBuilder;
-  sender?: User;
-  senderOrBuilder?: UserOrBuilder;
-  commitsList?: Commit[];
-  commitsCount?: number;
-  commitsOrBuilderList?: CommitOrBuilder[];
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface PushHookOrBuilder {
-  ref?: string;
-  after?: string;
-  baseRef?: string;
-  baseRefBytes?: ByteString;
-  repo?: Repository;
-  refBytes?: ByteString;
-  repoOrBuilder?: RepositoryOrBuilder;
-  before?: string;
-  beforeBytes?: ByteString;
-  afterBytes?: ByteString;
-  commit?: Commit;
-  commitOrBuilder?: CommitOrBuilder;
-  sender?: User;
-  senderOrBuilder?: UserOrBuilder;
-  commitsList?: Commit[];
-  commitsCount?: number;
-  commitsOrBuilderList?: CommitOrBuilder[];
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Reference {
-  unknownFields?: UnknownFieldSet;
-  name?: string;
-  path?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserReference;
-  defaultInstanceForType?: Reference;
-  nameBytes?: ByteString;
-  shaBytes?: ByteString;
-  sha?: string;
-  pathBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ReferenceOrBuilder {
-  name?: string;
-  path?: string;
-  nameBytes?: ByteString;
-  shaBytes?: ByteString;
-  sha?: string;
-  pathBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Repository {
-  unknownFields?: UnknownFieldSet;
-  name?: string;
-  id?: string;
-  namespace?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserRepository;
-  defaultInstanceForType?: Repository;
-  branch?: string;
-  link?: string;
-  created?: Timestamp;
-  nameBytes?: ByteString;
-  namespaceBytes?: ByteString;
-  idBytes?: ByteString;
-  perm?: Perm;
-  permOrBuilder?: PermOrBuilder;
-  branchBytes?: ByteString;
-  private?: boolean;
-  clone?: string;
-  cloneBytes?: ByteString;
-  cloneSsh?: string;
-  cloneSshBytes?: ByteString;
-  linkBytes?: ByteString;
-  createdOrBuilder?: TimestampOrBuilder;
-  updated?: Timestamp;
-  updatedOrBuilder?: TimestampOrBuilder;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface RepositoryOrBuilder {
-  name?: string;
-  id?: string;
-  namespace?: string;
-  branch?: string;
-  link?: string;
-  created?: Timestamp;
-  nameBytes?: ByteString;
-  namespaceBytes?: ByteString;
-  idBytes?: ByteString;
-  perm?: Perm;
-  permOrBuilder?: PermOrBuilder;
-  branchBytes?: ByteString;
-  private?: boolean;
-  clone?: string;
-  cloneBytes?: ByteString;
-  cloneSsh?: string;
-  cloneSshBytes?: ByteString;
-  linkBytes?: ByteString;
-  createdOrBuilder?: TimestampOrBuilder;
-  updated?: Timestamp;
-  updatedOrBuilder?: TimestampOrBuilder;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ResponseNGPipelineExecutionResponse {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: NGPipelineExecutionResponse;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ServiceDescriptor {
-  index?: number;
-  fullName?: string;
-  file?: FileDescriptor;
-  methods?: MethodDescriptor[];
-  name?: string;
-  options?: ServiceOptions;
-}
-
-export interface ServiceOptions {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserServiceOptions;
-  defaultInstanceForType?: ServiceOptions;
-  deprecated?: boolean;
-  uninterpretedOptionList?: UninterpretedOption[];
-  uninterpretedOptionOrBuilderList?: UninterpretedOptionOrBuilder[];
-  uninterpretedOptionCount?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  allFieldsRaw?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface Signature {
-  unknownFields?: UnknownFieldSet;
-  name?: string;
-  login?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserSignature;
-  defaultInstanceForType?: Signature;
-  date?: Timestamp;
-  dateOrBuilder?: TimestampOrBuilder;
-  email?: string;
-  nameBytes?: ByteString;
-  emailBytes?: ByteString;
-  avatar?: string;
-  avatarBytes?: ByteString;
-  loginBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface SignatureOrBuilder {
-  name?: string;
-  login?: string;
-  date?: Timestamp;
-  dateOrBuilder?: TimestampOrBuilder;
-  email?: string;
-  nameBytes?: ByteString;
-  emailBytes?: ByteString;
-  avatar?: string;
-  avatarBytes?: ByteString;
-  loginBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface Timestamp {
-  unknownFields?: UnknownFieldSet;
-  seconds?: number;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTimestamp;
-  defaultInstanceForType?: Timestamp;
-  nanos?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TimestampOrBuilder {
-  seconds?: number;
-  nanos?: number;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface TriggerPayload {
-  unknownFields?: UnknownFieldSet;
-  type?: "CUSTOM" | "GIT" | "SCHEDULED" | "UNRECOGNIZED";
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTriggerPayload;
-  defaultInstanceForType?: TriggerPayload;
-  jsonPayloadBytes?: ByteString;
-  jsonPayload?: string;
-  parsedPayload?: ParsedPayload;
-  parsedPayloadOrBuilder?: ParsedPayloadOrBuilder;
-  typeValue?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TriggerPayloadOrBuilder {
-  type?: "CUSTOM" | "GIT" | "SCHEDULED" | "UNRECOGNIZED";
-  jsonPayloadBytes?: ByteString;
-  jsonPayload?: string;
-  parsedPayload?: ParsedPayload;
-  parsedPayloadOrBuilder?: ParsedPayloadOrBuilder;
-  typeValue?: number;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface TriggeredBy {
-  unknownFields?: UnknownFieldSet;
-  identifier?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTriggeredBy;
-  defaultInstanceForType?: TriggeredBy;
-  uuid?: string;
-  uuidBytes?: ByteString;
-  identifierBytes?: ByteString;
-  extraInfoCount?: number;
-  extraInfo?: {
-    [key: string]: string;
-  };
-  extraInfoMap?: {
-    [key: string]: string;
-  };
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TriggeredByOrBuilder {
-  identifier?: string;
-  uuid?: string;
-  uuidBytes?: ByteString;
-  identifierBytes?: ByteString;
-  extraInfoCount?: number;
-  extraInfo?: {
-    [key: string]: string;
-  };
-  extraInfoMap?: {
-    [key: string]: string;
-  };
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface UninterpretedOption {
-  unknownFields?: UnknownFieldSet;
-  nameCount?: number;
-  stringValue?: ByteString;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserUninterpretedOption;
-  defaultInstanceForType?: UninterpretedOption;
-  doubleValue?: number;
-  nameList?: NamePart[];
-  nameOrBuilderList?: NamePartOrBuilder[];
-  identifierValue?: string;
-  identifierValueBytes?: ByteString;
-  positiveIntValue?: number;
-  negativeIntValue?: number;
-  aggregateValue?: string;
-  aggregateValueBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface UninterpretedOptionOrBuilder {
-  nameCount?: number;
-  stringValue?: ByteString;
-  doubleValue?: number;
-  nameList?: NamePart[];
-  nameOrBuilderList?: NamePartOrBuilder[];
-  identifierValue?: string;
-  identifierValueBytes?: ByteString;
-  positiveIntValue?: number;
-  negativeIntValue?: number;
-  aggregateValue?: string;
-  aggregateValueBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface UnknownFieldSet {
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: Parser;
-  defaultInstanceForType?: UnknownFieldSet;
-  serializedSizeAsMessageSet?: number;
-}
-
-export interface User {
-  uuid: string;
-  appId: string;
-  createdBy?: EmbeddedUser;
-  createdAt?: number;
-  lastUpdatedBy?: EmbeddedUser;
-  lastUpdatedAt: number;
-  name?: string;
-  givenName?: string;
-  familyName?: string;
-  email?: string;
-  companyName?: string;
-  accountName?: string;
-  userGroups?: UserGroup[];
-  accounts?: Account[];
-  pendingAccounts?: Account[];
-  supportAccounts?: Account[];
-  lastLogin?: number;
-  firstLogin?: boolean;
-  password?: string[];
-  token?: string;
-  twoFactorJwtToken?: string;
-  emailVerified?: boolean;
-  passwordExpired?: boolean;
-  userLocked?: boolean;
-  statsFetchedOn?: number;
-  lastAccountId?: string;
-  defaultAccountId?: string;
-  lastAppId?: string;
-  disabled?: boolean;
-  imported?: boolean;
-  userLockoutInfo?: UserLockoutInfo;
-  twoFactorAuthenticationEnabled?: boolean;
-  twoFactorAuthenticationMechanism?: "TOTP";
-  oauthProvider?: string;
-  reportedSegmentTracks?: string[];
-  utmInfo?: UtmInfo;
-  accountIds?: string[];
-}
-
-export interface UserOrBuilder {
-  name?: string;
-  login?: string;
-  email?: string;
-  created?: Timestamp;
-  nameBytes?: ByteString;
-  emailBytes?: ByteString;
-  avatar?: string;
-  avatarBytes?: ByteString;
-  createdOrBuilder?: TimestampOrBuilder;
-  updated?: Timestamp;
-  updatedOrBuilder?: TimestampOrBuilder;
-  loginBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export type AbortFailureActionConfig = FailureStrategyActionConfig & {
-  type: "Abort";
-};
-
-export type AddSegmentToVariationTargetMapYaml = PatchInstruction & {
-  type:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-  spec: AddSegmentToVariationTargetMapYamlSpec;
-};
-
-export interface AddSegmentToVariationTargetMapYamlSpec {
-  variation?: string;
-  segments?: string[];
-}
-
-export type AddTargetsToVariationTargetMapYaml = PatchInstruction & {
-  type:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-  spec: AddTargetsToVariationTargetMapYamlSpec;
-};
-
-export interface AddTargetsToVariationTargetMapYamlSpec {
-  variation?: string;
-  targets?: string[];
-}
-
-export interface ApproverInputInfo {
-  name?: string;
-  defaultValue?: string;
-}
-
-export interface Approvers {
-  userGroups: string[];
-  minimumCount: number;
-  disallowPipelineExecutor: boolean;
-}
-
-export interface ArtifactConfig {
-  [key: string]: any;
-}
-
-export interface ArtifactListConfig {
-  primary?: ArtifactSpecWrapper;
-  sidecars?: SidecarArtifactWrapper[];
-  metadata?: string;
-}
-
-export interface ArtifactOverrideSetWrapper {
-  overrideSet?: ArtifactOverrideSets;
-}
-
-export interface ArtifactOverrideSets {
-  identifier?: string;
-  artifacts?: ArtifactListConfig;
-}
-
-export interface ArtifactSpecWrapper {
-  type: "Dockerhub" | "Gcr" | "Ecr";
-  spec?: ArtifactConfig;
-}
-
-export type BarrierStepInfo = StepSpecType & {
-  barrierRef: string;
-};
-
-export type BitbucketStore = StoreConfig & {
-  connectorRef?: string;
-  gitFetchType?: "BRANCH" | "COMMIT";
-  branch?: string;
-  commitId?: string;
-  paths?: string[];
-  folderPath?: string;
-  repoName?: string;
-  metadata?: string;
-};
-
-export type BranchBuildSpec = BuildSpec & {
-  branch: string;
-};
-
-export interface Build {
-  type: "branch" | "tag";
-  spec: BuildSpec;
-}
-
-export interface BuildSpec {
-  [key: string]: any;
-}
-
-export interface CodeBase {
-  connectorRef: string;
-  repoName?: string;
-  build: Build;
-}
-
-export interface Condition {
-  key: string;
-  value: string;
-  operator: "equals" | "not equals" | "in" | "not in";
-}
-
-export type CountInstanceSelection = InstanceSelectionBase & {
-  count?: string;
-};
-
-export interface CriteriaSpec {
-  [key: string]: any;
-}
-
-export interface CriteriaSpecWrapper {
-  type: "Jexl" | "KeyValues";
-  spec: CriteriaSpec;
-}
-
-export type DeleteManifestPathSpec = DeleteResourcesBaseSpec & {
-  manifestPaths?: string[];
-};
-
-export type DeleteReleaseNameSpec = DeleteResourcesBaseSpec & {};
-
-export type DeleteResourceNameSpec = DeleteResourcesBaseSpec & {};
-
-export interface DeleteResourcesBaseSpec {
-  type?: "ResourceName" | "ReleaseName" | "ManifestPath";
-  manifestPaths?: string;
-  resourceNames?: string[];
-  deleteNamespace?: boolean;
-  allManifestPaths?: boolean;
-}
-
-export interface DeleteResourcesWrapper {
-  type?: "ResourceName" | "ReleaseName" | "ManifestPath";
-  spec?: DeleteResourcesBaseSpec;
-}
-
-export type DeploymentStage = StageType & {
-  variables?: NGVariable[];
-  serviceConfig?: ServiceConfig;
-  infrastructure?: PipelineInfrastructure;
-  execution?: ExecutionElement;
-  skipCondition?: string;
-  metadata?: string;
-};
-
-export type DockerHubArtifactConfig = ArtifactConfig & {
-  connectorRef?: string;
-  imagePath?: string;
-  tag?: string;
-  tagRegex?: string;
-  metadata?: string;
-};
-
-export type EcrArtifactConfig = ArtifactConfig & {
-  connectorRef?: string;
-  region?: string;
-  imagePath?: string;
-  tag?: string;
-  tagRegex?: string;
-};
-
-export interface EnvironmentYaml {
-  name: string;
-  identifier: string;
-  description?: string;
-  type: "PreProduction" | "Production";
-  tags?: {
-    [key: string]: string;
-  };
-}
-
-export interface ExecutionElement {
-  steps?: ExecutionWrapper[];
-  rollbackSteps?: ExecutionWrapper[];
-  metadata?: string;
-}
-
-export interface ExecutionElementConfig {
-  steps?: ExecutionWrapperConfig[];
-  rollbackSteps?: ExecutionWrapperConfig[];
-}
-
-export interface ExecutionTarget {
-  host?: string;
-  connectorRef?: string;
-  workingDirectory?: string;
-}
-
-export interface ExecutionWrapper {
-  [key: string]: any;
-}
-
-export interface ExecutionWrapperConfig {
-  step?: StepElementConfig;
-  parallel?: ParallelStepElementConfig;
-  stepGroup?: StepGroupElementConfig;
-}
-
-export interface FailureStrategyActionConfig {
-  type:
-    | "Ignore"
-    | "Retry"
-    | "MarkAsSuccess"
-    | "Abort"
-    | "StageRollback"
-    | "StepGroupRollback"
-    | "ManualIntervention";
-}
-
-export interface FailureStrategyConfig {
-  onFailure: OnFailureConfig;
-}
-
-export type FeatureUpdateStepInfo = StepSpecType & {
-  featureUpdateRef: string;
-  feature: string;
-  environment: string;
-  instructions: PatchInstruction[];
-  state: string;
-};
-
-export type GcrArtifactConfig = ArtifactConfig & {
-  connectorRef?: string;
-  registryHostname?: string;
-  imagePath?: string;
-  tag?: string;
-  tagRegex?: string;
-  metadata?: string;
-};
-
-export type GcsStoreConfig = StoreConfig & {
-  connectorRef?: string;
-  bucketName?: string;
-  folderPath?: string;
-  metadata?: string;
-};
-
-export type GitLabStore = StoreConfig & {
-  connectorRef?: string;
-  gitFetchType?: "BRANCH" | "COMMIT";
-  branch?: string;
-  commitId?: string;
-  paths?: string[];
-  folderPath?: string;
-  repoName?: string;
-  metadata?: string;
-};
-
-export type GitStore = StoreConfig & {
-  connectorRef?: string;
-  gitFetchType?: "BRANCH" | "COMMIT";
-  branch?: string;
-  commitId?: string;
-  paths?: string[];
-  folderPath?: string;
-  repoName?: string;
-  metadata?: string;
-};
-
-export type GithubStore = StoreConfig & {
-  connectorRef?: string;
-  gitFetchType?: "BRANCH" | "COMMIT";
-  branch?: string;
-  commitId?: string;
-  paths?: string[];
-  folderPath?: string;
-  repoName?: string;
-  metadata?: string;
-};
-
-export type HarnessApprovalStepInfo = StepSpecType & {
-  approvalMessage: string;
-  includePipelineExecutionHistory: boolean;
-  approvers: Approvers;
-  approverInputs?: ApproverInputInfo[];
-};
-
-export type HelmChartManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  chartName?: string;
-  chartVersion?: string;
-  helmVersion?: "V2" | "V3";
-  skipResourceVersioning?: boolean;
-  commandFlags?: HelmManifestCommandFlag[];
-  metadata?: string;
-};
-
-export interface HelmManifestCommandFlag {
-  commandType: "Fetch" | "Version" | "Template" | "Pull";
-  flag?: string;
-}
-
-export interface HoldingScope {
-  scope: string;
-  nodeSetupId: string;
-}
-
-export interface HttpHeaderConfig {
-  key?: string;
-  value?: string;
-}
-
-export type HttpStepInfo = StepSpecType & {
-  url: string;
-  method: string;
-  requestBody?: string;
-  assertion?: string;
-  outputVariables?: NGVariable[];
-  headers?: HttpHeaderConfig[];
-  delegateSelectors?: ParameterFieldListTaskSelectorYaml;
-};
-
-export type HttpStoreConfig = StoreConfig & {
-  connectorRef?: string;
-  metadata?: string;
-};
-
-export type IgnoreFailureActionConfig = FailureStrategyActionConfig & {
-  type: "Ignore";
-};
-
-export interface InfraOverrides {
-  environment?: EnvironmentYaml;
-  infrastructureDefinition?: InfrastructureDef;
-}
-
-export interface InfraUseFromStage {
-  stage: string;
-  overrides?: InfraOverrides;
-}
-
-export interface Infrastructure {
-  [key: string]: any;
-}
-
-export interface InfrastructureDef {
-  type?: string;
-  spec?: Infrastructure;
-  provisioner?: ExecutionElementConfig;
-}
-
-export type InlineTerraformBackendConfigSpec = TerraformBackendConfigSpec & {
-  content?: string;
-};
-
-export type InlineTerraformVarFileSpec = TerraformVarFileSpec & {
-  content?: string;
-};
-
-export interface InputSetValidator {
-  validatorType?: "ALLOWED_VALUES" | "REGEX";
-  parameters?: string;
-}
-
-export interface InstanceSelectionBase {
-  type?: "Count" | "Percentage";
-  instances?: number;
-}
-
-export interface InstanceSelectionWrapper {
-  type?: "Count" | "Percentage";
-  spec?: InstanceSelectionBase;
-}
-
-export type JexlCriteriaSpec = CriteriaSpec & {
-  expression: string;
-};
-
-export type JiraApprovalStepInfo = StepSpecType & {
-  connectorRef: string;
-  issueKey: string;
-  approvalCriteria: CriteriaSpecWrapper;
-  rejectionCriteria: CriteriaSpecWrapper;
-};
-
-export type JiraCreateStepInfo = StepSpecType & {
-  connectorRef?: string;
-  projectKey?: string;
-  issueType?: string;
-  fields?: JiraField[];
-};
-
-export interface JiraField {
-  name?: string;
-  value: string;
-}
-
-export type JiraUpdateStepInfo = StepSpecType & {
-  connectorRef: string;
-  issueKey: string;
-  transitionTo?: TransitionTo;
-  fields?: JiraField[];
-};
-
-export type K8SDirectInfrastructure = Infrastructure & {
-  connectorRef?: string;
-  namespace?: string;
-  releaseName?: string;
-};
-
-export type K8sApplyStepInfo = StepSpecType & {
-  skipDryRun: ParameterFieldBoolean;
-  skipSteadyStateCheck?: ParameterFieldBoolean;
-  filePaths?: string[];
-};
-
-export type K8sBGSwapServicesStepInfo = StepSpecType & {
-  skipDryRun?: boolean;
-};
-
-export type K8sBlueGreenStepInfo = StepSpecType & {
-  skipDryRun?: ParameterFieldBoolean;
-};
-
-export type K8sCanaryDeleteStepInfo = StepSpecType & {
-  skipDryRun?: boolean;
-};
-
-export type K8sCanaryStepInfo = StepSpecType & {
-  instanceSelection: InstanceSelectionWrapper;
-  skipDryRun?: ParameterFieldBoolean;
-};
-
-export type K8sDeleteStepInfo = StepSpecType & {
-  deleteResources: DeleteResourcesWrapper;
-  skipDryRun?: ParameterFieldBoolean;
-};
-
-export type K8sGcpInfrastructure = Infrastructure & {
-  connectorRef?: string;
-  namespace?: string;
-  releaseName?: string;
-  cluster?: string;
-  metadata?: string;
-};
-
-export type K8sManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  skipResourceVersioning?: boolean;
-  metadata?: string;
-};
-
-export type K8sRollingRollbackStepInfo = StepSpecType & {
-  skipDryRun?: ParameterFieldBoolean;
-};
-
-export type K8sRollingStepInfo = StepSpecType & {
-  skipDryRun: boolean;
-};
-
-export type K8sScaleStepInfo = StepSpecType & {
-  instanceSelection: InstanceSelectionWrapper;
-  workload?: string;
-  skipDryRun?: ParameterFieldBoolean;
-  skipSteadyStateCheck?: ParameterFieldBoolean;
-};
-
-export type KeyValuesCriteriaSpec = CriteriaSpec & {
-  matchAnyCondition?: boolean;
-  conditions: Condition[];
-};
-
-export type KubernetesServiceSpec = ServiceSpec & {
-  metadata?: string;
-};
-
-export type KustomizeManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  skipResourceVersioning?: boolean;
-  pluginPath?: string;
-  metadata?: string;
-};
-
-export interface ManifestAttributes {
-  [key: string]: any;
-}
-
-export interface ManifestConfig {
-  identifier?: string;
-  type?: string;
-  spec?: ManifestAttributes;
-}
-
-export interface ManifestConfigWrapper {
-  manifest?: ManifestConfig;
-}
-
-export interface ManifestOverrideSetWrapper {
-  overrideSet?: ManifestOverrideSets;
-}
-
-export interface ManifestOverrideSets {
-  identifier?: string;
-  manifests?: ManifestConfigWrapper[];
-}
-
-export interface ManualFailureSpecConfig {
-  timeout: string;
-  onTimeout: OnTimeoutConfig;
-}
-
-export type ManualInterventionFailureActionConfig = FailureStrategyActionConfig & {
-  spec: ManualFailureSpecConfig;
-  type: "ManualIntervention";
-};
-
-export type MarkAsSuccessFailureActionConfig = FailureStrategyActionConfig & {
-  type: "MarkAsSuccess";
-};
-
-export interface NGVariable {
-  name?: string;
-  type?: "String" | "Number" | "Secret";
-  required?: boolean;
-  description?: string;
-  metadata?: string;
-}
-
-export interface NGVariableOverrideSetWrapper {
-  overrideSet?: NGVariableOverrideSets;
-  uuid?: string;
-}
-
-export interface NGVariableOverrideSets {
-  identifier?: string;
-  variables?: NGVariable[];
-}
-
-export type NativeHelmServiceSpec = ServiceSpec & {
-  metadata?: string;
-};
-
-export interface NgPipeline {
-  name: string;
-  identifier: string;
-  description?: string;
-  tags?: {
-    [key: string]: string;
-  };
-  variables?: NGVariable[];
-  ciCodebase?: CodeBase;
-  stages?: StageElementWrapper[];
-  metadata?: string;
-}
-
-export type NumberNGVariable = NGVariable & {
-  type?: "Number";
-  value: number;
-  default?: number;
-};
-
-export interface OnFailureConfig {
-  errors: string[];
-  action: FailureStrategyActionConfig;
-}
-
-export interface OnRetryFailureConfig {
-  action?: FailureStrategyActionConfig;
-}
-
-export interface OnTimeoutConfig {
-  action?: FailureStrategyActionConfig;
-}
-
-export type OpenshiftManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  skipResourceVersioning?: boolean;
-  metadata?: string;
-};
-
-export type OpenshiftParamManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  metadata?: string;
-};
-
-export type ParallelStageElement = StageElementWrapper & {
-  sections: StageElementWrapper[];
-  metadata?: string;
-};
-
-export type ParallelStepElement = ExecutionWrapper & {
-  sections: ExecutionWrapper[];
-  metadata?: string;
-};
-
-export interface ParallelStepElementConfig {
-  sections: ExecutionWrapperConfig[];
-}
-
-export interface ParameterField {
-  expressionValue?: string;
-  expression?: boolean;
-  value?: { [key: string]: any };
-  typeString?: boolean;
-  inputSetValidator?: InputSetValidator;
-  jsonResponseField?: boolean;
-  responseField?: string;
-}
-
-export interface ParameterFieldBoolean {
-  expressionValue?: string;
-  expression?: boolean;
-  value?: boolean;
-  typeString?: boolean;
-  inputSetValidator?: InputSetValidator;
-  jsonResponseField?: boolean;
-  responseField?: string;
-}
-
-export interface ParameterFieldInteger {
-  expressionValue?: string;
-  expression?: boolean;
-  value?: number;
-  typeString?: boolean;
-  inputSetValidator?: InputSetValidator;
-  jsonResponseField?: boolean;
-  responseField?: string;
-}
-
-export interface ParameterFieldListTaskSelectorYaml {
-  expressionValue?: string;
-  expression?: boolean;
-  value?: TaskSelectorYaml[];
-  typeString?: boolean;
-  inputSetValidator?: InputSetValidator;
-  jsonResponseField?: boolean;
-  responseField?: string;
-}
-
-export interface PatchInstruction {
-  type?:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-}
-
-export type PercentageInstanceSelection = InstanceSelectionBase & {
-  percentage?: ParameterFieldInteger;
-};
-
-export interface PipelineInfrastructure {
-  infrastructureDefinition?: InfrastructureDef;
-  useFromStage?: InfraUseFromStage;
-  environment?: EnvironmentYaml;
-  allowSimultaneousDeployments?: boolean;
-  infrastructureKey?: string;
-  environmentRef?: string;
-}
-
-export type RemoteTerraformVarFileSpec = TerraformVarFileSpec & {
-  store?: StoreConfigWrapper;
-};
-
-export type RemoveSegmentToVariationTargetMapYaml = PatchInstruction & {
-  type:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-  spec: RemoveSegmentToVariationTargetMapYamlSpec;
-};
-
-export interface RemoveSegmentToVariationTargetMapYamlSpec {
-  variation?: string;
-  segments?: string[];
-}
-
-export type RemoveTargetsToVariationTargetMapYaml = PatchInstruction & {
-  type:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-  spec: RemoveTargetsToVariationTargetMapYamlSpec;
-};
-
-export interface RemoveTargetsToVariationTargetMapYamlSpec {
-  variation?: string;
-  targets?: string[];
-}
-
-export type ResourceConstraintStepInfo = StepSpecType & {
-  name: string;
-  resourceUnit: string;
-  acquireMode: "ENSURE" | "ACCUMULATE";
-  permits: number;
-  holdingScope: HoldingScope;
-};
-
-export type RetryFailureActionConfig = FailureStrategyActionConfig & {
-  spec: RetryFailureSpecConfig;
-  type: "Retry";
-};
-
-export interface RetryFailureSpecConfig {
-  retryCount: number;
-  retryIntervals: string[];
-  onRetryFailure: OnRetryFailureConfig;
-}
-
-export type S3StoreConfig = StoreConfig & {
-  connectorRef?: string;
-  bucketName?: string;
-  region?: string;
-  folderPath?: string;
-  metadata?: string;
-};
-
-export type SecretNGVariable = NGVariable & {
-  type?: "Secret";
-  value: string;
-  default?: string;
-};
-
-export interface ServiceConfig {
-  useFromStage?: ServiceUseFromStage;
-  service?: ServiceYaml;
-  serviceRef?: string;
-  serviceDefinition?: ServiceDefinition;
-  stageOverrides?: StageOverridesConfig;
-}
-
-export interface ServiceDefinition {
-  type?: string;
-  spec?: ServiceSpec;
-}
-
-export interface ServiceOverrides {
-  name?: string;
-  description?: string;
-}
-
-export interface ServiceSpec {
-  variables?: NGVariable[];
-  artifacts?: ArtifactListConfig;
-  manifestOverrideSets?: ManifestOverrideSetWrapper[];
-  manifests?: ManifestConfigWrapper[];
-  artifactOverrideSets?: ArtifactOverrideSetWrapper[];
-  variableOverrideSets?: NGVariableOverrideSetWrapper[];
-}
-
-export interface ServiceUseFromStage {
-  stage: string;
-  overrides?: ServiceOverrides;
-  metadata?: string;
-}
-
-export interface ServiceYaml {
-  identifier: string;
-  name: string;
-  description?: string;
-  tags?: {
-    [key: string]: string;
-  };
-}
-
-export type SetFeatureFlagStateYaml = PatchInstruction & {
-  type:
-    | "SetFeatureFlagState"
-    | "AddTargetsToVariationTargetMap"
-    | "RemoveTargetsToVariationTargetMap"
-    | "AddSegmentsToVariationTargetMap"
-    | "RemoveSegmentsToVariationTargetMap";
-  spec: SetFeatureFlagStateYamlSpec;
-};
-
-export interface SetFeatureFlagStateYamlSpec {
-  state?: string;
-}
-
-export interface ShellScriptBaseSource {
-  type?: string;
-}
-
-export type ShellScriptInlineSource = ShellScriptBaseSource & {
-  script?: string;
-};
-
-export interface ShellScriptSourceWrapper {
-  type?: string;
-  spec?: ShellScriptBaseSource;
-}
-
-export type ShellScriptStepInfo = StepSpecType & {
-  shell: "Bash" | "PowerShell";
-  source: ShellScriptSourceWrapper;
-  executionTarget?: ExecutionTarget;
-  onDelegate: ParameterFieldBoolean;
-  outputVariables?: NGVariable[];
-  environmentVariables?: NGVariable[];
-  delegateSelectors?: ParameterFieldListTaskSelectorYaml;
-  metadata?: string;
-};
-
-export interface SidecarArtifact {
-  identifier?: string;
-  type: "Dockerhub" | "Gcr" | "Ecr";
-  spec?: ArtifactConfig;
-}
-
-export interface SidecarArtifactWrapper {
-  sidecar?: SidecarArtifact;
-}
-
-export type StageElement = StageElementWrapper & {
-  identifier: string;
-  name?: string;
-  description?: string;
-  failureStrategies: FailureStrategyConfig[];
-  type?: string;
-  skipCondition?: string;
-  metadata?: string;
-  spec?: StageType;
-};
-
-export interface StageElementWrapper {
-  [key: string]: any;
-}
-
-export interface StageOverridesConfig {
-  variables?: NGVariable[];
-  useVariableOverrideSets?: string[];
-  useArtifactOverrideSets?: string[];
-  artifacts?: ArtifactListConfig;
-  useManifestOverrideSets?: string[];
-  manifests?: ManifestConfigWrapper[];
-}
-
-export type StageRollbackFailureActionConfig = FailureStrategyActionConfig & {
-  type: "StageRollback";
-};
-
-export interface StageType {
-  identifier: string;
-}
-
-export type StepElement = ExecutionWrapper & {
-  identifier: string;
-  name?: string;
-  failureStrategies?: FailureStrategyConfig[];
-  type?: string;
-  skipCondition?: string;
-  metadata?: string;
-  spec?: StepSpecType;
-};
-
-export interface StepElementConfig {
-  identifier?: string;
-  name?: string;
-  description?: string;
-  timeout?: string;
-  failureStrategies?: FailureStrategyConfig[];
-  skipCondition?: string;
-  type?: string;
-  spec?: StepSpecType;
-}
-
-export type StepGroupElement = ExecutionWrapper & {
-  identifier: string;
-  name?: string;
-  failureStrategies?: FailureStrategyConfig[];
-  steps: ExecutionWrapper[];
-  rollbackSteps?: ExecutionWrapper[];
-  metadata?: string;
-};
-
-export interface StepGroupElementConfig {
-  identifier: string;
-  name?: string;
-  skipCondition?: string;
-  failureStrategies?: FailureStrategyConfig[];
-  steps: ExecutionWrapperConfig[];
-  rollbackSteps?: ExecutionWrapperConfig[];
-}
-
-export type StepGroupFailureActionConfig = FailureStrategyActionConfig & {
-  type: "StepGroupRollback";
-};
-
-export interface StepSpecType {
-  [key: string]: any;
-}
-
-export interface StoreConfig {
-  [key: string]: any;
-}
-
-export interface StoreConfigWrapper {
-  type?: string;
-  metadata?: string;
-  spec?: StoreConfig;
-}
-
-export type StringNGVariable = NGVariable & {
-  type?: "String";
-  value: string;
-  default?: string;
-};
-
-export type TagBuildSpec = BuildSpec & {
-  tag: string;
-};
-
-export interface TaskSelectorYaml {
-  delegateSelectors?: string;
-}
-
-export type TerraformApplyStepInfo = StepSpecType & {
-  provisionerIdentifier?: string;
-  metadata?: string;
-  configuration?: TerrformStepConfiguration;
-};
-
-export interface TerraformBackendConfig {
-  type?: string;
-  spec?: TerraformBackendConfigSpec;
-}
-
-export interface TerraformBackendConfigSpec {
-  [key: string]: any;
-}
-
-export interface TerraformConfigFilesWrapper {
-  store?: StoreConfigWrapper;
-}
-
-export type TerraformDestroyStepInfo = StepSpecType & {
-  provisionerIdentifier?: string;
-  metadata?: string;
-  configuration?: TerrformStepConfiguration;
-};
-
-export interface TerraformExecutionData {
-  workspace?: string;
-  targets?: string[];
-  environmentVariables?: NGVariable[];
-  configFiles?: TerraformConfigFilesWrapper;
-  varFiles?: TerraformVarFileWrapper[];
-  backendConfig?: TerraformBackendConfig;
-}
-
-export interface TerraformPlanExecutionData {
-  workspace?: string;
-  targets?: string[];
-  environmentVariables?: NGVariable[];
-  command?: "Apply" | "Destroy";
-  secretManagerRef?: string;
-  configFiles?: TerraformConfigFilesWrapper;
-  varFiles?: TerraformVarFileWrapper[];
-  backendConfig?: TerraformBackendConfig;
-}
-
-export type TerraformPlanStepInfo = StepSpecType & {
-  provisionerIdentifier?: string;
-  configuration?: TerraformPlanExecutionData;
-};
-
-export interface TerraformVarFile {
-  type?: string;
-  spec?: TerraformVarFileSpec;
-}
-
-export interface TerraformVarFileSpec {
-  type?: string;
-}
-
-export interface TerraformVarFileWrapper {
-  varFile?: TerraformVarFile;
-}
-
-export interface TerrformStepConfiguration {
-  type?: "Inline" | "InheritFromPlan" | "InheritFromApply";
-  spec?: TerraformExecutionData;
-}
-
-export interface TransitionTo {
-  status: string;
-  transitionName?: string;
-}
-
-export type ValuesManifest = ManifestAttributes & {
-  store?: StoreConfigWrapper;
-  metadata?: string;
-};
-
-export interface MergeInputSetRequest {
-  inputSetReferences?: string[];
 }
 
 export type AppDynamicsConnectorDTO = ConnectorConfigDTO & {
   username?: string;
   accountname: string;
   controllerUrl: string;
-  accountId: string;
   delegateSelectors?: string[];
   passwordRef?: string;
   clientSecretRef?: string;
@@ -3477,6 +1124,8 @@ export interface AwsCredentialSpec {
 export interface AwsCurAttributes {
   reportName: string;
   s3BucketName: string;
+  region?: string;
+  s3Prefix?: string;
 }
 
 export interface AwsKmsConnectorCredential {
@@ -3517,10 +1166,22 @@ export type AwsManualConfigSpec = AwsCredentialSpec & {
   secretKeyRef: string;
 };
 
+export type AzureKeyVaultConnectorDTO = ConnectorConfigDTO & {
+  clientId: string;
+  secretKey?: string;
+  tenantId: string;
+  vaultName: string;
+  subscription: string;
+  azureEnvironmentType?: "AZURE" | "AZURE_US_GOVERNMENT";
+  default?: boolean;
+};
+
 export interface BillingExportSpec {
   storageAccountName: string;
   containerName: string;
   directoryName: string;
+  reportName: string;
+  subscriptionId: string;
 }
 
 export interface BitbucketApiAccess {
@@ -3539,6 +1200,7 @@ export interface BitbucketAuthentication {
 
 export type BitbucketConnector = ConnectorConfigDTO & {
   url: string;
+  validationRepo?: string;
   authentication: BitbucketAuthentication;
   apiAccess?: BitbucketApiAccess;
   delegateSelectors?: string[];
@@ -3577,11 +1239,12 @@ export type BitbucketUsernameTokenApiAccess = BitbucketApiAccessSpecDTO & {
 export type CEAwsConnector = ConnectorConfigDTO & {
   crossAccountAccess: CrossAccountAccess;
   curAttributes?: AwsCurAttributes;
-  featuresEnabled?: ("CUR" | "EVENTS" | "OPTIMIZATION")[];
+  awsAccountId?: string;
+  featuresEnabled?: ("BILLING" | "OPTIMIZATION" | "VISIBILITY")[];
 };
 
 export type CEAzureConnector = ConnectorConfigDTO & {
-  featuresEnabled?: ("BILLING" | "OPTIMIZATION")[];
+  featuresEnabled?: ("BILLING" | "OPTIMIZATION" | "VISIBILITY")[];
   tenantId: string;
   subscriptionId: string;
   billingExportSpec?: BillingExportSpec;
@@ -3589,6 +1252,7 @@ export type CEAzureConnector = ConnectorConfigDTO & {
 
 export type CEKubernetesClusterConfig = ConnectorConfigDTO & {
   connectorRef: string;
+  featuresEnabled?: ("BILLING" | "OPTIMIZATION" | "VISIBILITY")[];
 };
 
 export interface ConnectorActivityDetails {
@@ -3600,7 +1264,7 @@ export interface ConnectorConfigDTO {
 }
 
 export interface ConnectorConnectivityDetails {
-  status?: "SUCCESS" | "FAILURE" | "PARTIAL";
+  status?: "SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN";
   errorSummary?: string;
   errors?: ErrorDetail[];
   testedAt?: number;
@@ -3622,7 +1286,10 @@ export interface ConnectorInfoDTO {
     | "Git"
     | "Splunk"
     | "AppDynamics"
+    | "Prometheus"
+    | "Dynatrace"
     | "Vault"
+    | "AzureKeyVault"
     | "DockerRegistry"
     | "Local"
     | "AwsKms"
@@ -3641,7 +1308,9 @@ export interface ConnectorInfoDTO {
     | "GcpCloudCost"
     | "CEK8sCluster"
     | "HttpHelmRepo"
-    | "NewRelic";
+    | "NewRelic"
+    | "Datadog"
+    | "SumoLogic";
   spec: ConnectorConfigDTO;
 }
 
@@ -3660,11 +1329,12 @@ export interface CrossAccountAccess {
   externalId?: string;
 }
 
-export interface CustomCommitAttributes {
-  authorName?: string;
-  authorEmail?: string;
-  commitMessage?: string;
-}
+export type DatadogConnectorDTO = ConnectorConfigDTO & {
+  url: string;
+  applicationKeyRef: string;
+  apiKeyRef: string;
+  delegateSelectors?: string[];
+};
 
 export interface DockerAuthCredentialsDTO {
   [key: string]: any;
@@ -3688,10 +1358,18 @@ export type DockerUserNamePasswordDTO = DockerAuthCredentialsDTO & {
   passwordRef: string;
 };
 
+export type DynatraceConnectorDTO = ConnectorConfigDTO & {
+  url: string;
+  apiTokenRef: string;
+  delegateSelectors?: string[];
+};
+
 export interface EntityGitDetails {
   objectId?: string;
   branch?: string;
   repoIdentifier?: string;
+  rootFolder?: string;
+  filePath?: string;
 }
 
 export interface ErrorDetail {
@@ -3701,12 +1379,12 @@ export interface ErrorDetail {
 }
 
 export interface GcpBillingExportSpec {
-  projectId: string;
   datasetId: string;
 }
 
 export type GcpCloudCostConnector = ConnectorConfigDTO & {
-  featuresEnabled?: "BILLING"[];
+  featuresEnabled?: ("BILLING" | "OPTIMIZATION" | "VISIBILITY")[];
+  projectId: string;
   billingExportSpec?: GcpBillingExportSpec;
 };
 
@@ -3743,12 +1421,12 @@ export interface GitAuthenticationDTO {
 
 export type GitConfigDTO = ConnectorConfigDTO & {
   url: string;
+  validationRepo?: string;
   branchName?: string;
   delegateSelectors?: string[];
   type: "Http" | "Ssh";
   connectionType: "Account" | "Repo";
   spec: GitAuthenticationDTO;
-  gitSync?: GitSyncConfig;
 };
 
 export type GitHTTPAuthenticationDTO = GitAuthenticationDTO & {
@@ -3760,18 +1438,6 @@ export type GitHTTPAuthenticationDTO = GitAuthenticationDTO & {
 export type GitSSHAuthenticationDTO = GitAuthenticationDTO & {
   sshKeyRef: string;
 };
-
-export interface GitSyncConfig {
-  identifier?: string;
-  name?: string;
-  projectIdentifier?: string;
-  orgIdentifier?: string;
-  gitConnectorRef?: string;
-  repo?: string;
-  branch?: string;
-  gitConnectorType: "Github" | "Gitlab" | "Bitbucket";
-  gitSyncFolderConfigDTOs?: GitSyncFolderConfigDTO[];
-}
 
 export interface GithubApiAccess {
   type: "GithubApp" | "Token";
@@ -3795,6 +1461,7 @@ export interface GithubAuthentication {
 
 export type GithubConnector = ConnectorConfigDTO & {
   url: string;
+  validationRepo?: string;
   authentication: GithubAuthentication;
   apiAccess?: GithubApiAccess;
   delegateSelectors?: string[];
@@ -3850,6 +1517,7 @@ export interface GitlabAuthentication {
 
 export type GitlabConnector = ConnectorConfigDTO & {
   url: string;
+  validationRepo?: string;
   authentication: GitlabAuthentication;
   apiAccess?: GitlabApiAccess;
   delegateSelectors?: string[];
@@ -3938,7 +1606,7 @@ export type KubernetesClientKeyCertDTO = KubernetesAuthCredentialDTO & {
   caCertRef?: string;
   clientCertRef: string;
   clientKeyRef: string;
-  clientKeyPassphraseRef: string;
+  clientKeyPassphraseRef?: string;
   clientKeyAlgo?: string;
 };
 
@@ -4014,6 +1682,11 @@ export type NexusUsernamePasswordAuth = NexusAuthCredentials & {
   passwordRef: string;
 };
 
+export type PrometheusConnectorDTO = ConnectorConfigDTO & {
+  url: string;
+  delegateSelectors?: string[];
+};
+
 export interface ResponseConnectorResponse {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: ConnectorResponse;
@@ -4022,11 +1695,18 @@ export interface ResponseConnectorResponse {
 }
 
 export type SplunkConnectorDTO = ConnectorConfigDTO & {
-  splunkUrl?: string;
+  splunkUrl: string;
   username?: string;
   accountId: string;
   delegateSelectors?: string[];
   passwordRef: string;
+};
+
+export type SumoLogicConnectorDTO = ConnectorConfigDTO & {
+  url: string;
+  accessIdRef: string;
+  accessKeyRef: string;
+  delegateSelectors?: string[];
 };
 
 export type VaultConnectorDTO = ConnectorConfigDTO & {
@@ -4056,16 +1736,12 @@ export interface ResponseBoolean {
 }
 
 export interface Page {
-  totalElements?: number;
   totalPages?: number;
-  size?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
   content?: { [key: string]: any }[];
-  number?: number;
-  first?: boolean;
-  sort?: Sort;
-  last?: boolean;
-  numberOfElements?: number;
-  pageable?: Pageable;
+  pageIndex?: number;
   empty?: boolean;
 }
 
@@ -4086,6 +1762,13 @@ export interface ResponsePageConnectorResponse {
   correlationId?: string;
 }
 
+export interface CcmConnectorFilter {
+  featuresEnabled?: ("BILLING" | "OPTIMIZATION" | "VISIBILITY")[];
+  awsAccountId?: string;
+  azureSubscriptionId?: string;
+  azureTenantId?: string;
+}
+
 export type ConnectorFilterProperties = FilterProperties & {
   connectorNames?: string[];
   connectorIdentifiers?: string[];
@@ -4095,7 +1778,10 @@ export type ConnectorFilterProperties = FilterProperties & {
     | "Git"
     | "Splunk"
     | "AppDynamics"
+    | "Prometheus"
+    | "Dynatrace"
     | "Vault"
+    | "AzureKeyVault"
     | "DockerRegistry"
     | "Local"
     | "AwsKms"
@@ -4115,6 +1801,8 @@ export type ConnectorFilterProperties = FilterProperties & {
     | "CEK8sCluster"
     | "HttpHelmRepo"
     | "NewRelic"
+    | "Datadog"
+    | "SumoLogic"
   )[];
   categories?: (
     | "CLOUD_PROVIDER"
@@ -4125,24 +1813,10 @@ export type ConnectorFilterProperties = FilterProperties & {
     | "MONITORING"
     | "TICKETING"
   )[];
-  connectivityStatuses?: ("SUCCESS" | "FAILURE" | "PARTIAL")[];
+  connectivityStatuses?: ("SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN")[];
   inheritingCredentialsFromDelegate?: boolean;
+  ccmConnectorFilter?: CcmConnectorFilter;
 };
-
-export interface ConnectorValidationResult {
-  status?: "SUCCESS" | "FAILURE" | "PARTIAL";
-  errors?: ErrorDetail[];
-  errorSummary?: string;
-  testedAt?: number;
-  delegateId?: string;
-}
-
-export interface ResponseConnectorValidationResult {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ConnectorValidationResult;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
 
 export interface ConnectorStatistics {
   typeStats?: ConnectorTypeStatistics[];
@@ -4150,7 +1824,7 @@ export interface ConnectorStatistics {
 }
 
 export interface ConnectorStatusStatistics {
-  status?: "SUCCESS" | "FAILURE" | "PARTIAL";
+  status?: "SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN";
   count?: number;
 }
 
@@ -4160,7 +1834,10 @@ export interface ConnectorTypeStatistics {
     | "Git"
     | "Splunk"
     | "AppDynamics"
+    | "Prometheus"
+    | "Dynatrace"
     | "Vault"
+    | "AzureKeyVault"
     | "DockerRegistry"
     | "Local"
     | "AwsKms"
@@ -4179,7 +1856,9 @@ export interface ConnectorTypeStatistics {
     | "GcpCloudCost"
     | "CEK8sCluster"
     | "HttpHelmRepo"
-    | "NewRelic";
+    | "NewRelic"
+    | "Datadog"
+    | "SumoLogic";
   count?: number;
 }
 
@@ -4197,50 +1876,30 @@ export interface ResponseListConnectorResponse {
   correlationId?: string;
 }
 
-export interface ConnectorCatalogueItem {
-  category?:
-    | "CLOUD_PROVIDER"
-    | "SECRET_MANAGER"
-    | "CLOUD_COST"
-    | "ARTIFACTORY"
-    | "CODE_REPO"
-    | "MONITORING"
-    | "TICKETING";
-  connectors?: (
-    | "K8sCluster"
-    | "Git"
-    | "Splunk"
-    | "AppDynamics"
-    | "Vault"
-    | "DockerRegistry"
-    | "Local"
-    | "AwsKms"
-    | "GcpKms"
-    | "Gcp"
-    | "Aws"
-    | "Artifactory"
-    | "Jira"
-    | "Nexus"
-    | "Github"
-    | "Gitlab"
-    | "Bitbucket"
-    | "Codecommit"
-    | "CEAws"
-    | "CEAzure"
-    | "GcpCloudCost"
-    | "CEK8sCluster"
-    | "HttpHelmRepo"
-    | "NewRelic"
-  )[];
+export interface FieldValues {
+  fieldValues?: {
+    [key: string]: string[];
+  };
 }
 
-export interface ConnectorCatalogueResponse {
-  catalogue?: ConnectorCatalogueItem[];
-}
-
-export interface ResponseConnectorCatalogueResponse {
+export interface ResponseFieldValues {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ConnectorCatalogueResponse;
+  data?: FieldValues;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ConnectorValidationResult {
+  status?: "SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN";
+  errors?: ErrorDetail[];
+  errorSummary?: string;
+  testedAt?: number;
+  delegateId?: string;
+}
+
+export interface ResponseConnectorValidationResult {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ConnectorValidationResult;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -4248,7 +1907,7 @@ export interface ResponseConnectorCatalogueResponse {
 export type AuditFilterProperties = FilterProperties & {
   scopes?: ResourceScopeDTO[];
   resources?: ResourceDTO[];
-  modules?: ("CD" | "CI" | "CORE" | "CV" | "CF" | "CE")[];
+  modules?: ("CD" | "CI" | "CV" | "CF" | "CE" | "CORE" | "PMS")[];
   actions?: (
     | "CREATE"
     | "UPDATE"
@@ -4355,16 +2014,14 @@ export interface ResponsePageFilterDTO {
   correlationId?: string;
 }
 
-export interface ResponseListString {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: string[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
 export interface GitBranchDTO {
   branchName?: string;
   branchSyncStatus?: "SYNCED" | "SYNCING" | "UNSYNCED";
+}
+
+export interface GitBranchListDTO {
+  defaultBranch?: GitBranchDTO;
+  branches?: PageGitBranchDTO;
 }
 
 export interface PageGitBranchDTO {
@@ -4377,9 +2034,9 @@ export interface PageGitBranchDTO {
   empty?: boolean;
 }
 
-export interface ResponsePageGitBranchDTO {
+export interface ResponseGitBranchListDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageGitBranchDTO;
+  data?: GitBranchListDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -4405,6 +2062,7 @@ export interface GitSyncEntityDTO {
     | "DeploymentSteps"
     | "DeploymentStage"
     | "ApprovalStage"
+    | "FeatureFlagStage"
     | "Triggers";
   entityIdentifier?: string;
   gitConnectorId?: string;
@@ -4436,9 +2094,44 @@ export interface GitSyncEntityListDTO {
     | "DeploymentSteps"
     | "DeploymentStage"
     | "ApprovalStage"
+    | "FeatureFlagStage"
     | "Triggers";
   count?: number;
   gitSyncEntities?: GitSyncEntityDTO[];
+}
+
+export interface ResponseListGitSyncEntityListDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GitSyncEntityListDTO[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitEntityBranchFilterSummaryProperties {
+  moduleType?: "CD" | "CI" | "CV" | "CF" | "CE" | "CORE" | "PMS";
+  entityTypes?: (
+    | "Projects"
+    | "Pipelines"
+    | "PipelineSteps"
+    | "Connectors"
+    | "Secrets"
+    | "Service"
+    | "Environment"
+    | "InputSets"
+    | "CvConfig"
+    | "Delegates"
+    | "DelegateConfigurations"
+    | "CvVerificationJob"
+    | "IntegrationStage"
+    | "IntegrationSteps"
+    | "CvKubernetesActivitySource"
+    | "DeploymentSteps"
+    | "DeploymentStage"
+    | "ApprovalStage"
+    | "FeatureFlagStage"
+    | "Triggers"
+  )[];
+  searchTerm?: string;
 }
 
 export interface GitSyncRepoFiles {
@@ -4447,7 +2140,7 @@ export interface GitSyncRepoFiles {
 }
 
 export interface GitSyncRepoFilesList {
-  moduleType?: "CD" | "CI" | "CORE" | "CV" | "CF" | "CE";
+  moduleType?: "CD" | "CI" | "CV" | "CF" | "CE" | "CORE" | "PMS";
   gitSyncRepoFilesList?: GitSyncRepoFiles[];
 }
 
@@ -4459,7 +2152,7 @@ export interface ResponseGitSyncRepoFilesList {
 }
 
 export interface GitEntityFilterProperties {
-  moduleType?: "CD" | "CI" | "CORE" | "CV" | "CF" | "CE";
+  moduleType?: "CD" | "CI" | "CV" | "CF" | "CE" | "CORE" | "PMS";
   gitSyncConfigIdentifiers?: string[];
   entityTypes?: (
     | "Projects"
@@ -4480,39 +2173,7 @@ export interface GitEntityFilterProperties {
     | "DeploymentSteps"
     | "DeploymentStage"
     | "ApprovalStage"
-    | "Triggers"
-  )[];
-  searchTerm?: string;
-}
-
-export interface ResponseListGitSyncEntityListDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: GitSyncEntityListDTO[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface GitEntityBranchFilterSummaryProperties {
-  moduleType?: "CD" | "CI" | "CORE" | "CV" | "CF" | "CE";
-  entityTypes?: (
-    | "Projects"
-    | "Pipelines"
-    | "PipelineSteps"
-    | "Connectors"
-    | "Secrets"
-    | "Service"
-    | "Environment"
-    | "InputSets"
-    | "CvConfig"
-    | "Delegates"
-    | "DelegateConfigurations"
-    | "CvVerificationJob"
-    | "IntegrationStage"
-    | "IntegrationSteps"
-    | "CvKubernetesActivitySource"
-    | "DeploymentSteps"
-    | "DeploymentStage"
-    | "ApprovalStage"
+    | "FeatureFlagStage"
     | "Triggers"
   )[];
   searchTerm?: string;
@@ -4535,6 +2196,79 @@ export interface ResponsePageGitSyncEntityListDTO {
   correlationId?: string;
 }
 
+export interface GitSyncSettingsDTO {
+  accountIdentifier: string;
+  projectIdentifier: string;
+  organizationIdentifier: string;
+  executeOnDelegate: boolean;
+}
+
+export interface ResponseGitSyncSettingsDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GitSyncSettingsDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitFileContent {
+  content?: string;
+  objectId?: string;
+}
+
+export interface ResponseGitFileContent {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GitFileContent;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface CreatePRDTO {
+  prNumber?: number;
+}
+
+export interface ResponseCreatePRDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: CreatePRDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitPRCreateRequest {
+  sourceBranch: string;
+  targetBranch: string;
+  title: string;
+}
+
+export interface ResponseListString {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: string[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseSaasGitDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: SaasGitDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface SaasGitDTO {
+  saasGit?: boolean;
+}
+
+export interface GitSyncConfig {
+  identifier?: string;
+  name?: string;
+  projectIdentifier?: string;
+  orgIdentifier?: string;
+  gitConnectorRef?: string;
+  repo?: string;
+  branch?: string;
+  gitConnectorType: "Github" | "Gitlab" | "Bitbucket";
+  gitSyncFolderConfigDTOs?: GitSyncFolderConfigDTO[];
+}
+
 export interface GitSyncFolderConfigDTO {
   rootFolder?: string;
   isDefault?: boolean;
@@ -4551,14 +2285,21 @@ export interface RestResponse {
 }
 
 export type CDModuleLicenseDTO = ModuleLicenseDTO & {
-  deploymentUnits?: {
-    [key: string]: number;
-  };
+  maxWorkLoads?: number;
+  deploymentsPerDay?: number;
 };
 
-export type CEModuleLicenseDTO = ModuleLicenseDTO & {};
+export type CEModuleLicenseDTO = ModuleLicenseDTO & {
+  numberOfCluster?: number;
+  spendLimit?: number;
+  dataRetentionInDays?: number;
+};
 
-export type CFModuleLicenseDTO = ModuleLicenseDTO & {};
+export type CFModuleLicenseDTO = ModuleLicenseDTO & {
+  numberOfUsers?: number;
+  numberOfClientMAUs?: number;
+  updateChannels?: ("POLLING" | "STREAMING")[];
+};
 
 export type CIModuleLicenseDTO = ModuleLicenseDTO & {
   numberOfCommitters?: number;
@@ -4604,33 +2345,6 @@ export interface StartTrialRequestDTO {
   moduleType: "CD" | "CI" | "CV" | "CE" | "CF";
 }
 
-export interface RestResponseVersionPackage {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: VersionPackage;
-  responseMessages?: ResponseMessage[];
-}
-
-export interface RuntimeInfo {
-  primary?: boolean;
-  primaryVersion?: string;
-  deployMode?: string;
-}
-
-export interface VersionInfo {
-  version?: string;
-  buildNo?: string;
-  gitCommit?: string;
-  gitBranch?: string;
-  timestamp?: string;
-}
-
-export interface VersionPackage {
-  versionInfo?: VersionInfo;
-  runtimeInfo?: RuntimeInfo;
-}
-
 export interface PageRoleAssignmentResponse {
   totalPages?: number;
   totalItems?: number;
@@ -4654,6 +2368,7 @@ export interface RoleAssignment {
   roleIdentifier: string;
   principal: Principal;
   disabled?: boolean;
+  managed?: boolean;
 }
 
 export interface RoleAssignmentResponse {
@@ -4695,6 +2410,63 @@ export interface ResponseListRoleAssignmentResponse {
 
 export interface BatchRoleAssignmentCreateRequest {
   roleAssignments?: RoleAssignment[];
+}
+
+export interface RestResponseBoolean {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: boolean;
+  responseMessages?: ResponseMessage[];
+}
+
+export type OAuthSettings = NGAuthSettings & {
+  filter?: string;
+  allowedProviders?: (
+    | "AZURE"
+    | "BITBUCKET"
+    | "GITHUB"
+    | "GITLAB"
+    | "GOOGLE"
+    | "LINKEDIN"
+  )[];
+};
+
+export interface Account {
+  uuid: string;
+  appId: string;
+  createdBy?: EmbeddedUser;
+  createdAt?: number;
+  lastUpdatedBy?: EmbeddedUser;
+  lastUpdatedAt: number;
+  companyName: string;
+  accountName: string;
+  whitelistedDomains?: string[];
+  licenseId?: string;
+  dataRetentionDurationMs?: number;
+  licenseInfo?: LicenseInfo;
+  ceLicenseInfo?: CeLicenseInfo;
+  accountEvents?: AccountEvent[];
+  subdomainUrl?: string;
+  twoFactorAdminEnforced?: boolean;
+  forImport?: boolean;
+  migratedToClusterUrl?: string;
+  defaultExperience?: "NG" | "CG";
+  createdFromNG?: boolean;
+  localEncryptionEnabled?: boolean;
+  delegateConfiguration?: DelegateConfiguration;
+  techStacks?: TechStack[];
+  oauthEnabled?: boolean;
+  accountPreferences?: AccountPreferences;
+  cloudCostEnabled?: boolean;
+  ceAutoCollectK8sEvents?: boolean;
+  trialSignupOptions?: TrialSignupOptions;
+  serviceGuardLimit?: number;
+  defaults?: {
+    [key: string]: string;
+  };
+  harnessSupportAccessAllowed?: boolean;
+  povAccount?: boolean;
 }
 
 export interface AccountEvent {
@@ -4765,6 +2537,7 @@ export interface AccountPermissions {
     | "MANAGE_TAGS"
     | "MANAGE_CUSTOM_DASHBOARDS"
     | "CREATE_CUSTOM_DASHBOARDS"
+    | "MANAGE_RESTRICTED_ACCESS"
   )[];
 }
 
@@ -4816,7 +2589,8 @@ export interface AppPermission {
     | "MANAGE_API_KEYS"
     | "MANAGE_TAGS"
     | "MANAGE_CUSTOM_DASHBOARDS"
-    | "CREATE_CUSTOM_DASHBOARDS";
+    | "CREATE_CUSTOM_DASHBOARDS"
+    | "MANAGE_RESTRICTED_ACCESS";
   appFilter?: GenericEntityFilter;
   entityFilter?: Filter;
   actions?: (
@@ -4847,6 +2621,7 @@ export interface CeLicenseInfo {
 
 export interface DelegateConfiguration {
   delegateVersions?: string[];
+  action?: "SELF_DESTRUCT";
 }
 
 export interface EmbeddedUser {
@@ -4869,6 +2644,7 @@ export type GenericEntityFilter = Filter & {
 
 export type LDAPSettings = NGAuthSettings & {
   connectionSettings: LdapConnectionSettings;
+  identifier: string;
   userSettingsList?: LdapUserSettings[];
   groupSettingsList?: LdapGroupSettings[];
 };
@@ -4932,19 +2708,6 @@ export interface NotificationSettings {
   microsoftTeamsWebhookUrl?: string;
 }
 
-export interface OAuthSettings {
-  filter?: string;
-  allowedProviders?: (
-    | "AZURE"
-    | "BITBUCKET"
-    | "GITHUB"
-    | "GITLAB"
-    | "GOOGLE"
-    | "LINKEDIN"
-  )[];
-  settingsType?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
-}
-
 export interface PasswordExpirationPolicy {
   enabled?: boolean;
   daysBeforePasswordExpires?: number;
@@ -4970,6 +2733,7 @@ export interface RestResponseAuthenticationSettingsResponse {
 
 export type SAMLSettings = NGAuthSettings & {
   origin: string;
+  identifier: string;
   logoutUrl?: string;
   groupMembershipAttr?: string;
   displayName?: string;
@@ -4991,7 +2755,7 @@ export interface TrialSignupOptions {
   assistedOption?: boolean;
 }
 
-export interface UserGroup {
+export interface User {
   uuid: string;
   appId: string;
   createdBy?: EmbeddedUser;
@@ -4999,21 +2763,60 @@ export interface UserGroup {
   lastUpdatedBy?: EmbeddedUser;
   lastUpdatedAt: number;
   name?: string;
-  description?: string;
+  givenName?: string;
+  familyName?: string;
+  email?: string;
+  companyName?: string;
+  accountName?: string;
+  userGroups?: UserGroup[];
+  accounts?: Account[];
+  pendingAccounts?: Account[];
+  supportAccounts?: Account[];
+  lastLogin?: number;
+  firstLogin?: boolean;
+  password?: string[];
+  token?: string;
+  twoFactorJwtToken?: string;
+  emailVerified?: boolean;
+  passwordExpired?: boolean;
+  userLocked?: boolean;
+  statsFetchedOn?: number;
+  lastAccountId?: string;
+  defaultAccountId?: string;
+  lastAppId?: string;
+  disabled?: boolean;
+  imported?: boolean;
+  userLockoutInfo?: UserLockoutInfo;
+  twoFactorAuthenticationEnabled?: boolean;
+  twoFactorAuthenticationMechanism?: "TOTP";
+  oauthProvider?: string;
+  reportedSegmentTracks?: string[];
+  utmInfo?: UtmInfo;
+  accountIds?: string[];
+}
+
+export interface UserGroup {
+  id?: string;
+  accountIdentifier: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  identifier?: string;
+  isSsoLinked?: boolean;
   linkedSsoType?: "SAML" | "LDAP" | "OAUTH";
   linkedSsoId?: string;
   linkedSsoDisplayName?: string;
   ssoGroupId?: string;
   ssoGroupName?: string;
-  importedByScim?: boolean;
-  accountId?: string;
-  memberIds?: string[];
-  members?: User[];
-  appPermissions?: AppPermission[];
-  accountPermissions?: AccountPermissions;
-  notificationSettings?: NotificationSettings;
-  default?: boolean;
-  ssoLinked?: boolean;
+  name?: string;
+  users: string[];
+  notificationConfigs: NotificationSettingConfig[];
+  harnessManaged?: boolean;
+  description: string;
+  tags: NGTag[];
+  createdAt?: number;
+  lastModifiedAt?: number;
+  version?: number;
+  deleted?: boolean;
 }
 
 export interface UserLockoutInfo {
@@ -5044,14 +2847,6 @@ export interface UtmInfo {
 export type WorkflowFilter = Filter & {
   filterTypes?: string[];
 };
-
-export interface RestResponseBoolean {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: boolean;
-  responseMessages?: ResponseMessage[];
-}
 
 export interface RestResponseLoginSettings {
   metaData?: {
@@ -5117,6 +2912,7 @@ export interface SSOSettings {
   type: "SAML" | "LDAP" | "OAUTH";
   displayName?: string;
   url?: string;
+  nextIteration?: number;
   accountId?: string;
 }
 
@@ -5132,8 +2928,8 @@ export interface LoginTypeResponse {
   authenticationMechanism?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
   showCaptcha?: boolean;
   defaultExperience?: "NG" | "CG";
-  oauthEnabled?: boolean;
   ssorequest?: SSORequest;
+  oauthEnabled?: boolean;
 }
 
 export interface RestResponseLoginTypeResponse {
@@ -5163,12 +2959,105 @@ export interface SSORequest {
   )[];
 }
 
+export interface DashboardWorkloadDeployment {
+  workloadDeploymentInfoList?: WorkloadDeploymentInfo[];
+}
+
+export interface LastWorkloadInfo {
+  startTime?: number;
+  endTime?: number;
+  deploymentType?: string;
+  status?: string;
+}
+
+export interface ResponseDashboardWorkloadDeployment {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: DashboardWorkloadDeployment;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface WorkloadCountInfo {
+  count?: number;
+}
+
+export interface WorkloadDateCountInfo {
+  date?: number;
+  execution?: WorkloadCountInfo;
+}
+
+export interface WorkloadDeploymentInfo {
+  serviceName?: string;
+  serviceId?: string;
+  lastExecuted?: LastWorkloadInfo;
+  deploymentTypeList?: string[];
+  totalDeployments?: number;
+  totalDeploymentChangeRate?: number;
+  percentSuccess?: number;
+  rateSuccess?: number;
+  failureRate?: number;
+  failureRateChangeRate?: number;
+  frequency?: number;
+  frequencyChangeRate?: number;
+  lastPipelineExecutionId?: string;
+  workload?: WorkloadDateCountInfo[];
+}
+
+export interface ResponseServiceDetailsInfoDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ServiceDetailsInfoDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServiceDetailsDTO {
+  serviceName?: string;
+  serviceIdentifier?: string;
+  deploymentTypeList?: string[];
+  totalDeployments?: number;
+  totalDeploymentChangeRate?: number;
+  successRate?: number;
+  successRateChangeRate?: number;
+  failureRate?: number;
+  failureRateChangeRate?: number;
+  frequency?: number;
+  frequencyChangeRate?: number;
+  lastPipelineExecuted?: ServicePipelineInfo;
+}
+
+export interface ServiceDetailsInfoDTO {
+  serviceDeploymentDetailsList?: ServiceDetailsDTO[];
+}
+
+export interface ServicePipelineInfo {
+  pipelineExecutionId?: string;
+  identifier?: string;
+  name?: string;
+  status?: string;
+  lastExecutedAt?: number;
+}
+
+export interface ResponseTimeValuePairListDTOInteger {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: TimeValuePairListDTOInteger;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface TimeValuePairListDTO {
+  [key: string]: any;
+}
+
+export interface TimeValuePairListDTOInteger {
+  [key: string]: any;
+}
+
 export interface Deployment {
   count?: number;
 }
 
 export interface DeploymentDateAndCount {
-  time?: string;
+  time?: number;
   deployments?: Deployment;
 }
 
@@ -5200,6 +3089,89 @@ export interface TotalDeploymentInfo {
   production?: number;
   nonProduction?: number;
   countList?: DeploymentDateAndCount[];
+}
+
+export interface DeploymentCount {
+  total?: number;
+  success?: number;
+  failure?: number;
+}
+
+export interface ResponseServiceDeploymentInfoDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ServiceDeploymentInfoDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServiceDeployment {
+  time?: number;
+  deployments?: DeploymentCount;
+}
+
+export interface ServiceDeploymentInfoDTO {
+  serviceDeploymentList?: ServiceDeployment[];
+}
+
+export interface ResponseServiceDeploymentListInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ServiceDeploymentListInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServiceDeploymentListInfo {
+  startTime?: number;
+  endTime?: number;
+  totalDeployments?: number;
+  failureRate?: number;
+  frequency?: number;
+  failureRateChangeRate?: number;
+  totalDeploymentsChangeRate?: number;
+  frequencyChangeRate?: number;
+  serviceDeploymentList?: ServiceDeployment[];
+}
+
+export interface ExecutionDeployment {
+  time?: number;
+  deployments?: DeploymentCount;
+}
+
+export interface ExecutionDeploymentInfo {
+  executionDeploymentList?: ExecutionDeployment[];
+}
+
+export interface ResponseExecutionDeploymentInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ExecutionDeploymentInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface DashboardDeploymentActiveFailedRunningInfo {
+  failure?: DeploymentStatusInfo[];
+  pending?: DeploymentStatusInfo[];
+  active?: DeploymentStatusInfo[];
+}
+
+export interface DeploymentStatusInfo {
+  name?: string;
+  startTs?: number;
+  endTs?: number;
+  status?: string;
+  serviceInfoList?: ServiceDeploymentInfo[];
+}
+
+export interface ResponseDashboardDeploymentActiveFailedRunningInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: DashboardDeploymentActiveFailedRunningInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServiceDeploymentInfo {
+  serviceName?: string;
+  serviceTag?: string;
 }
 
 export interface Activity {
@@ -5240,12 +3212,16 @@ export interface EntityDetail {
     | "DeploymentSteps"
     | "DeploymentStage"
     | "ApprovalStage"
+    | "FeatureFlagStage"
     | "Triggers";
   entityRef?: EntityReference;
   name?: string;
 }
 
 export interface EntityReference {
+  default?: boolean;
+  branch?: string;
+  repoIdentifier?: string;
   identifier?: string;
   accountIdentifier?: string;
   projectIdentifier?: string;
@@ -5257,23 +3233,25 @@ export type IdentifierRef = EntityReference & {
   metadata?: {
     [key: string]: string;
   };
+  isDefault?: boolean;
 };
 
 export type InputSetReference = EntityReference & {
   pipelineIdentifier?: string;
+  isDefault?: boolean;
 };
 
 export interface PageActivity {
   totalElements?: number;
   totalPages?: number;
+  first?: boolean;
   size?: number;
   content?: Activity[];
   number?: number;
-  first?: boolean;
-  sort?: Sort;
   last?: boolean;
   numberOfElements?: number;
   pageable?: Pageable;
+  sort?: Sort;
   empty?: boolean;
 }
 
@@ -5282,8 +3260,8 @@ export interface Pageable {
   offset?: number;
   sort?: Sort;
   paged?: boolean;
-  pageNumber?: number;
   unpaged?: boolean;
+  pageNumber?: number;
 }
 
 export interface ResponsePageActivity {
@@ -5294,8 +3272,8 @@ export interface ResponsePageActivity {
 }
 
 export interface Sort {
-  unsorted?: boolean;
   sorted?: boolean;
+  unsorted?: boolean;
   empty?: boolean;
 }
 
@@ -5332,14 +3310,14 @@ export interface ActivitySummary {
 export interface PageActivitySummary {
   totalElements?: number;
   totalPages?: number;
+  first?: boolean;
   size?: number;
   content?: ActivitySummary[];
   number?: number;
-  first?: boolean;
-  sort?: Sort;
   last?: boolean;
   numberOfElements?: number;
   pageable?: Pageable;
+  sort?: Sort;
   empty?: boolean;
 }
 
@@ -5362,13 +3340,9 @@ export interface DockerBuildDetailsDTO {
   imagePath?: string;
 }
 
-export interface DockerResponseDTO {
-  buildDetailsList?: DockerBuildDetailsDTO[];
-}
-
-export interface ResponseDockerResponseDTO {
+export interface ResponseDockerBuildDetailsDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: DockerResponseDTO;
+  data?: DockerBuildDetailsDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -5379,9 +3353,13 @@ export interface DockerRequestDTO {
   tagsList?: string[];
 }
 
-export interface ResponseDockerBuildDetailsDTO {
+export interface DockerResponseDTO {
+  buildDetailsList?: DockerBuildDetailsDTO[];
+}
+
+export interface ResponseDockerResponseDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: DockerBuildDetailsDTO;
+  data?: DockerResponseDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -5398,17 +3376,6 @@ export interface EcrBuildDetailsDTO {
   imagePath?: string;
 }
 
-export interface EcrResponseDTO {
-  buildDetailsList?: EcrBuildDetailsDTO[];
-}
-
-export interface ResponseEcrResponseDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: EcrResponseDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
 export interface ResponseEcrBuildDetailsDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: EcrBuildDetailsDTO;
@@ -5423,6 +3390,28 @@ export interface EcrRequestDTO {
   region?: string;
 }
 
+export interface EcrResponseDTO {
+  buildDetailsList?: EcrBuildDetailsDTO[];
+}
+
+export interface ResponseEcrResponseDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: EcrResponseDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface EcrListImagesDTO {
+  images?: string[];
+}
+
+export interface ResponseEcrListImagesDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: EcrListImagesDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
 export interface GcrBuildDetailsDTO {
   tag?: string;
   buildUrl?: string;
@@ -5433,17 +3422,6 @@ export interface GcrBuildDetailsDTO {
     [key: string]: string;
   };
   imagePath?: string;
-}
-
-export interface GcrResponseDTO {
-  buildDetailsList?: GcrBuildDetailsDTO[];
-}
-
-export interface ResponseGcrResponseDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: GcrResponseDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface ResponseGcrBuildDetailsDTO {
@@ -5460,6 +3438,17 @@ export interface GcrRequestDTO {
   registryHostname?: string;
 }
 
+export interface GcrResponseDTO {
+  buildDetailsList?: GcrBuildDetailsDTO[];
+}
+
+export interface ResponseGcrResponseDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GcrResponseDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
 export interface DelegateProfileDetailsNg {
   uuid?: string;
   accountId?: string;
@@ -5472,8 +3461,12 @@ export interface DelegateProfileDetailsNg {
   selectors?: string[];
   createdBy?: EmbeddedUserDetails;
   lastUpdatedBy?: EmbeddedUserDetails;
+  createdAt?: number;
+  lastUpdatedAt?: number;
   identifier?: string;
   numberOfDelegates?: number;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
 }
 
 export interface EmbeddedUserDetails {
@@ -5516,295 +3509,6 @@ export interface RestResponsePageResponseDelegateProfileDetailsNg {
   responseMessages?: ResponseMessage[];
 }
 
-export interface ContextElement {
-  name?: string;
-  uuid?: string;
-  elementType?:
-    | "SERVICE"
-    | "INFRAMAPPING"
-    | "SERVICE_TEMPLATE"
-    | "TAG"
-    | "SHELL"
-    | "HOST"
-    | "INSTANCE"
-    | "STANDARD"
-    | "PARAM"
-    | "PARTITION"
-    | "OTHER"
-    | "FORK"
-    | "CONTAINER_SERVICE"
-    | "CLUSTER"
-    | "AWS_LAMBDA_FUNCTION"
-    | "AMI_SERVICE_SETUP"
-    | "AMI_SERVICE_DEPLOY"
-    | "ECS_SERVICE_SETUP"
-    | "AMI_SWITCH_ROUTES"
-    | "PCF_SERVICE_SETUP"
-    | "PCF_SERVICE_DEPLOY"
-    | "PCF_ROUTE_SWAP_ROLLBACK"
-    | "PCF_INSTANCE"
-    | "SPOTINST_SERVICE_SETUP"
-    | "SPOTINST_SERVICE_DEPLOY"
-    | "ARTIFACT"
-    | "ARTIFACT_VARIABLE"
-    | "HELM_DEPLOY"
-    | "CLOUD_FORMATION_PROVISION"
-    | "CLOUD_FORMATION_ROLLBACK"
-    | "CLOUD_FORMATION_DEPROVISION"
-    | "TERRAFORM_PROVISION"
-    | "SHELL_SCRIPT_PROVISION"
-    | "K8S"
-    | "TERRAFORM_INHERIT_PLAN"
-    | "TERRAGRUNT_INHERIT_PLAN"
-    | "AZURE_VMSS_SETUP"
-    | "AZURE_WEBAPP_SETUP"
-    | "HELM_CHART"
-    | "MANIFEST_VARIABLE";
-}
-
-export interface DOMConfiguration {
-  parameterNames?: DOMStringList;
-}
-
-export interface DOMImplementation {
-  [key: string]: any;
-}
-
-export interface DOMStringList {
-  length?: number;
-}
-
-export interface DelegateMetaInfo {
-  id?: string;
-  hostName?: string;
-}
-
-export interface DelegateResponseData {
-  [key: string]: any;
-}
-
-export interface Document {
-  doctype?: DocumentType;
-  documentElement?: Element;
-  inputEncoding?: string;
-  xmlEncoding?: string;
-  xmlStandalone?: boolean;
-  xmlVersion?: string;
-  strictErrorChecking?: boolean;
-  documentURI?: string;
-  domConfig?: DOMConfiguration;
-  implementation?: DOMImplementation;
-  attributes?: NamedNodeMap;
-  prefix?: string;
-  nodeType?: number;
-  namespaceURI?: string;
-  localName?: string;
-  nodeName?: string;
-  nodeValue?: string;
-  parentNode?: Node;
-  childNodes?: NodeList;
-  firstChild?: Node;
-  lastChild?: Node;
-  previousSibling?: Node;
-  nextSibling?: Node;
-  ownerDocument?: Document;
-  baseURI?: string;
-  textContent?: string;
-}
-
-export interface DocumentType {
-  name?: string;
-  publicId?: string;
-  systemId?: string;
-  entities?: NamedNodeMap;
-  notations?: NamedNodeMap;
-  internalSubset?: string;
-  attributes?: NamedNodeMap;
-  prefix?: string;
-  nodeType?: number;
-  namespaceURI?: string;
-  localName?: string;
-  nodeName?: string;
-  nodeValue?: string;
-  parentNode?: Node;
-  childNodes?: NodeList;
-  firstChild?: Node;
-  lastChild?: Node;
-  previousSibling?: Node;
-  nextSibling?: Node;
-  ownerDocument?: Document;
-  baseURI?: string;
-  textContent?: string;
-}
-
-export interface Element {
-  tagName?: string;
-  schemaTypeInfo?: TypeInfo;
-  attributes?: NamedNodeMap;
-  prefix?: string;
-  nodeType?: number;
-  namespaceURI?: string;
-  localName?: string;
-  nodeName?: string;
-  nodeValue?: string;
-  parentNode?: Node;
-  childNodes?: NodeList;
-  firstChild?: Node;
-  lastChild?: Node;
-  previousSibling?: Node;
-  nextSibling?: Node;
-  ownerDocument?: Document;
-  baseURI?: string;
-  textContent?: string;
-}
-
-export interface ExecutionDataValue {
-  displayName?: string;
-  value?: { [key: string]: any };
-}
-
-export type HttpStateExecutionData = DelegateResponseData & {
-  httpUrl?: string;
-  httpMethod?: string;
-  httpResponseCode?: number;
-  httpResponseBody?: string;
-  assertionStatement?: string;
-  assertionStatus?: string;
-  header?: string;
-  headers?: KeyValuePair[];
-  useProxy?: boolean;
-  warningMessage?: string;
-  document?: Document;
-  stateName?: string;
-  stateType?: string;
-  startTs?: number;
-  endTs?: number;
-  status?:
-    | "ABORTED"
-    | "DISCONTINUING"
-    | "ERROR"
-    | "FAILED"
-    | "NEW"
-    | "PAUSED"
-    | "PAUSING"
-    | "QUEUED"
-    | "RESUMED"
-    | "RUNNING"
-    | "SCHEDULED"
-    | "STARTING"
-    | "SUCCESS"
-    | "WAITING"
-    | "SKIPPED"
-    | "ABORTING"
-    | "REJECTED"
-    | "EXPIRED"
-    | "PREPARING";
-  errorMsg?: string;
-  waitInterval?: number;
-  element?: ContextElement;
-  stateParams?: {
-    [key: string]: { [key: string]: any };
-  };
-  delegateMetaInfo?: DelegateMetaInfo;
-  templateVariable?: {
-    [key: string]: { [key: string]: any };
-  };
-  type?: string;
-  executionSummary?: {
-    [key: string]: ExecutionDataValue;
-  };
-  executionDetails?: {
-    [key: string]: ExecutionDataValue;
-  };
-};
-
-export interface KeyValuePair {
-  key?: string;
-  value?: string;
-}
-
-export interface NamedNodeMap {
-  length?: number;
-}
-
-export interface Node {
-  attributes?: NamedNodeMap;
-  prefix?: string;
-  nodeType?: number;
-  namespaceURI?: string;
-  localName?: string;
-  nodeName?: string;
-  nodeValue?: string;
-  parentNode?: Node;
-  childNodes?: NodeList;
-  firstChild?: Node;
-  lastChild?: Node;
-  previousSibling?: Node;
-  nextSibling?: Node;
-  ownerDocument?: Document;
-  baseURI?: string;
-  textContent?: string;
-}
-
-export interface NodeList {
-  length?: number;
-}
-
-export type ScriptStateExecutionData = DelegateResponseData & {
-  name?: string;
-  activityId?: string;
-  sweepingOutputEnvVariables?: {
-    [key: string]: string;
-  };
-  secretOutputVars?: string[];
-  stateName?: string;
-  stateType?: string;
-  startTs?: number;
-  endTs?: number;
-  status?:
-    | "ABORTED"
-    | "DISCONTINUING"
-    | "ERROR"
-    | "FAILED"
-    | "NEW"
-    | "PAUSED"
-    | "PAUSING"
-    | "QUEUED"
-    | "RESUMED"
-    | "RUNNING"
-    | "SCHEDULED"
-    | "STARTING"
-    | "SUCCESS"
-    | "WAITING"
-    | "SKIPPED"
-    | "ABORTING"
-    | "REJECTED"
-    | "EXPIRED"
-    | "PREPARING";
-  errorMsg?: string;
-  waitInterval?: number;
-  element?: ContextElement;
-  stateParams?: {
-    [key: string]: { [key: string]: any };
-  };
-  delegateMetaInfo?: DelegateMetaInfo;
-  templateVariable?: {
-    [key: string]: { [key: string]: any };
-  };
-  type?: string;
-  executionSummary?: {
-    [key: string]: ExecutionDataValue;
-  };
-  executionDetails?: {
-    [key: string]: ExecutionDataValue;
-  };
-};
-
-export interface TypeInfo {
-  typeName?: string;
-  typeNamespace?: string;
-}
-
 export interface EntitySetupUsageDTO {
   accountIdentifier?: string;
   referredEntity?: EntityDetail;
@@ -5816,14 +3520,14 @@ export interface EntitySetupUsageDTO {
 export interface PageEntitySetupUsageDTO {
   totalElements?: number;
   totalPages?: number;
+  first?: boolean;
   size?: number;
   content?: EntitySetupUsageDTO[];
   number?: number;
-  first?: boolean;
-  sort?: Sort;
   last?: boolean;
   numberOfElements?: number;
   pageable?: Pageable;
+  sort?: Sort;
   empty?: boolean;
 }
 
@@ -5943,7 +3647,6 @@ export interface ResponseOptionalInvite {
 }
 
 export interface RoleBinding {
-  identifier?: string;
   roleIdentifier: string;
   roleName: string;
   resourceGroupIdentifier?: string;
@@ -6016,8 +3719,8 @@ export interface Organization {
 export interface OrganizationAggregateDTO {
   organizationResponse: OrganizationResponse;
   projectsCount?: number;
-  admins?: UserSearchDTO[];
-  collaborators?: UserSearchDTO[];
+  admins?: UserMetadataDTO[];
+  collaborators?: UserMetadataDTO[];
 }
 
 export interface OrganizationResponse {
@@ -6034,8 +3737,8 @@ export interface ResponseOrganizationAggregateDTO {
   correlationId?: string;
 }
 
-export interface UserSearchDTO {
-  name: string;
+export interface UserMetadataDTO {
+  name?: string;
   email: string;
   uuid: string;
 }
@@ -6045,7 +3748,7 @@ export interface Project {
   identifier: string;
   name: string;
   color?: string;
-  modules?: ("CD" | "CI" | "CORE" | "CV" | "CF" | "CE")[];
+  modules?: ("CD" | "CI" | "CV" | "CF" | "CE" | "CORE" | "PMS")[];
   description?: string;
   tags?: {
     [key: string]: string;
@@ -6056,8 +3759,8 @@ export interface ProjectAggregateDTO {
   projectResponse: ProjectResponse;
   organization?: Organization;
   harnessManagedOrg?: boolean;
-  admins?: UserSearchDTO[];
-  collaborators?: UserSearchDTO[];
+  admins?: UserMetadataDTO[];
+  collaborators?: UserMetadataDTO[];
 }
 
 export interface ProjectResponse {
@@ -6113,6 +3816,7 @@ export interface RoleAssignmentMetadataDTO {
   resourceGroupIdentifier: string;
   resourceGroupName: string;
   managedRole: boolean;
+  managedRoleAssignment: boolean;
 }
 
 export type SlackConfigDTO = NotificationSettingConfigDTO & {
@@ -6121,7 +3825,7 @@ export type SlackConfigDTO = NotificationSettingConfigDTO & {
 
 export interface UserGroupAggregateDTO {
   userGroupDTO: UserGroupDTO;
-  users?: UserSearchDTO[];
+  users?: UserMetadataDTO[];
   roleAssignmentsMetadataDTO?: RoleAssignmentMetadataDTO[];
   lastModifiedAt?: number;
 }
@@ -6130,14 +3834,19 @@ export interface UserGroupDTO {
   accountIdentifier?: string;
   orgIdentifier?: string;
   projectIdentifier?: string;
-  identifier?: string;
-  name?: string;
+  identifier: string;
+  name: string;
   users?: string[];
   notificationConfigs?: NotificationSettingConfigDTO[];
+  linkedSsoId?: string;
+  linkedSsoDisplayName?: string;
+  ssoGroupId?: string;
+  ssoGroupName?: string;
   description?: string;
   tags?: {
     [key: string]: string;
   };
+  ssoLinked?: boolean;
 }
 
 export interface ResponseListUserGroupAggregateDTO {
@@ -6194,52 +3903,9 @@ export interface ResponsePageProjectAggregateDTO {
   correlationId?: string;
 }
 
-export interface SecretFileDTO {
-  account?: string;
-  org?: string;
-  project?: string;
-  identifier?: string;
-  secretManager?: string;
-  name?: string;
-  tags?: string[];
-  description?: string;
-  type: "SecretFile" | "SecretText" | "SSHKey";
-}
-
-export interface EncryptedDataDTO {
-  type?: "SecretFile" | "SecretText" | "SSHKey";
-  valueType?: "Inline" | "Reference";
-  value?: string;
-  draft?: boolean;
-  account?: string;
-  org?: string;
-  project?: string;
-  identifier?: string;
-  secretManager?: string;
-  secretManagerName?: string;
-  name?: string;
-  encryptionType?:
-    | "LOCAL"
-    | "KMS"
-    | "GCP_KMS"
-    | "AWS_SECRETS_MANAGER"
-    | "AZURE_VAULT"
-    | "CYBERARK"
-    | "VAULT"
-    | "GCP_SECRETS_MANAGER"
-    | "CUSTOM"
-    | "VAULT_SSH";
-  tags?: string[];
-  lastUpdatedAt?: number;
-  description?: string;
-}
-
-export interface ResponseEncryptedDataDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: EncryptedDataDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
+export type AzureKeyVaultMetadataSpecDTO = SecretManagerMetadataSpecDTO & {
+  vaultNames?: string[];
+};
 
 export interface ResponseSecretManagerMetadataDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
@@ -6277,6 +3943,14 @@ export interface VaultSecretEngineDTO {
   type?: string;
   version?: number;
 }
+
+export type AzureKeyVaultMetadataRequestSpecDTO = SecretManagerMetadataRequestSpecDTO & {
+  clientId: string;
+  tenantId: string;
+  secretKey: string;
+  subscription: string;
+  azureEnvironmentType?: "AZURE" | "AZURE_US_GOVERNMENT";
+};
 
 export interface SecretManagerMetadataRequestDTO {
   encryptionType:
@@ -6318,57 +3992,6 @@ export type VaultMetadataRequestSpecDTO = SecretManagerMetadataRequestSpecDTO & 
   accessType: "APP_ROLE" | "TOKEN";
   spec?: VaultCredentialDTO;
 };
-
-export interface PageEncryptedDataDTO {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: EncryptedDataDTO[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageEncryptedDataDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageEncryptedDataDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface SecretTextDTO {
-  account?: string;
-  org?: string;
-  project?: string;
-  identifier?: string;
-  secretManager?: string;
-  name?: string;
-  tags?: string[];
-  description?: string;
-  type: "SecretFile" | "SecretText" | "SSHKey";
-  valueType: "Inline" | "Reference";
-  value?: string;
-}
-
-export interface ResponseSecretValidationResultDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: SecretValidationResultDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface SecretValidationResultDTO {
-  success?: boolean;
-  message?: string;
-}
-
-export type SSHKeyValidationMetadata = SecretValidationMetaData & {
-  host: string;
-};
-
-export interface SecretValidationMetaData {
-  type: "SecretFile" | "SecretText" | "SSHKey";
-}
 
 export interface BaseSSHSpecDTO {
   [key: string]: any;
@@ -6491,6 +4114,26 @@ export interface ResponsePageSecretResponseWrapper {
   correlationId?: string;
 }
 
+export interface ResponseSecretValidationResultDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: SecretValidationResultDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface SecretValidationResultDTO {
+  success?: boolean;
+  message?: string;
+}
+
+export type SSHKeyValidationMetadata = SecretValidationMetaData & {
+  host: string;
+};
+
+export interface SecretValidationMetaData {
+  type: "SecretFile" | "SecretText" | "SSHKey";
+}
+
 export interface ResponseOrganizationResponse {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: OrganizationResponse;
@@ -6554,21 +4197,33 @@ export interface ResponseUserGroupDTO {
   correlationId?: string;
 }
 
-export interface ResponseListUserGroupDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: UserGroupDTO[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
+export type EmailConfig = NotificationSettingConfig & {
+  groupEmail?: string;
+};
+
+export type MicrosoftTeamsConfig = NotificationSettingConfig & {
+  microsoftTeamsWebhookUrl?: string;
+};
+
+export interface NotificationSettingConfig {
+  type: "EMAIL" | "SLACK" | "PAGERDUTY" | "MSTEAMS";
 }
 
-export interface UserGroupFilterDTO {
-  databaseIdFilter?: string[];
-  identifierFilter?: string[];
-  userIdentifierFilter?: string[];
-  accountIdentifier?: string;
-  orgIdentifier?: string;
-  projectIdentifier?: string;
+export type PagerDutyConfig = NotificationSettingConfig & {
+  pagerDutyKey?: string;
+};
+
+export interface RestResponseUserGroup {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: UserGroup;
+  responseMessages?: ResponseMessage[];
 }
+
+export type SlackConfig = NotificationSettingConfig & {
+  slackWebhookUrl?: string;
+};
 
 export interface PageUserGroupDTO {
   totalPages?: number;
@@ -6587,31 +4242,46 @@ export interface ResponsePageUserGroupDTO {
   correlationId?: string;
 }
 
-export interface PageUserInfo {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: UserInfo[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageUserInfo {
+export interface ResponseListUserGroupDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageUserInfo;
+  data?: UserGroupDTO[];
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
 
-export interface UserInfo {
-  uuid?: string;
-  name?: string;
-  email?: string;
-  token?: string;
-  defaultAccountId?: string;
-  admin?: boolean;
-  twoFactorAuthenticationEnabled?: boolean;
+export interface UserGroupFilterDTO {
+  databaseIdFilter?: string[];
+  identifierFilter?: string[];
+  userIdentifierFilter?: string[];
+  accountIdentifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+}
+
+export interface PageUserMetadataDTO {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: UserMetadataDTO[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageUserMetadataDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageUserMetadataDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface UserFilter {
+  searchTerm?: string;
+  identifiers?: string[];
+}
+
+export interface SamlLinkGroupRequest {
+  samlGroupName?: string;
 }
 
 export interface ResponseServiceResponseDTO {
@@ -6694,20 +4364,11 @@ export interface ResponsePageServiceResponse {
   correlationId?: string;
 }
 
-export interface ResponseTwoFactorAuthSettingsInfo {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: TwoFactorAuthSettingsInfo;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface TwoFactorAuthSettingsInfo {
-  userId?: string;
-  email?: string;
-  twoFactorAuthenticationEnabled?: boolean;
-  mechanism?: "TOTP";
-  totpSecretKey?: string;
-  totpqrurl?: string;
+export interface GatewayAccountRequestDTO {
+  uuid?: string;
+  accountName?: string;
+  companyName?: string;
+  createdFromNG?: boolean;
 }
 
 export interface ResponseUserInfo {
@@ -6717,50 +4378,16 @@ export interface ResponseUserInfo {
   correlationId?: string;
 }
 
-export interface PageUserSearchDTO {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: UserSearchDTO[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageUserSearchDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageUserSearchDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface PageProject {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: Project[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageProject {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageProject;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ResponseUserAggregate {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: UserAggregate;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface UserAggregate {
-  user: UserSearchDTO;
-  roleBindings?: RoleBinding[];
+export interface UserInfo {
+  uuid?: string;
+  name?: string;
+  email?: string;
+  token?: string;
+  defaultAccountId?: string;
+  accounts?: GatewayAccountRequestDTO[];
+  admin?: boolean;
+  twoFactorAuthenticationEnabled?: boolean;
+  emailVerified?: boolean;
 }
 
 export interface PageUserAggregate {
@@ -6780,46 +4407,98 @@ export interface ResponsePageUserAggregate {
   correlationId?: string;
 }
 
-export interface AdviserIssuer {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserAdviserIssuer;
-  defaultInstanceForType?: AdviserIssuer;
-  adviserTypeValue?: number;
-  adviserType?:
-    | "UNKNOWN"
-    | "NEXT_STEP"
-    | "RETRY"
-    | "INTERVENTION_WAIT"
-    | "END_PLAN"
-    | "MARK_SUCCESS"
-    | "UNRECOGNIZED";
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
+export interface UserAggregate {
+  user: UserMetadataDTO;
+  roleAssignmentMetadata: RoleAssignmentMetadataDTO[];
 }
 
-export interface AdviserIssuerOrBuilder {
-  adviserTypeValue?: number;
-  adviserType?:
-    | "UNKNOWN"
-    | "NEXT_STEP"
-    | "RETRY"
-    | "INTERVENTION_WAIT"
-    | "END_PLAN"
-    | "MARK_SUCCESS"
-    | "UNRECOGNIZED";
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
+export interface ResponseUserAggregate {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: UserAggregate;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseTwoFactorAuthSettingsInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: TwoFactorAuthSettingsInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface TwoFactorAuthSettingsInfo {
+  userId?: string;
+  email?: string;
+  twoFactorAuthenticationEnabled?: boolean;
+  mechanism?: "TOTP";
+  totpSecretKey?: string;
+  totpqrurl?: string;
+}
+
+export interface ResponsePasswordChangeResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?:
+    | "PASSWORD_CHANGED"
+    | "INCORRECT_CURRENT_PASSWORD"
+    | "PASSWORD_STRENGTH_VIOLATED";
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface PasswordChangeDTO {
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+export interface PageProject {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: Project[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageProject {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageProject;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseListExecutionStatus {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: (
+    | "Running"
+    | "AsyncWaiting"
+    | "TaskWaiting"
+    | "TimedWaiting"
+    | "Failed"
+    | "Errored"
+    | "IgnoreFailed"
+    | "NotStarted"
+    | "Expired"
+    | "Aborted"
+    | "Discontinuing"
+    | "Queued"
+    | "Paused"
+    | "ResourceWaiting"
+    | "InterventionWaiting"
+    | "ApprovalWaiting"
+    | "Success"
+    | "Suspended"
+    | "Skipped"
+    | "Pausing"
+    | "ApprovalRejected"
+    | "NOT_STARTED"
+    | "INTERVENTION_WAITING"
+    | "APPROVAL_WAITING"
+    | "APPROVAL_REJECTED"
+    | "WAITING"
+  )[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
 }
 
 export interface ArtifactSummary {
@@ -6830,952 +4509,6 @@ export interface ArtifactSummary {
 export interface ArtifactsSummary {
   primary?: ArtifactSummary;
   sidecars?: ArtifactSummary[];
-}
-
-export interface AsyncExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserAsyncExecutableResponse;
-  defaultInstanceForType?: AsyncExecutableResponse;
-  mode?:
-    | "RUNNING_MODE"
-    | "APPROVAL_WAITING_MODE"
-    | "RESOURCE_WAITING_MODE"
-    | "UNRECOGNIZED";
-  callbackIdsList?: string[];
-  callbackIdsCount?: number;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  modeValue?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface AsyncExecutableResponseOrBuilder {
-  mode?:
-    | "RUNNING_MODE"
-    | "APPROVAL_WAITING_MODE"
-    | "RESOURCE_WAITING_MODE"
-    | "UNRECOGNIZED";
-  callbackIdsList?: string[];
-  callbackIdsCount?: number;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  modeValue?: number;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export type CDStageExecutionSummaryDTO = StageExecutionSummaryDTO & {
-  planExecutionId?: string;
-  stageIdentifier?: string;
-  serviceInfo?: ServiceExecutionSummary;
-  stageName?: string;
-  serviceDefinitionType?: string;
-  executionStatus?:
-    | "Running"
-    | "Failed"
-    | "NotStarted"
-    | "Expired"
-    | "Aborted"
-    | "Queued"
-    | "Paused"
-    | "Waiting"
-    | "InterventionWaiting"
-    | "ApprovalWaiting"
-    | "Success"
-    | "Suspended"
-    | "Skipped"
-    | "Pausing"
-    | "ApprovalRejected";
-  startedAt?: number;
-  endedAt?: number;
-  serviceIdentifier?: string;
-  envIdentifier?: string;
-  errorInfo?: ExecutionErrorInfo;
-};
-
-export interface Child {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserChild;
-  defaultInstanceForType?: Child;
-  childNodeIdBytes?: ByteString;
-  childNodeId?: string;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ChildChainExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserChildChainExecutableResponse;
-  defaultInstanceForType?: ChildChainExecutableResponse;
-  nextChildId?: string;
-  nextChildIdBytes?: ByteString;
-  previousChildId?: string;
-  previousChildIdBytes?: ByteString;
-  passThroughData?: ByteString;
-  lastLink?: boolean;
-  suspend?: boolean;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ChildChainExecutableResponseOrBuilder {
-  nextChildId?: string;
-  nextChildIdBytes?: ByteString;
-  previousChildId?: string;
-  previousChildIdBytes?: ByteString;
-  passThroughData?: ByteString;
-  lastLink?: boolean;
-  suspend?: boolean;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ChildExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserChildExecutableResponse;
-  defaultInstanceForType?: ChildExecutableResponse;
-  childNodeIdBytes?: ByteString;
-  childNodeId?: string;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ChildExecutableResponseOrBuilder {
-  childNodeIdBytes?: ByteString;
-  childNodeId?: string;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ChildOrBuilder {
-  childNodeIdBytes?: ByteString;
-  childNodeId?: string;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ChildrenExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserChildrenExecutableResponse;
-  defaultInstanceForType?: ChildrenExecutableResponse;
-  childrenCount?: number;
-  childrenList?: Child[];
-  childrenOrBuilderList?: ChildOrBuilder[];
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ChildrenExecutableResponseOrBuilder {
-  childrenCount?: number;
-  childrenList?: Child[];
-  childrenOrBuilderList?: ChildOrBuilder[];
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface DelegateInfo {
-  id?: string;
-  name?: string;
-  taskId?: string;
-  taskName?: string;
-}
-
-export interface ExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserExecutableResponse;
-  defaultInstanceForType?: ExecutableResponse;
-  async?: AsyncExecutableResponse;
-  responseCase?:
-    | "ASYNC"
-    | "CHILD"
-    | "CHILDREN"
-    | "CHILDCHAIN"
-    | "TASK"
-    | "TASKCHAIN"
-    | "SYNC"
-    | "SKIPTASK"
-    | "RESPONSE_NOT_SET";
-  asyncOrBuilder?: AsyncExecutableResponseOrBuilder;
-  child?: ChildExecutableResponse;
-  childOrBuilder?: ChildExecutableResponseOrBuilder;
-  children?: ChildrenExecutableResponse;
-  childrenOrBuilder?: ChildrenExecutableResponseOrBuilder;
-  childChain?: ChildChainExecutableResponse;
-  childChainOrBuilder?: ChildChainExecutableResponseOrBuilder;
-  taskOrBuilder?: TaskExecutableResponseOrBuilder;
-  taskChain?: TaskChainExecutableResponse;
-  taskChainOrBuilder?: TaskChainExecutableResponseOrBuilder;
-  sync?: SyncExecutableResponse;
-  syncOrBuilder?: SyncExecutableResponseOrBuilder;
-  skipTask?: SkipTaskExecutableResponse;
-  skipTaskOrBuilder?: SkipTaskExecutableResponseOrBuilder;
-  task?: TaskExecutableResponse;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionErrorInfo {
-  unknownFields?: UnknownFieldSet;
-  message?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserExecutionErrorInfo;
-  defaultInstanceForType?: ExecutionErrorInfo;
-  messageBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ExecutionGraph {
-  rootNodeId?: string;
-  nodeMap?: {
-    [key: string]: ExecutionNode;
-  };
-  nodeAdjacencyListMap?: {
-    [key: string]: ExecutionNodeAdjacencyList;
-  };
-  representationStrategy?: "camelCase";
-}
-
-export interface ExecutionNode {
-  uuid?: string;
-  setupId?: string;
-  name?: string;
-  identifier?: string;
-  baseFqn?: string;
-  outcomes?: {
-    [key: string]: { [key: string]: any };
-  }[];
-  stepParameters?: {
-    [key: string]: { [key: string]: any };
-  };
-  startTs?: number;
-  endTs?: number;
-  stepType?: string;
-  status?:
-    | "Running"
-    | "Failed"
-    | "NotStarted"
-    | "Expired"
-    | "Aborted"
-    | "Queued"
-    | "Paused"
-    | "Waiting"
-    | "InterventionWaiting"
-    | "ApprovalWaiting"
-    | "Success"
-    | "Suspended"
-    | "Skipped"
-    | "Pausing"
-    | "ApprovalRejected";
-  failureInfo?: FailureInfoDTO;
-  skipInfo?: SkipInfo;
-  nodeRunInfo?: NodeRunInfo;
-  executableResponses?: ExecutableResponse[];
-  taskIdToProgressDataMap?: {
-    [key: string]: ProgressData[];
-  };
-  unitProgresses?: UnitProgress[];
-  delegateInfoList?: DelegateInfo[];
-  interruptHistories?: InterruptEffect[];
-}
-
-export interface ExecutionNodeAdjacencyList {
-  children?: string[];
-  nextIds?: string[];
-}
-
-export interface FailureInfoDTO {
-  message?: string;
-  failureTypeList?: (
-    | "EXPIRED"
-    | "DELEGATE_PROVISIONING"
-    | "CONNECTIVITY"
-    | "AUTHENTICATION"
-    | "VERIFICATION_FAILURE"
-    | "APPLICATION_ERROR"
-    | "AUTHORIZATION_ERROR"
-    | "TIMEOUT_ERROR"
-  )[];
-  responseMessages?: ResponseMessage[];
-}
-
-export interface InterruptConfig {
-  unknownFields?: UnknownFieldSet;
-  configCase?: "RETRYINTERRUPTCONFIG" | "CONFIG_NOT_SET";
-  issuedBy?: IssuedBy;
-  issuedByOrBuilder?: IssuedByOrBuilder;
-  retryInterruptConfig?: RetryInterruptConfig;
-  retryInterruptConfigOrBuilder?: RetryInterruptConfigOrBuilder;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserInterruptConfig;
-  defaultInstanceForType?: InterruptConfig;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface InterruptEffect {
-  interruptId: string;
-  tookEffectAt: number;
-  interruptType:
-    | "UNKNOWN"
-    | "ABORT"
-    | "ABORT_ALL"
-    | "PAUSE"
-    | "PAUSE_ALL"
-    | "RESUME"
-    | "RESUME_ALL"
-    | "RETRY"
-    | "IGNORE"
-    | "WAITING_FOR_MANUAL_INTERVENTION"
-    | "MARK_FAILED"
-    | "MARK_SUCCESS"
-    | "NEXT_STEP"
-    | "END_EXECUTION"
-    | "MARK_EXPIRED"
-    | "CUSTOM_FAILURE"
-    | "UNRECOGNIZED";
-  interruptConfig: InterruptConfig;
-}
-
-export interface IssuedBy {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserIssuedBy;
-  defaultInstanceForType?: IssuedBy;
-  manualIssuer?: ManualIssuer;
-  manualIssuerOrBuilder?: ManualIssuerOrBuilder;
-  adviserIssuer?: AdviserIssuer;
-  adviserIssuerOrBuilder?: AdviserIssuerOrBuilder;
-  timeoutIssuer?: TimeoutIssuer;
-  timeoutIssuerOrBuilder?: TimeoutIssuerOrBuilder;
-  issuerCase?:
-    | "MANUALISSUER"
-    | "ADVISERISSUER"
-    | "TIMEOUTISSUER"
-    | "ISSUER_NOT_SET";
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface IssuedByOrBuilder {
-  manualIssuer?: ManualIssuer;
-  manualIssuerOrBuilder?: ManualIssuerOrBuilder;
-  adviserIssuer?: AdviserIssuer;
-  adviserIssuerOrBuilder?: AdviserIssuerOrBuilder;
-  timeoutIssuer?: TimeoutIssuer;
-  timeoutIssuerOrBuilder?: TimeoutIssuerOrBuilder;
-  issuerCase?:
-    | "MANUALISSUER"
-    | "ADVISERISSUER"
-    | "TIMEOUTISSUER"
-    | "ISSUER_NOT_SET";
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ManualIssuer {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserManualIssuer;
-  defaultInstanceForType?: ManualIssuer;
-  userId?: string;
-  emailId?: string;
-  emailIdBytes?: ByteString;
-  userIdBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ManualIssuerOrBuilder {
-  userId?: string;
-  emailId?: string;
-  emailIdBytes?: ByteString;
-  userIdBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface NGStageType {
-  type?: string;
-}
-
-export interface NodeRunInfo {
-  unknownFields?: UnknownFieldSet;
-  evaluatedCondition?: boolean;
-  whenCondition?: string;
-  whenConditionBytes?: ByteString;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserNodeRunInfo;
-  defaultInstanceForType?: NodeRunInfo;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export type ParallelStageExecutionSummaryDTO = StageExecutionSummaryDTO & {
-  stageExecutions?: StageExecutionSummaryDTO[];
-};
-
-export interface ParserAdviserIssuer {
-  [key: string]: any;
-}
-
-export interface ParserAsyncExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserChild {
-  [key: string]: any;
-}
-
-export interface ParserChildChainExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserChildExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserChildrenExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserExecutionErrorInfo {
-  [key: string]: any;
-}
-
-export interface ParserInterruptConfig {
-  [key: string]: any;
-}
-
-export interface ParserIssuedBy {
-  [key: string]: any;
-}
-
-export interface ParserManualIssuer {
-  [key: string]: any;
-}
-
-export interface ParserNodeRunInfo {
-  [key: string]: any;
-}
-
-export interface ParserRetryInterruptConfig {
-  [key: string]: any;
-}
-
-export interface ParserSkipInfo {
-  [key: string]: any;
-}
-
-export interface ParserSkipTaskExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserSyncExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserTaskChainExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserTaskExecutableResponse {
-  [key: string]: any;
-}
-
-export interface ParserTimeoutIssuer {
-  [key: string]: any;
-}
-
-export interface ParserUnitProgress {
-  [key: string]: any;
-}
-
-export interface PipelineExecutionDetail {
-  pipelineExecution?: PipelineExecutionSummaryDTO;
-  stageGraph?: ExecutionGraph;
-  stageRollbackGraph?: ExecutionGraph;
-}
-
-export interface PipelineExecutionSummaryDTO {
-  pipelineIdentifier?: string;
-  pipelineName?: string;
-  deploymentId?: string;
-  planExecutionId?: string;
-  executionStatus?:
-    | "Running"
-    | "Failed"
-    | "NotStarted"
-    | "Expired"
-    | "Aborted"
-    | "Queued"
-    | "Paused"
-    | "Waiting"
-    | "InterventionWaiting"
-    | "ApprovalWaiting"
-    | "Success"
-    | "Suspended"
-    | "Skipped"
-    | "Pausing"
-    | "ApprovalRejected";
-  inputSetYaml?: string;
-  startedAt?: number;
-  endedAt?: number;
-  tags?: {
-    [key: string]: string;
-  };
-  stageExecutionSummaryElements?: StageExecutionSummaryDTO[];
-  errorMsg?: string;
-  stageIdentifiers?: string[];
-  serviceIdentifiers?: string[];
-  envIdentifiers?: string[];
-  serviceDefinitionTypes?: string[];
-  stageTypes?: NGStageType[];
-  errorInfo?: ExecutionErrorInfo;
-  triggerInfo?: ExecutionTriggerInfo;
-  successfulStagesCount?: number;
-  runningStagesCount?: number;
-  failedStagesCount?: number;
-  totalStagesCount?: number;
-}
-
-export interface ProgressData {
-  [key: string]: any;
-}
-
-export interface ResponsePipelineExecutionDetail {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PipelineExecutionDetail;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface RetryInterruptConfig {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserRetryInterruptConfig;
-  defaultInstanceForType?: RetryInterruptConfig;
-  retryIdBytes?: ByteString;
-  retryId?: string;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface RetryInterruptConfigOrBuilder {
-  retryIdBytes?: ByteString;
-  retryId?: string;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface ServiceExecutionSummary {
-  identifier?: string;
-  displayName?: string;
-  deploymentType?: string;
-  artifacts?: ArtifactsSummary;
-}
-
-export interface SkipInfo {
-  unknownFields?: UnknownFieldSet;
-  skipCondition?: string;
-  skipConditionBytes?: ByteString;
-  evaluatedCondition?: boolean;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserSkipInfo;
-  defaultInstanceForType?: SkipInfo;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface SkipTaskExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  message?: string;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserSkipTaskExecutableResponse;
-  defaultInstanceForType?: SkipTaskExecutableResponse;
-  messageBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface SkipTaskExecutableResponseOrBuilder {
-  message?: string;
-  messageBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface StageExecutionSummaryDTO {
-  [key: string]: any;
-}
-
-export interface SyncExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserSyncExecutableResponse;
-  defaultInstanceForType?: SyncExecutableResponse;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface SyncExecutableResponseOrBuilder {
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface TaskChainExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTaskChainExecutableResponse;
-  defaultInstanceForType?: TaskChainExecutableResponse;
-  taskId?: string;
-  taskName?: string;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  taskCategoryValue?: number;
-  taskCategory?:
-    | "UNKNOWN_CATEGORY"
-    | "DELEGATE_TASK_V1"
-    | "DELEGATE_TASK_V2"
-    | "UNRECOGNIZED";
-  taskNameBytes?: ByteString;
-  chainEnd?: boolean;
-  passThroughData?: ByteString;
-  taskIdBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TaskChainExecutableResponseOrBuilder {
-  taskId?: string;
-  taskName?: string;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  taskCategoryValue?: number;
-  taskCategory?:
-    | "UNKNOWN_CATEGORY"
-    | "DELEGATE_TASK_V1"
-    | "DELEGATE_TASK_V2"
-    | "UNRECOGNIZED";
-  taskNameBytes?: ByteString;
-  chainEnd?: boolean;
-  passThroughData?: ByteString;
-  taskIdBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface TaskExecutableResponse {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTaskExecutableResponse;
-  defaultInstanceForType?: TaskExecutableResponse;
-  taskId?: string;
-  taskName?: string;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  taskCategoryValue?: number;
-  taskCategory?:
-    | "UNKNOWN_CATEGORY"
-    | "DELEGATE_TASK_V1"
-    | "DELEGATE_TASK_V2"
-    | "UNRECOGNIZED";
-  taskNameBytes?: ByteString;
-  taskIdBytes?: ByteString;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TaskExecutableResponseOrBuilder {
-  taskId?: string;
-  taskName?: string;
-  logKeysList?: string[];
-  logKeysCount?: number;
-  unitsList?: string[];
-  unitsCount?: number;
-  taskCategoryValue?: number;
-  taskCategory?:
-    | "UNKNOWN_CATEGORY"
-    | "DELEGATE_TASK_V1"
-    | "DELEGATE_TASK_V2"
-    | "UNRECOGNIZED";
-  taskNameBytes?: ByteString;
-  taskIdBytes?: ByteString;
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface TimeoutIssuer {
-  unknownFields?: UnknownFieldSet;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserTimeoutIssuer;
-  defaultInstanceForType?: TimeoutIssuer;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface TimeoutIssuerOrBuilder {
-  unknownFields?: UnknownFieldSet;
-  defaultInstanceForType?: Message;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-  initialized?: boolean;
-}
-
-export interface UnitProgress {
-  unknownFields?: UnknownFieldSet;
-  unitName?: string;
-  unitNameBytes?: ByteString;
-  statusValue?: number;
-  status?:
-    | "UNKNOWN"
-    | "SUCCESS"
-    | "FAILURE"
-    | "RUNNING"
-    | "QUEUED"
-    | "SKIPPED"
-    | "EXPIRED"
-    | "UNRECOGNIZED";
-  startTime?: number;
-  endTime?: number;
-  initialized?: boolean;
-  serializedSize?: number;
-  parserForType?: ParserUnitProgress;
-  defaultInstanceForType?: UnitProgress;
-  initializationErrorString?: string;
-  descriptorForType?: Descriptor;
-  allFields?: {
-    [key: string]: { [key: string]: any };
-  };
-}
-
-export interface ResponseListExecutionStatus {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: (
-    | "Running"
-    | "Failed"
-    | "NotStarted"
-    | "Expired"
-    | "Aborted"
-    | "Queued"
-    | "Paused"
-    | "Waiting"
-    | "InterventionWaiting"
-    | "ApprovalWaiting"
-    | "Success"
-    | "Suspended"
-    | "Skipped"
-    | "Pausing"
-    | "ApprovalRejected"
-  )[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ResponsePipelineExecutionInterrupt {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PipelineExecutionInterrupt;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface PipelineExecutionInterrupt {
-  id?: string;
-  type?: "Abort" | "Pause" | "Resume";
-  planExecutionId?: string;
-}
-
-export interface PagePipelineExecutionSummaryDTO {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: PipelineExecutionSummaryDTO[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePagePipelineExecutionSummaryDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PagePipelineExecutionSummaryDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface CDStageModuleInfo {
@@ -7797,6 +4530,1077 @@ export interface ResponseCDStageModuleInfo {
   correlationId?: string;
 }
 
+export interface ServiceExecutionSummary {
+  identifier?: string;
+  displayName?: string;
+  deploymentType?: string;
+  artifacts?: ArtifactsSummary;
+}
+
+export type AbortFailureActionConfig = FailureStrategyActionConfig & {
+  type: "Abort";
+};
+
+export type AddSegmentToVariationTargetMapYaml = PatchInstruction & {
+  type: "AddSegmentToVariationTargetMap";
+  identifier: string;
+  spec: AddSegmentToVariationTargetMapYamlSpec;
+};
+
+export interface AddSegmentToVariationTargetMapYamlSpec {
+  variation: string;
+  segments: string[];
+}
+
+export type AddTargetsToVariationTargetMapYaml = PatchInstruction & {
+  type: "AddTargetsToVariationTargetMap";
+  identifier: string;
+  spec: AddTargetsToVariationTargetMapYamlSpec;
+};
+
+export interface AddTargetsToVariationTargetMapYamlSpec {
+  variation: string;
+  targets: string[];
+}
+
+export type ApprovalStageConfig = StageInfoConfig & {
+  execution: ExecutionElementConfig;
+};
+
+export interface ApproverInputInfo {
+  name?: string;
+  defaultValue?: string;
+}
+
+export interface Approvers {
+  userGroups: string[];
+  minimumCount: number;
+  disallowPipelineExecutor: boolean;
+}
+
+export interface ArtifactConfig {
+  [key: string]: any;
+}
+
+export interface ArtifactListConfig {
+  primary?: PrimaryArtifact;
+  sidecars?: SidecarArtifactWrapper[];
+  metadata?: string;
+}
+
+export interface ArtifactOverrideSetWrapper {
+  overrideSet?: ArtifactOverrideSets;
+}
+
+export interface ArtifactOverrideSets {
+  identifier?: string;
+  artifacts?: ArtifactListConfig;
+}
+
+export interface BarrierInfoConfig {
+  identifier: string;
+  name: string;
+}
+
+export type BarrierStepInfo = StepSpecType & {
+  barrierRef: string;
+};
+
+export type BitbucketStore = StoreConfig & {
+  connectorRef: string;
+  gitFetchType: "Branch" | "Commit";
+  branch?: string;
+  commitId?: string;
+  paths?: string[];
+  folderPath?: string;
+  repoName?: string;
+  metadata?: string;
+};
+
+export type BranchBuildSpec = BuildSpec & {
+  branch: string;
+};
+
+export interface Build {
+  type: "branch" | "tag";
+  spec: BuildSpec;
+}
+
+export interface BuildSpec {
+  [key: string]: any;
+}
+
+export interface CIProperties {
+  codebase?: CodeBase;
+}
+
+export interface CodeBase {
+  connectorRef: string;
+  repoName?: string;
+  build: Build;
+  depth?: number;
+  sslVerify?: boolean;
+  resources?: ContainerResource;
+}
+
+export interface Condition {
+  key: string;
+  value: string;
+  operator: "equals" | "not equals" | "in" | "not in";
+}
+
+export interface ContainerResource {
+  limits: Limits;
+}
+
+export type CountInstanceSelection = InstanceSelectionBase & {
+  count?: ParameterFieldString;
+};
+
+export interface CriteriaSpec {
+  [key: string]: any;
+}
+
+export interface CriteriaSpecWrapper {
+  type: "Jexl" | "KeyValues";
+  spec: CriteriaSpec;
+}
+
+export type DeleteManifestPathSpec = DeleteResourcesBaseSpec & {
+  manifestPaths?: string[];
+  allManifestPaths?: boolean;
+};
+
+export type DeleteReleaseNameSpec = DeleteResourcesBaseSpec & {
+  deleteNamespace?: ParameterFieldBoolean;
+};
+
+export type DeleteResourceNameSpec = DeleteResourcesBaseSpec & {
+  resourceNames?: string[];
+};
+
+export interface DeleteResourcesBaseSpec {
+  [key: string]: any;
+}
+
+export interface DeleteResourcesWrapper {
+  type?: "ResourceName" | "ReleaseName" | "ManifestPath";
+  spec?: DeleteResourcesBaseSpec;
+}
+
+export type DeploymentStageConfig = StageInfoConfig & {
+  serviceConfig: ServiceConfig;
+  infrastructure: PipelineInfrastructure;
+  execution: ExecutionElementConfig;
+};
+
+export type DockerHubArtifactConfig = ArtifactConfig & {
+  connectorRef?: string;
+  imagePath?: string;
+  tag?: string;
+  tagRegex?: string;
+  metadata?: string;
+};
+
+export type EcrArtifactConfig = ArtifactConfig & {
+  connectorRef?: string;
+  region?: string;
+  imagePath?: string;
+  tag?: string;
+  tagRegex?: string;
+};
+
+export interface EnvironmentYaml {
+  name: string;
+  identifier: string;
+  description?: string;
+  type: "PreProduction" | "Production";
+  tags?: {
+    [key: string]: string;
+  };
+}
+
+export interface ExecutionElementConfig {
+  steps: ExecutionWrapperConfig[];
+  rollbackSteps?: ExecutionWrapperConfig[];
+}
+
+export interface ExecutionTarget {
+  host?: string;
+  connectorRef?: string;
+  workingDirectory?: string;
+}
+
+export interface ExecutionWrapperConfig {
+  step?: StepElementConfig;
+  parallel?: ParallelStepElementConfig;
+  stepGroup?: StepGroupElementConfig;
+}
+
+export interface FailureStrategyActionConfig {
+  type:
+    | "Ignore"
+    | "Retry"
+    | "MarkAsSuccess"
+    | "Abort"
+    | "StageRollback"
+    | "StepGroupRollback"
+    | "ManualIntervention";
+}
+
+export interface FailureStrategyConfig {
+  onFailure: OnFailureConfig;
+}
+
+export type FeatureFlagStageConfig = StageInfoConfig & {};
+
+export type FlagConfigurationStepInfo = StepSpecType & {
+  feature: string;
+  environment: string;
+  instructions: PatchInstruction[];
+};
+
+export interface FlowControlConfig {
+  barriers?: BarrierInfoConfig[];
+}
+
+export type GcrArtifactConfig = ArtifactConfig & {
+  connectorRef?: string;
+  registryHostname?: string;
+  imagePath?: string;
+  tag?: string;
+  tagRegex?: string;
+  metadata?: string;
+};
+
+export type GcsStoreConfig = StoreConfig & {
+  connectorRef?: string;
+  bucketName?: string;
+  folderPath?: string;
+  metadata?: string;
+};
+
+export type GitLabStore = StoreConfig & {
+  connectorRef: string;
+  gitFetchType: "Branch" | "Commit";
+  branch?: string;
+  commitId?: string;
+  paths?: string[];
+  folderPath?: string;
+  repoName?: string;
+  metadata?: string;
+};
+
+export type GitStore = StoreConfig & {
+  connectorRef: string;
+  gitFetchType: "Branch" | "Commit";
+  branch?: string;
+  commitId?: string;
+  paths?: string[];
+  folderPath?: string;
+  repoName?: string;
+  metadata?: string;
+};
+
+export type GithubStore = StoreConfig & {
+  connectorRef: string;
+  gitFetchType: "Branch" | "Commit";
+  branch?: string;
+  commitId?: string;
+  paths?: string[];
+  folderPath?: string;
+  repoName?: string;
+  metadata?: string;
+};
+
+export type HarnessApprovalStepInfo = StepSpecType & {
+  approvalMessage: string;
+  includePipelineExecutionHistory: boolean;
+  approvers: Approvers;
+  approverInputs?: ApproverInputInfo[];
+};
+
+export type HelmChartManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  chartName?: string;
+  chartVersion?: string;
+  helmVersion?: "V2" | "V3";
+  skipResourceVersioning?: ParameterFieldBoolean;
+  commandFlags?: HelmManifestCommandFlag[];
+  metadata?: string;
+};
+
+export interface HelmManifestCommandFlag {
+  commandType: "Fetch" | "Version" | "Template" | "Pull";
+  flag?: string;
+}
+
+export interface HoldingScope {
+  scope: string;
+  nodeSetupId: string;
+}
+
+export interface HttpHeaderConfig {
+  key?: string;
+  value?: string;
+}
+
+export type HttpStepInfo = StepSpecType & {
+  url: string;
+  method: string;
+  requestBody?: string;
+  assertion?: string;
+  outputVariables?: NGVariable[];
+  headers?: HttpHeaderConfig[];
+  delegateSelectors?: string[];
+};
+
+export type HttpStoreConfig = StoreConfig & {
+  connectorRef?: string;
+  metadata?: string;
+};
+
+export type IgnoreFailureActionConfig = FailureStrategyActionConfig & {
+  type: "Ignore";
+};
+
+export interface InfraOverrides {
+  environment?: EnvironmentYaml;
+  infrastructureDefinition?: InfrastructureDef;
+}
+
+export interface InfraUseFromStage {
+  stage: string;
+  overrides?: InfraOverrides;
+}
+
+export interface Infrastructure {
+  [key: string]: any;
+}
+
+export interface InfrastructureDef {
+  type: string;
+  spec: Infrastructure;
+  provisioner?: ExecutionElementConfig;
+}
+
+export type InlineTerraformBackendConfigSpec = TerraformBackendConfigSpec & {
+  content?: string;
+};
+
+export type InlineTerraformVarFileSpec = TerraformVarFileSpec & {
+  content?: string;
+};
+
+export interface InputSetValidator {
+  validatorType?: "ALLOWED_VALUES" | "REGEX";
+  parameters?: string;
+}
+
+export interface InstanceSelectionBase {
+  [key: string]: any;
+}
+
+export interface InstanceSelectionWrapper {
+  type?: "Count" | "Percentage";
+  spec?: InstanceSelectionBase;
+}
+
+export type JexlCriteriaSpec = CriteriaSpec & {
+  expression: string;
+};
+
+export type JiraApprovalStepInfo = StepSpecType & {
+  connectorRef: string;
+  issueKey: string;
+  approvalCriteria: CriteriaSpecWrapper;
+  rejectionCriteria?: CriteriaSpecWrapper;
+};
+
+export type JiraCreateStepInfo = StepSpecType & {
+  connectorRef?: string;
+  projectKey?: string;
+  issueType?: string;
+  fields?: JiraField[];
+};
+
+export interface JiraField {
+  name?: string;
+  value: string;
+}
+
+export type JiraUpdateStepInfo = StepSpecType & {
+  connectorRef: string;
+  issueKey: string;
+  transitionTo?: TransitionTo;
+  fields?: JiraField[];
+};
+
+export type K8SDirectInfrastructure = Infrastructure & {
+  connectorRef: string;
+  namespace: string;
+  releaseName: string;
+};
+
+export type K8sApplyStepInfo = StepSpecType & {
+  skipDryRun?: ParameterFieldBoolean;
+  skipSteadyStateCheck?: ParameterFieldBoolean;
+  filePaths?: string[];
+  delegateSelectors?: string[];
+};
+
+export type K8sBGSwapServicesStepInfo = StepSpecType & {
+  skipDryRun?: boolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sBlueGreenStepInfo = StepSpecType & {
+  skipDryRun?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sCanaryDeleteStepInfo = StepSpecType & {
+  skipDryRun?: boolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sCanaryStepInfo = StepSpecType & {
+  instanceSelection: InstanceSelectionWrapper;
+  skipDryRun?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sDeleteStepInfo = StepSpecType & {
+  deleteResources: DeleteResourcesWrapper;
+  skipDryRun?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sGcpInfrastructure = Infrastructure & {
+  connectorRef: string;
+  namespace: string;
+  releaseName: string;
+  cluster: string;
+  metadata?: string;
+};
+
+export type K8sManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  skipResourceVersioning?: ParameterFieldBoolean;
+  metadata?: string;
+};
+
+export type K8sRollingRollbackStepInfo = StepSpecType & {
+  skipDryRun?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sRollingStepInfo = StepSpecType & {
+  skipDryRun?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type K8sScaleStepInfo = StepSpecType & {
+  instanceSelection: InstanceSelectionWrapper;
+  workload?: string;
+  skipDryRun?: ParameterFieldBoolean;
+  skipSteadyStateCheck?: ParameterFieldBoolean;
+  delegateSelectors?: string[];
+};
+
+export type KeyValuesCriteriaSpec = CriteriaSpec & {
+  matchAnyCondition?: boolean;
+  conditions: Condition[];
+};
+
+export type KubernetesServiceSpec = ServiceSpec & {
+  metadata?: string;
+};
+
+export type KustomizeManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  skipResourceVersioning?: ParameterFieldBoolean;
+  pluginPath?: string;
+  metadata?: string;
+};
+
+export interface Limits {
+  memory?: string;
+  cpu?: string;
+}
+
+export interface ManifestAttributes {
+  [key: string]: any;
+}
+
+export interface ManifestConfig {
+  identifier?: string;
+  type?: string;
+  spec?: ManifestAttributes;
+}
+
+export interface ManifestConfigWrapper {
+  manifest?: ManifestConfig;
+}
+
+export interface ManifestOverrideSetWrapper {
+  overrideSet?: ManifestOverrideSets;
+}
+
+export interface ManifestOverrideSets {
+  identifier?: string;
+  manifests?: ManifestConfigWrapper[];
+}
+
+export interface ManualFailureSpecConfig {
+  timeout: string;
+  onTimeout: OnTimeoutConfig;
+}
+
+export type ManualInterventionFailureActionConfig = FailureStrategyActionConfig & {
+  spec: ManualFailureSpecConfig;
+  type: "ManualIntervention";
+};
+
+export type MarkAsSuccessFailureActionConfig = FailureStrategyActionConfig & {
+  type: "MarkAsSuccess";
+};
+
+export interface NGProperties {
+  ci?: CIProperties;
+}
+
+export interface NGVariable {
+  name?: string;
+  type?: "String" | "Number" | "Secret";
+  description?: string;
+  required?: boolean;
+  metadata?: string;
+}
+
+export interface NGVariableOverrideSetWrapper {
+  overrideSet?: NGVariableOverrideSets;
+}
+
+export interface NGVariableOverrideSets {
+  identifier?: string;
+  variables?: NGVariable[];
+}
+
+export type NativeHelmServiceSpec = ServiceSpec & {
+  metadata?: string;
+};
+
+export interface NotificationChannelWrapper {
+  type?: string;
+  spec?: PmsNotificationChannel;
+}
+
+export interface NotificationRules {
+  name?: string;
+  enabled?: boolean;
+  pipelineEvents?: PipelineEvent[];
+  notificationMethod?: NotificationChannelWrapper;
+}
+
+export type NumberNGVariable = NGVariable & {
+  name?: string;
+  type?: "Number";
+  value: number;
+  default?: number;
+};
+
+export interface OnFailureConfig {
+  errors: (
+    | "Unknown"
+    | "AllErrors"
+    | "Authentication"
+    | "Connectivity"
+    | "Timeout"
+    | "Authorization"
+    | "Verification"
+    | "DelegateProvisioning"
+  )[];
+  action: FailureStrategyActionConfig;
+}
+
+export interface OnRetryFailureConfig {
+  action?: FailureStrategyActionConfig;
+}
+
+export interface OnTimeoutConfig {
+  action?: FailureStrategyActionConfig;
+}
+
+export type OpenshiftManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  skipResourceVersioning?: ParameterFieldBoolean;
+  metadata?: string;
+};
+
+export type OpenshiftParamManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  metadata?: string;
+};
+
+export interface ParallelStageElementConfig {
+  sections: StageElementWrapperConfig[];
+}
+
+export interface ParallelStepElementConfig {
+  sections: ExecutionWrapperConfig[];
+}
+
+export interface ParameterField {
+  expressionValue?: string;
+  expression?: boolean;
+  value?: { [key: string]: any };
+  typeString?: boolean;
+  inputSetValidator?: InputSetValidator;
+  jsonResponseField?: boolean;
+  responseField?: string;
+}
+
+export interface ParameterFieldBoolean {
+  expressionValue?: string;
+  expression?: boolean;
+  value?: boolean;
+  typeString?: boolean;
+  inputSetValidator?: InputSetValidator;
+  jsonResponseField?: boolean;
+  responseField?: string;
+}
+
+export interface ParameterFieldString {
+  expressionValue?: string;
+  expression?: boolean;
+  value?: string;
+  typeString?: boolean;
+  inputSetValidator?: InputSetValidator;
+  jsonResponseField?: boolean;
+  responseField?: string;
+}
+
+export interface PatchInstruction {
+  type?:
+    | "SetFeatureFlagState"
+    | "AddTargetsToVariationTargetMap"
+    | "RemoveTargetsToVariationTargetMap"
+    | "AddSegmentsToVariationTargetMap"
+    | "RemoveSegmentsToVariationTargetMap";
+}
+
+export type PercentageInstanceSelection = InstanceSelectionBase & {
+  percentage?: ParameterFieldString;
+};
+
+export interface PipelineConfig {
+  pipeline?: PipelineInfoConfig;
+}
+
+export interface PipelineEvent {
+  type?:
+    | "AllEvents"
+    | "PipelineStart"
+    | "PipelineSuccess"
+    | "PipelineFailed"
+    | "PipelinePaused"
+    | "StageSuccess"
+    | "StageFailed"
+    | "StageStart"
+    | "StepFailed";
+  forStages?: string[];
+}
+
+export interface PipelineInfoConfig {
+  name: string;
+  identifier: string;
+  flowControl?: FlowControlConfig;
+  description?: string;
+  tags?: {
+    [key: string]: string;
+  };
+  variables?: NGVariable[];
+  properties?: NGProperties;
+  stages?: StageElementWrapperConfig[];
+  notificationRules?: NotificationRules[];
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+}
+
+export interface PipelineInfrastructure {
+  infrastructureDefinition?: InfrastructureDef;
+  useFromStage?: InfraUseFromStage;
+  environment?: EnvironmentYaml;
+  allowSimultaneousDeployments?: boolean;
+  infrastructureKey?: string;
+  environmentRef?: string;
+}
+
+export type PmsEmailChannel = PmsNotificationChannel & {
+  userGroups?: string[];
+  recipients?: string[];
+};
+
+export type PmsMSTeamChannel = PmsNotificationChannel & {
+  msTeamKeys?: string[];
+  userGroups?: string[];
+};
+
+export interface PmsNotificationChannel {
+  [key: string]: any;
+}
+
+export type PmsPagerDutyChannel = PmsNotificationChannel & {
+  userGroups?: string[];
+  integrationKey?: string;
+};
+
+export type PmsSlackChannel = PmsNotificationChannel & {
+  userGroups?: string[];
+  webhookUrl?: string;
+};
+
+export interface PrimaryArtifact {
+  type: "DockerRegistry" | "Gcr" | "Ecr";
+  spec?: ArtifactConfig;
+}
+
+export type RemoteTerraformVarFileSpec = TerraformVarFileSpec & {
+  store: StoreConfigWrapper;
+};
+
+export type RemoveSegmentToVariationTargetMapYaml = PatchInstruction & {
+  type: "RemoveSegmentToVariationTargetMap";
+  identifier: string;
+  spec: RemoveSegmentToVariationTargetMapYamlSpec;
+};
+
+export interface RemoveSegmentToVariationTargetMapYamlSpec {
+  variation: string;
+  segments: string[];
+}
+
+export type RemoveTargetsToVariationTargetMapYaml = PatchInstruction & {
+  type: "RemoveTargetsToVariationTargetMap";
+  identifier: string;
+  spec: RemoveTargetsToVariationTargetMapYamlSpec;
+};
+
+export interface RemoveTargetsToVariationTargetMapYamlSpec {
+  variation: string;
+  targets: string[];
+}
+
+export type ResourceConstraintStepInfo = StepSpecType & {
+  name: string;
+  resourceUnit: string;
+  acquireMode: "ENSURE" | "ACCUMULATE";
+  permits: number;
+  holdingScope: HoldingScope;
+};
+
+export interface ResponsePipelineConfig {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PipelineConfig;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export type RetryFailureActionConfig = FailureStrategyActionConfig & {
+  spec: RetryFailureSpecConfig;
+  type: "Retry";
+};
+
+export interface RetryFailureSpecConfig {
+  retryCount: number;
+  retryIntervals: string[];
+  onRetryFailure: OnRetryFailureConfig;
+}
+
+export type S3StoreConfig = StoreConfig & {
+  connectorRef?: string;
+  bucketName?: string;
+  region?: string;
+  folderPath?: string;
+  metadata?: string;
+};
+
+export type SecretNGVariable = NGVariable & {
+  name?: string;
+  type?: "Secret";
+  value: string;
+  default?: string;
+};
+
+export interface ServiceConfig {
+  useFromStage?: ServiceUseFromStage;
+  service?: ServiceYaml;
+  serviceRef?: string;
+  serviceDefinition?: ServiceDefinition;
+  stageOverrides?: StageOverridesConfig;
+}
+
+export interface ServiceDefinition {
+  type?: string;
+  spec?: ServiceSpec;
+}
+
+export interface ServiceOverrides {
+  name?: string;
+  description?: string;
+}
+
+export interface ServiceSpec {
+  variables?: NGVariable[];
+  artifacts?: ArtifactListConfig;
+  manifests?: ManifestConfigWrapper[];
+  manifestOverrideSets?: ManifestOverrideSetWrapper[];
+  artifactOverrideSets?: ArtifactOverrideSetWrapper[];
+  variableOverrideSets?: NGVariableOverrideSetWrapper[];
+}
+
+export interface ServiceUseFromStage {
+  stage: string;
+  overrides?: ServiceOverrides;
+  metadata?: string;
+}
+
+export interface ServiceYaml {
+  identifier: string;
+  name: string;
+  description?: string;
+  tags?: {
+    [key: string]: string;
+  };
+}
+
+export type SetFeatureFlagStateYaml = PatchInstruction & {
+  type: "SetFeatureFlagState";
+  identifier: string;
+  spec: SetFeatureFlagStateYamlSpec;
+};
+
+export interface SetFeatureFlagStateYamlSpec {
+  state: string;
+}
+
+export interface ShellScriptBaseSource {
+  type?: string;
+}
+
+export type ShellScriptInlineSource = ShellScriptBaseSource & {
+  script?: string;
+};
+
+export interface ShellScriptSourceWrapper {
+  type?: string;
+  spec?: ShellScriptBaseSource;
+}
+
+export type ShellScriptStepInfo = StepSpecType & {
+  shell: "Bash" | "PowerShell";
+  source: ShellScriptSourceWrapper;
+  executionTarget?: ExecutionTarget;
+  onDelegate: ParameterFieldBoolean;
+  outputVariables?: NGVariable[];
+  environmentVariables?: NGVariable[];
+  delegateSelectors?: string[];
+  metadata?: string;
+};
+
+export interface SidecarArtifact {
+  identifier?: string;
+  type: "DockerRegistry" | "Gcr" | "Ecr";
+  spec?: ArtifactConfig;
+}
+
+export interface SidecarArtifactWrapper {
+  sidecar?: SidecarArtifact;
+}
+
+export interface StageElementConfig {
+  identifier: string;
+  name: string;
+  description?: string;
+  when?: StageWhenCondition;
+  failureStrategies?: FailureStrategyConfig[];
+  variables?: NGVariable[];
+  tags?: {
+    [key: string]: string;
+  };
+  type: string;
+  spec?: StageInfoConfig;
+}
+
+export interface StageElementWrapperConfig {
+  stage?: StageElementConfig;
+  parallel?: ParallelStageElementConfig;
+}
+
+export interface StageInfoConfig {
+  execution?: ExecutionElementConfig;
+}
+
+export interface StageOverridesConfig {
+  variables?: NGVariable[];
+  useVariableOverrideSets?: string[];
+  useArtifactOverrideSets?: string[];
+  artifacts?: ArtifactListConfig;
+  useManifestOverrideSets?: string[];
+  manifests?: ManifestConfigWrapper[];
+}
+
+export type StageRollbackFailureActionConfig = FailureStrategyActionConfig & {
+  type: "StageRollback";
+};
+
+export interface StageWhenCondition {
+  pipelineStatus: "Success" | "Failure" | "All";
+  condition?: string;
+}
+
+export interface StepElementConfig {
+  identifier?: string;
+  name?: string;
+  description?: string;
+  timeout?: string;
+  failureStrategies?: FailureStrategyConfig[];
+  when?: StepWhenCondition;
+  type?: string;
+  spec?: StepSpecType;
+}
+
+export interface StepGroupElementConfig {
+  identifier: string;
+  name?: string;
+  when?: StepWhenCondition;
+  failureStrategies?: FailureStrategyConfig[];
+  steps: ExecutionWrapperConfig[];
+  rollbackSteps?: ExecutionWrapperConfig[];
+}
+
+export type StepGroupFailureActionConfig = FailureStrategyActionConfig & {
+  type: "StepGroupRollback";
+};
+
+export interface StepSpecType {
+  [key: string]: any;
+}
+
+export interface StepWhenCondition {
+  stageStatus: "Success" | "Failure" | "All";
+  condition?: string;
+}
+
+export interface StoreConfig {
+  [key: string]: any;
+}
+
+export interface StoreConfigWrapper {
+  type: string;
+  spec: StoreConfig;
+  metadata?: string;
+}
+
+export type StringNGVariable = NGVariable & {
+  name?: string;
+  type?: "String";
+  value: string;
+  default?: string;
+};
+
+export type TagBuildSpec = BuildSpec & {
+  tag: string;
+};
+
+export type TerraformApplyStepInfo = StepSpecType & {
+  provisionerIdentifier: string;
+  delegateSelectors?: string[];
+  metadata?: string;
+  configuration: TerraformStepConfiguration;
+};
+
+export interface TerraformBackendConfig {
+  type?: string;
+  spec?: TerraformBackendConfigSpec;
+}
+
+export interface TerraformBackendConfigSpec {
+  [key: string]: any;
+}
+
+export interface TerraformConfigFilesWrapper {
+  store?: StoreConfigWrapper;
+}
+
+export type TerraformDestroyStepInfo = StepSpecType & {
+  provisionerIdentifier: string;
+  delegateSelectors?: string[];
+  metadata?: string;
+  configuration: TerraformStepConfiguration;
+};
+
+export interface TerraformExecutionData {
+  workspace?: string;
+  targets?: string[];
+  environmentVariables?: NGVariable[];
+  configFiles: TerraformConfigFilesWrapper;
+  varFiles?: TerraformVarFileWrapper[];
+  backendConfig?: TerraformBackendConfig;
+}
+
+export interface TerraformPlanExecutionData {
+  workspace?: string;
+  targets?: string[];
+  environmentVariables?: NGVariable[];
+  command: "Apply" | "Destroy";
+  secretManagerRef: string;
+  configFiles: TerraformConfigFilesWrapper;
+  varFiles?: TerraformVarFileWrapper[];
+  backendConfig?: TerraformBackendConfig;
+}
+
+export type TerraformPlanStepInfo = StepSpecType & {
+  provisionerIdentifier: string;
+  delegateSelectors?: string[];
+  configuration: TerraformPlanExecutionData;
+};
+
+export type TerraformRollbackStepInfo = StepSpecType & {
+  provisionerIdentifier: string;
+  delegateSelectors?: string[];
+};
+
+export interface TerraformStepConfiguration {
+  type: "Inline" | "InheritFromPlan" | "InheritFromApply";
+  spec?: TerraformExecutionData;
+}
+
+export interface TerraformVarFile {
+  type: string;
+  identifier: string;
+  spec: TerraformVarFileSpec;
+}
+
+export interface TerraformVarFileSpec {
+  type?: string;
+}
+
+export interface TerraformVarFileWrapper {
+  varFile?: TerraformVarFile;
+}
+
+export interface TransitionTo {
+  status: string;
+  transitionName?: string;
+}
+
+export type ValuesManifest = ManifestAttributes & {
+  store?: StoreConfigWrapper;
+  metadata?: string;
+};
+
 export interface CDPipelineModuleInfo {
   serviceIdentifiers?: string[];
   envIdentifiers?: string[];
@@ -7808,6 +5612,19 @@ export interface CDPipelineModuleInfo {
 export interface ResponseCDPipelineModuleInfo {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: CDPipelineModuleInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface JiraProjectBasicNG {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface ResponseListJiraProjectBasicNG {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: JiraProjectBasicNG[];
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -7895,19 +5712,6 @@ export interface JiraIssueUpdateMetadataNG {
 export interface ResponseJiraIssueUpdateMetadataNG {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: JiraIssueUpdateMetadataNG;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface JiraProjectBasicNG {
-  id: string;
-  key: string;
-  name: string;
-}
-
-export interface ResponseListJiraProjectBasicNG {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: JiraProjectBasicNG[];
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -8033,6 +5837,25 @@ export interface ResponseOverlayInputSetResponse {
   correlationId?: string;
 }
 
+export type DeploymentStage = StageType & {
+  variables?: NGVariable[];
+  serviceConfig?: ServiceConfig;
+  infrastructure?: PipelineInfrastructure;
+  execution?: ExecutionElement;
+  skipCondition?: string;
+  metadata?: string;
+};
+
+export interface ExecutionElement {
+  steps?: ExecutionWrapper[];
+  rollbackSteps?: ExecutionWrapper[];
+  metadata?: string;
+}
+
+export interface ExecutionWrapper {
+  [key: string]: any;
+}
+
 export interface InputSetConfig {
   identifier: string;
   name?: string;
@@ -8042,6 +5865,67 @@ export interface InputSetConfig {
     [key: string]: string;
   };
 }
+
+export interface NgPipeline {
+  name: string;
+  identifier: string;
+  description?: string;
+  tags?: {
+    [key: string]: string;
+  };
+  variables?: NGVariable[];
+  ciCodebase?: CodeBase;
+  stages?: StageElementWrapper[];
+  metadata?: string;
+}
+
+export type ParallelStageElement = StageElementWrapper & {
+  sections: StageElementWrapper[];
+  metadata?: string;
+};
+
+export type ParallelStepElement = ExecutionWrapper & {
+  sections: ExecutionWrapper[];
+  metadata?: string;
+};
+
+export type StageElement = StageElementWrapper & {
+  identifier: string;
+  name?: string;
+  description?: string;
+  failureStrategies: FailureStrategyConfig[];
+  type?: string;
+  skipCondition?: string;
+  metadata?: string;
+  spec?: StageType;
+};
+
+export interface StageElementWrapper {
+  [key: string]: any;
+}
+
+export interface StageType {
+  identifier: string;
+}
+
+export type StepElement = ExecutionWrapper & {
+  identifier: string;
+  name?: string;
+  failureStrategies?: FailureStrategyConfig[];
+  type?: string;
+  skipCondition?: string;
+  metadata?: string;
+  spec?: StepSpecType;
+};
+
+export type StepGroupElement = ExecutionWrapper & {
+  identifier: string;
+  name?: string;
+  failureStrategies?: FailureStrategyConfig[];
+  steps: ExecutionWrapper[];
+  rollbackSteps?: ExecutionWrapper[];
+  metadata?: string;
+};
 
 export interface OverlayInputSetConfig {
   identifier?: string;
@@ -8106,190 +5990,8 @@ export interface ResponseMergeInputSetResponse {
   correlationId?: string;
 }
 
-export interface NGPipelineSummaryResponse {
-  name?: string;
-  identifier?: string;
-  description?: string;
-  numOfStages?: number;
-  numOfErrors?: number;
-  deployments?: number[];
-  tags?: {
-    [key: string]: string;
-  };
-  version?: number;
-}
-
-export interface PageNGPipelineSummaryResponse {
-  totalElements?: number;
-  totalPages?: number;
-  size?: number;
-  content?: NGPipelineSummaryResponse[];
-  number?: number;
-  first?: boolean;
-  sort?: Sort;
-  last?: boolean;
-  numberOfElements?: number;
-  pageable?: Pageable;
-  empty?: boolean;
-}
-
-export interface ResponsePageNGPipelineSummaryResponse {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageNGPipelineSummaryResponse;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ResponseNGPipelineSummaryResponse {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: NGPipelineSummaryResponse;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export type ApprovalStageConfig = StageInfoConfig & {
-  execution: ExecutionElementConfig;
-};
-
-export interface BarrierInfoConfig {
-  identifier: string;
-  name: string;
-}
-
-export interface CIProperties {
-  codebase?: CodeBase;
-}
-
-export type DeploymentStageConfig = StageInfoConfig & {
-  serviceConfig: ServiceConfig;
-  infrastructure: PipelineInfrastructure;
-  execution: ExecutionElementConfig;
-};
-
-export type FeatureStageConfig = StageInfoConfig & {};
-
-export interface FlowControlConfig {
-  barriers?: BarrierInfoConfig[];
-}
-
-export interface NGProperties {
-  ci?: CIProperties;
-}
-
-export interface NotificationChannelWrapper {
-  type?: string;
-  spec?: PmsNotificationChannel;
-}
-
-export interface NotificationRules {
-  name?: string;
-  enabled?: boolean;
-  pipelineEvents?: PipelineEvent[];
-  notificationMethod?: NotificationChannelWrapper;
-}
-
-export interface ParallelStageElementConfig {
-  sections: StageElementWrapperConfig[];
-}
-
-export interface PipelineConfig {
-  pipeline?: PipelineInfoConfig;
-}
-
-export interface PipelineEvent {
-  type?:
-    | "AllEvents"
-    | "PipelineStart"
-    | "PipelineSuccess"
-    | "PipelineFailed"
-    | "PipelinePaused"
-    | "StageSuccess"
-    | "StageFailed"
-    | "StageStart"
-    | "StepFailed";
-  forStages?: string[];
-}
-
-export interface PipelineInfoConfig {
-  name: string;
-  identifier: string;
-  flowControl?: FlowControlConfig;
-  description?: string;
-  tags?: {
-    [key: string]: string;
-  };
-  variables?: NGVariable[];
-  properties?: NGProperties;
-  stages?: StageElementWrapperConfig[];
-  notificationRules?: NotificationRules[];
-}
-
-export type PmsEmailChannel = PmsNotificationChannel & {
-  userGroups?: string[];
-  recipients?: string[];
-};
-
-export type PmsMSTeamChannel = PmsNotificationChannel & {
-  msTeamKeys?: string[];
-  userGroups?: string[];
-};
-
-export interface PmsNotificationChannel {
-  [key: string]: any;
-}
-
-export type PmsPagerDutyChannel = PmsNotificationChannel & {
-  userGroups?: string[];
-  integrationKey?: string;
-};
-
-export type PmsSlackChannel = PmsNotificationChannel & {
-  userGroups?: string[];
-  webhookUrl?: string;
-};
-
-export interface ResponsePipelineConfig {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PipelineConfig;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface StageElementConfig {
-  identifier: string;
-  name: string;
-  description?: string;
-  skipCondition?: string;
-  failureStrategies?: FailureStrategyConfig[];
-  variables?: NGVariable[];
-  tags?: {
-    [key: string]: string;
-  };
-  type: string;
-  spec?: StageInfoConfig;
-}
-
-export interface StageElementWrapperConfig {
-  stage?: StageElementConfig;
-  parallel?: ParallelStageElementConfig;
-}
-
-export interface StageInfoConfig {
-  execution?: ExecutionElementConfig;
-}
-
-export interface NGPipelineResponse {
-  ngPipeline?: NgPipeline;
-  executionsPlaceHolder?: string[];
-  yamlPipeline?: string;
-  version?: number;
-}
-
-export interface ResponseNGPipelineResponse {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: NGPipelineResponse;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
+export interface MergeInputSetRequest {
+  inputSetReferences?: string[];
 }
 
 export interface RestResponseUserInfo {
@@ -8300,17 +6002,27 @@ export interface RestResponseUserInfo {
   responseMessages?: ResponseMessage[];
 }
 
-export interface OAuthSignupDTO {
-  email?: string;
-  name?: string;
-  login?: string;
-  utmInfo?: UtmInfo;
-  module?: "CD" | "CI" | "CORE" | "CV" | "CF" | "CE";
-}
-
 export interface SignupDTO {
   email?: string;
   password?: string;
+  utmInfo?: UtmInfo;
+}
+
+export interface RestResponseVerifyTokenResponseDTO {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: VerifyTokenResponseDTO;
+  responseMessages?: ResponseMessage[];
+}
+
+export interface VerifyTokenResponseDTO {
+  accountIdentifier?: string;
+}
+
+export interface OAuthSignupDTO {
+  email?: string;
+  name?: string;
   utmInfo?: UtmInfo;
 }
 
@@ -8388,29 +6100,23 @@ export interface YamlSnippets {
   yamlSnippets?: YamlSnippetMetaData[];
 }
 
-export type SecretFileDTORequestBody = void;
-
-export type DockerRequestDTORequestBody = DockerRequestDTO;
+export type ServiceRequestDTORequestBody = ServiceRequestDTO;
 
 export type OrganizationRequestRequestBody = OrganizationRequest;
 
 export type UploadSamlMetaDataRequestBody = void;
 
-export type EnvironmentRequestDTORequestBody = EnvironmentRequestDTO;
-
 export type GcrRequestDTORequestBody = GcrRequestDTO;
 
 export type ModuleLicenseDTORequestBody = ModuleLicenseDTO;
-
-export type MergeInputSetRequestRequestBody = MergeInputSetRequest;
 
 export type ProjectRequestRequestBody = ProjectRequest;
 
 export type GitSyncConfigRequestBody = GitSyncConfig;
 
-export type SecretTextDTORequestBody = void;
-
 export type DelegateProfileDetailsNgRequestBody = DelegateProfileDetailsNg;
+
+export type WebhookCatcherBodyRequestBody = string;
 
 export type UserGroupDTORequestBody = UserGroupDTO;
 
@@ -8418,21 +6124,23 @@ export type FilterDTORequestBody = FilterDTO;
 
 export type OverlayInputSetConfigRequestBody = OverlayInputSetConfig;
 
-export type NgPipelineRequestBody = NgPipeline;
+export type AccountDTORequestBody = AccountDTO;
 
 export type ConnectorRequestBody = Connector;
 
 export type UpdateWhitelistedDomainsBodyRequestBody = string[];
 
+export type DockerRequestDTORequestBody = DockerRequestDTO;
+
 export type EcrRequestDTORequestBody = EcrRequestDTO;
 
-export type SecretTextDTO2RequestBody = SecretTextDTO;
+export type EnvironmentRequestDTORequestBody = EnvironmentRequestDTO;
 
 export type SecretRequestWrapperRequestBody = SecretRequestWrapper;
 
 export type SecretRequestWrapper2RequestBody = void;
 
-export type ServiceRequestDTORequestBody = ServiceRequestDTO;
+export type UserFilterRequestBody = UserFilter;
 
 export type ServiceRequestDTOArrayRequestBody = ServiceRequestDTO[];
 
@@ -8492,3 +6200,64 @@ export const useSignup = (props: UseSignupProps) =>
     base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
     ...props
   });
+
+export interface VerifyTokenPathParams {
+  token: string;
+}
+
+export type VerifyTokenProps = Omit<
+  MutateProps<
+    RestResponseVerifyTokenResponseDTO,
+    Failure | Error,
+    void,
+    void,
+    VerifyTokenPathParams
+  >,
+  "path" | "verb"
+> &
+  VerifyTokenPathParams;
+
+export const VerifyToken = ({ token, ...props }: VerifyTokenProps) => (
+  <Mutate<
+    RestResponseVerifyTokenResponseDTO,
+    Failure | Error,
+    void,
+    void,
+    VerifyTokenPathParams
+  >
+    verb="POST"
+    path={`/signup/verify/${token}`}
+    base={window.location.pathname.replace("auth/", "") + "gateway/ng/api"}
+    {...props}
+  />
+);
+
+export type UseVerifyTokenProps = Omit<
+  UseMutateProps<
+    RestResponseVerifyTokenResponseDTO,
+    Failure | Error,
+    void,
+    void,
+    VerifyTokenPathParams
+  >,
+  "path" | "verb"
+> &
+  VerifyTokenPathParams;
+
+export const useVerifyToken = ({ token, ...props }: UseVerifyTokenProps) =>
+  useMutate<
+    RestResponseVerifyTokenResponseDTO,
+    Failure | Error,
+    void,
+    void,
+    VerifyTokenPathParams
+  >(
+    "POST",
+    (paramsInPath: VerifyTokenPathParams) =>
+      `/signup/verify/${paramsInPath.token}`,
+    {
+      base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
+      pathParams: { token },
+      ...props
+    }
+  );

@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
+import { VerifyEmail } from "./pages/VerifyEmail/VerifyEmail";
 
 export function App() {
   return (
@@ -30,6 +31,7 @@ export function App() {
           <Route path="/" exact>
             <Redirect to={routes.toSignIn()} />
           </Route>
+          <Route path={routes.toVerifyEmail()} component={VerifyEmail} />
         </Switch>
       </HashRouter>
     </RestfulProvider>
