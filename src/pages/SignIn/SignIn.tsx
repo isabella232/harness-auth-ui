@@ -141,7 +141,7 @@ const SignIn: React.FC = () => {
         </form>
         <AuthFooter page={AuthPage.SignIn} />
         <div className={css.footer}>
-          No account? <Link to={RouteDefinitions.toSignUp()}>Get Started</Link>
+          No account? <Link to={RouteDefinitions.toSignUp()}>Sign Up</Link>
         </div>
       </div>
     </BasicLayout>

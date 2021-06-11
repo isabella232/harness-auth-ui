@@ -183,7 +183,7 @@ exports[`SignIn render 1`] = `
             <a
               href="/signup"
             >
-              Get Started
+              Sign Up
             </a>
           </div>
         </div>
