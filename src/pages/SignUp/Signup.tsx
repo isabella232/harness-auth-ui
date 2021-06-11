@@ -9,7 +9,6 @@ import { useSignup } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
-import Text from "components/Text/Text";
 import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
@@ -136,10 +135,6 @@ const SignUp: React.FC = () => {
       <div className={cx(css.signup)}>
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
-          <div style={{ flex: 1 }}></div>
-          <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Sign In</Text>
-          </Link>
         </div>
         <div className={css.title}>Sign Up</div>
         <div className={css.subtitle}>and get ship done.</div>
@@ -172,6 +167,10 @@ const SignUp: React.FC = () => {
           )}
         />
         <AuthFooter page={AuthPage.SignUp} />
+        <div className={css.footer}>
+          Already have an account?{" "}
+          <Link to={RouteDefinitions.toSignIn()}>Sign In</Link>
+        </div>
       </div>
     </BasicLayout>
   );

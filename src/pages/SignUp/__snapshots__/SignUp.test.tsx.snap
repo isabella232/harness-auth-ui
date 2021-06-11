@@ -22,24 +22,6 @@ exports[`SignUp render 1`] = `
               src="test-file-stub"
               width="120"
             />
-            <div
-              style="flex: 1;"
-            />
-            <a
-              href="/signin"
-            >
-              <span
-                class="text"
-              >
-                <img
-                  class="icon"
-                  height="16"
-                  src="test-file-stub"
-                  width="16"
-                />
-                Sign In
-              </span>
-            </a>
           </div>
           <div
             class="title"
@@ -185,6 +167,17 @@ exports[`SignUp render 1`] = `
               Terms of Use
             </a>
           </div>
+          <div
+            class="footer"
+          >
+            Already have an account?
+             
+            <a
+              href="/signin"
+            >
+              Sign In
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -224,24 +217,6 @@ exports[`SignUp telemetry 1`] = `
               src="test-file-stub"
               width="120"
             />
-            <div
-              style="flex: 1;"
-            />
-            <a
-              href="/signin"
-            >
-              <span
-                class="text"
-              >
-                <img
-                  class="icon"
-                  height="16"
-                  src="test-file-stub"
-                  width="16"
-                />
-                Sign In
-              </span>
-            </a>
           </div>
           <div
             class="title"
@@ -388,6 +363,17 @@ exports[`SignUp telemetry 1`] = `
               target="_blank"
             >
               Terms of Use
+            </a>
+          </div>
+          <div
+            class="footer"
+          >
+            Already have an account?
+             
+            <a
+              href="/signin"
+            >
+              Sign In
             </a>
           </div>
         </div>
