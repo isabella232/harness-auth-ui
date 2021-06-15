@@ -65,7 +65,7 @@ export function handleLoginSuccess(resource?: User): void {
 
     switch (experience) {
       case "NG":
-        window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/projects`;
+        window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}`;
         return;
       case "CG":
       default:
