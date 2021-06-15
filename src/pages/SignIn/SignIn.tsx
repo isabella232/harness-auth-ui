@@ -1,22 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
+import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
-import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 
 const SignIn: React.FC = () => {
-  const queryString = window.location.hash?.split("?")?.[1];
-  const urlParams = new URLSearchParams(queryString);
+  const [captchaReponse, setCaptchaResponse] = useState("");
+  const captchaRef = useRef<ReCAPTCHA>(null);
   const baseUrl = window.location.pathname.replace("/auth", "");
 
+  const queryString = window.location.hash?.split("?")?.[1];
+  const urlParams = new URLSearchParams(queryString);
+
+  const errorCode = urlParams.get("errorCode");
+  const captchaEnabled = errorCode === "MAX_FAILED_ATTEMPT_COUNT_EXCEEDED";
+
   useEffect(() => {
-    const errorCode = urlParams.get("errorCode");
     switch (errorCode) {
       case "GATEWAY_SSO_REDIRECT_ERROR":
         toast.error(
@@ -31,8 +37,9 @@ const SignIn: React.FC = () => {
         return;
       case "INVALID_CREDENTIALS":
         toast.error("Your email or password is incorrect.");
+        return;
     }
-  }, []);
+  }, [errorCode]);
 
   return (
     <BasicLayout>
@@ -74,17 +81,25 @@ const SignIn: React.FC = () => {
               placeholder="Password"
             />
           </div>
-          {/* {showCaptcha ? (
-            <ReCAPTCHA
-              sitekey={window.captchaToken || ""}
-              ref={captchaRef}
-              onChange={(token: string | null) => {
-                if (token) {
-                  setCaptchaResponse(token);
-                }
-              }}
-            />
-          ) : null} */}
+          {captchaEnabled ? (
+            <>
+              <ReCAPTCHA
+                sitekey={window.captchaToken || "1234"}
+                ref={captchaRef}
+                onChange={(token: string | null) => {
+                  if (token) {
+                    setCaptchaResponse(token);
+                  }
+                }}
+              />
+              <input
+                type="hidden"
+                name="captcha"
+                id="captcha"
+                value={captchaReponse}
+              />
+            </>
+          ) : null}
           <input type="submit" value={"Sign In"} className="button primary" />
         </form>
         <AuthFooter page={AuthPage.SignIn} />
