@@ -13,6 +13,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import Text from "components/Text/Text";
 import { validateEmail } from "utils/FormValidationUtils";
+import { handleError } from "utils/ErrorUtils";
 
 interface ForgotPasswordFormData {
   email: string;
@@ -32,11 +33,10 @@ export default function ForgotPassword() {
           "An email has been sent to you with a link to reset your password"
         );
       } else {
-        toast.error("Something went wrong");
+        handleError(response);
       }
     } catch (err) {
-      // network error
-      toast.error("Something went wrong");
+      handleError(err);
     }
   };
 
