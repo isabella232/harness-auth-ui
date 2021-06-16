@@ -25,3 +25,11 @@ export function validatePassword(password: string): string | undefined {
     return "The password must be between 8 and 64 characters long";
   }
 }
+
+export function validatePasswordRequiredOnly(
+  password: string
+): string | undefined {
+  if (!password) {
+    return "A password is required";
+  }
+}
