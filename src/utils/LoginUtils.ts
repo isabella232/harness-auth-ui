@@ -22,6 +22,14 @@ export function handleLoginSuccess(resource?: User): void {
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
+    if (returnUrl) {
+      const accountId = returnUrl.split("#")[1].split("/")[2];
+      if (resource.accounts?.find((account) => account.uuid !== accountId)) {
+        window.location.href = window.location.hash?.split("?")[0];
+        return;
+      }
+    }
+
     AppStorage.set("token", resource.token);
     AppStorage.set("uuid", resource.uuid);
     AppStorage.set("acctId", resource.defaultAccountId);
