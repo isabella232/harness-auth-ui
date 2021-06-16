@@ -39,7 +39,7 @@ const Field: React.FC<FieldProps> = (props) => {
 
         return (
           <div className={cx("layout-vertical spacing-small", css.field)}>
-            {label ? <label>{label}</label> : null}
+            {label && <label>{label}</label>}
             <input
               {...input}
               id={name}
