@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 
 export function handleError(error: any): void {
-  const response = error.data;
+  const response = error?.data;
 
   if (
     response?.responseMessages?.length > 0 &&
