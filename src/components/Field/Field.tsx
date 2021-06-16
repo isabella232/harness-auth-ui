@@ -11,9 +11,9 @@ type validate = typeof validateEmail | typeof validatePassword;
 
 interface FieldProps {
   name: string;
-  label: string;
+  label?: string;
   validate: validate;
-  placeholder: string;
+  placeholder?: string;
   type?: string;
   disabled?: boolean;
   initialValue?: string;
@@ -39,7 +39,7 @@ const Field: React.FC<FieldProps> = (props) => {
 
         return (
           <div className={cx("layout-vertical spacing-small", css.field)}>
-            <label>{label}</label>
+            {label ? <label>{label}</label> : null}
             <input
               {...input}
               id={name}

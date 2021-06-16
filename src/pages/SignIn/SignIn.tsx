@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import RouteDefinitions from "RouteDefinitions";
+import Field from "components/Field/Field";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useLogin } from "services/portal";
 
@@ -13,6 +15,10 @@ import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
 import { handleLoginSuccess } from "utils/LoginUtils";
+import {
+  validateEmail,
+  validatePasswordRequiredOnly
+} from "utils/FormValidationUtils";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -72,73 +78,66 @@ const SignIn: React.FC = () => {
     <BasicLayout>
       <div className={cx(css.signin)}>
         <div className={css.header}>
-          <img src={logo} width={120} className={css.logo} />
+          <img src={logo} width={120} className={css.logo} alt={"Harness"} />
         </div>
         <div className={css.title}>Sign In</div>
         <div className={css.subtitle}>and get ship done.</div>
-        <form
-          className="layout-vertical spacing-medium"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.target as HTMLFormElement);
-            const loginFormData = (Object.fromEntries(
-              data.entries()
-            ) as unknown) as LoginFormData;
-            if (
-              loginFormData.email.length > 0 &&
-              loginFormData.password.length > 0
-            ) {
-              handleLogin(loginFormData);
-            }
+        <Form
+          onSubmit={handleLogin}
+          render={({ handleSubmit }) => {
+            return (
+              <form
+                className="layout-vertical spacing-medium"
+                onSubmit={handleSubmit}
+              >
+                <Field
+                  name="email"
+                  type="email"
+                  label="Email"
+                  placeholder="email@work.com"
+                  disabled={loading}
+                  validate={validateEmail}
+                />
+                <div
+                  className="layout-vertical spacing-small"
+                  style={{ position: "relative" }}
+                >
+                  <label htmlFor="password">Password</label>
+                  <Link
+                    to={RouteDefinitions.toForgotPassword()}
+                    className={css.forgotLink}
+                    tabIndex={-1}
+                  >
+                    Forgot Password?
+                  </Link>
+                  <Field
+                    name="password"
+                    type="password"
+                    disabled={loading}
+                    validate={validatePasswordRequiredOnly}
+                  />
+                </div>
+                {showCaptcha ? (
+                  <ReCAPTCHA
+                    sitekey={window.captchaToken || ""}
+                    ref={captchaRef}
+                    onChange={(token: string | null) => {
+                      if (token) {
+                        setCaptchaResponse(token);
+                      }
+                    }}
+                  />
+                ) : null}
+                <input
+                  type="submit"
+                  value={loading ? "Signing in..." : "Sign In"}
+                  className="button primary"
+                  disabled={loading || (showCaptcha && !captchaReponse)}
+                />
+              </form>
+            );
           }}
-        >
-          <div className="layout-vertical spacing-small">
-            <label htmlFor="email">Email</label>
-            <input
-              name="email"
-              type="email"
-              id="email"
-              placeholder="email@work.com"
-              disabled={loading}
-            />
-          </div>
-          <div
-            className="layout-vertical spacing-small"
-            style={{ position: "relative" }}
-          >
-            <label htmlFor="password">Password</label>
-            <Link
-              to={RouteDefinitions.toForgotPassword()}
-              className={css.forgotLink}
-              tabIndex={-1}
-            >
-              Forgot Password?
-            </Link>
-            <input
-              name="password"
-              id="password"
-              type="password"
-              disabled={loading}
-            />
-          </div>
-          {showCaptcha ? (
-            <ReCAPTCHA
-              sitekey={window.captchaToken || ""}
-              ref={captchaRef}
-              onChange={(token: string | null) => {
-                if (token) {
-                  setCaptchaResponse(token);
-                }
-              }}
-            />
-          ) : null}
-          <input
-            type="submit"
-            value={loading ? "Signing in..." : "Sign In"}
-            className="button primary"
-            disabled={loading || (showCaptcha && !captchaReponse)}
-          />
-        </form>
+        />
         <AuthFooter page={AuthPage.SignIn} />
         <div className={css.footer}>
           No account? <Link to={RouteDefinitions.toSignUp()}>Sign Up</Link>
