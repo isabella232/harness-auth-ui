@@ -21,8 +21,8 @@ export function validatePassword(password: string): string | undefined {
     return "A password is required";
   }
 
-  if (password.length < 8 || password.length > 128) {
-    return "The password must be between 8 and 128 characters long";
+  if (password.length < 8 || password.length > 64) {
+    return "The password must be between 8 and 64 characters long";
   }
 }
 
