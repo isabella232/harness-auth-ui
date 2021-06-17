@@ -13,7 +13,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import Text from "components/Text/Text";
 import { handleError } from "utils/ErrorUtils";
-import { validatePasswordRequiredOnly } from "utils/FormValidationUtils";
+import { validatePassword } from "utils/FormValidationUtils";
 
 interface UpdatePasswordFormData {
   password: string;
@@ -73,14 +73,14 @@ export default function ResetPassword() {
                   type="password"
                   label="Password"
                   disabled={loading}
-                  validate={validatePasswordRequiredOnly}
+                  validate={validatePassword}
                 />
                 <Field
                   name="confirmPassword"
                   type="password"
                   label="Confirm Password"
                   disabled={loading}
-                  validate={validatePasswordRequiredOnly}
+                  validate={validatePassword}
                 />
                 <input
                   type="submit"
