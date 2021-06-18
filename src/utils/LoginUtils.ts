@@ -1,5 +1,6 @@
 import type { User } from "services/portal";
 import AppStorage from "utils/AppStorage";
+import RouteDefinitions from "RouteDefinitions";
 
 interface AuthHeader {
   authorization: string;
@@ -44,14 +45,17 @@ export function handleLoginSuccess(resource?: User): void {
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
-          const accountId = returnUrl.split("#")[1].split("/")[2];
+          const splitReturnUrl = returnUrl.split("/");
           if (
-            resource.accounts?.find((account) => account.uuid !== accountId)
+            resource.accounts?.find((account) =>
+              splitReturnUrl.includes(account.uuid)
+            )
           ) {
-            window.location.href = window.location.hash?.split("?")[0];
+            window.location.href = returnUrl;
             return;
           }
-          window.location.href = returnUrl;
+          AppStorage.clear();
+          window.location.hash = RouteDefinitions.toSignIn();
           return;
         } else {
           // eslint-disable-next-line no-console
