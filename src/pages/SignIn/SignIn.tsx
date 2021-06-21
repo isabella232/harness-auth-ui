@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -39,6 +39,7 @@ const SignIn: React.FC = () => {
   const captchaRef = useRef<ReCAPTCHA>(null);
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
+  const history = useHistory();
 
   useEffect(() => {
     const errorCode = urlParams.get("errorCode");
@@ -62,7 +63,7 @@ const SignIn: React.FC = () => {
       const response = await login({
         authorization: createAuthToken(formData.email, formData.password)
       });
-      handleLoginSuccess(response?.resource);
+      handleLoginSuccess({ resource: response?.resource, history });
     } catch (error) {
       captchaRef.current?.reset();
       setCaptchaResponse(undefined);
