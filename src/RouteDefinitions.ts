@@ -6,5 +6,6 @@ export default {
   toResetPassword: () => `/reset-password/:token`,
   toTwoFactorAuth: () => `/two-factor-auth`,
   toSignUp: () => `/signup`,
-  toAcceptInvite: () => `/accept-invite`
+  toAcceptInvite: () => `/accept-invite`,
+  toVerifyEmail: () => `/register/verify/:token`
 };
