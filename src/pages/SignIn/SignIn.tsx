@@ -25,6 +25,7 @@ interface LoginFormData {
 }
 
 const SignIn: React.FC = () => {
+  throw new Error("testing");
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
   const { mutate: login, loading } = useLogin({
