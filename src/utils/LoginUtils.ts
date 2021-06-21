@@ -1,9 +1,15 @@
 import type { User } from "services/portal";
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
+import { History } from "history";
 
 interface AuthHeader {
   authorization: string;
+}
+
+interface HandleLoginSuccess {
+  resource?: User;
+  history: History;
 }
 
 export function formatJWTHeader(authCode: string): AuthHeader {
@@ -16,7 +22,10 @@ export function formatJWTHeader(authCode: string): AuthHeader {
   return header;
 }
 
-export function handleLoginSuccess(resource?: User): void {
+export function handleLoginSuccess({
+  resource,
+  history
+}: HandleLoginSuccess): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
   const returnUrl = urlParams?.get("returnUrl");
@@ -45,6 +54,8 @@ export function handleLoginSuccess(resource?: User): void {
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
+          // Checking the authorized accounts id in the returnUrl. If any account id exist, then redirecting to returnURL, else clearing the AppStorage and redirecting to signin without returnURL.
+          // TODO: If accountId is not valid, then need to redirect with default account to dashboard and show a proper message.
           const splitReturnUrl = returnUrl.split("/");
           if (
             resource.accounts?.find((account) =>
@@ -55,7 +66,7 @@ export function handleLoginSuccess(resource?: User): void {
             return;
           }
           AppStorage.clear();
-          window.location.hash = RouteDefinitions.toSignIn();
+          history.push(RouteDefinitions.toSignIn());
           return;
         } else {
           // eslint-disable-next-line no-console
