@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
@@ -23,6 +23,7 @@ interface TwoFactorAuthFormData {
 
 const TwoFactorAuth: React.FC = () => {
   const accountId = AppStorage.get("acctId");
+  const history = useHistory();
   const { mutate: login, loading } = useTwoFactorLogin({
     queryParams: {
       routingId: accountId // FIXME: swagger doesn't have this query param yet
@@ -32,7 +33,7 @@ const TwoFactorAuth: React.FC = () => {
   const handleLogin = async (formData: TwoFactorAuthFormData) => {
     try {
       const response = await login(formatJWTHeader(formData.authCode));
-      handleLoginSuccess(response?.resource);
+      handleLoginSuccess({ resource: response?.resource, history });
     } catch (err) {
       if (err.status === 401) {
         toast("Invalid Authentication Code");

@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
 
 import RouteDefinitions from "RouteDefinitions";
@@ -29,6 +29,7 @@ interface LoginFormData {
 }
 
 const LocalLogin: React.FC = () => {
+  const history = useHistory();
   const { mutate: login, loading } = useForceLoginUsingHarnessPassword({});
 
   const handleLogin = async (formData: LoginFormData) => {
@@ -36,7 +37,7 @@ const LocalLogin: React.FC = () => {
       const response = await login({
         authorization: createAuthToken(formData.email, formData.password)
       });
-      handleLoginSuccess(response?.resource);
+      handleLoginSuccess({ resource: response?.resource, history });
     } catch (error) {
       handleError(error);
     }
