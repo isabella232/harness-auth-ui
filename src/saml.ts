@@ -44,7 +44,7 @@ function saml(): void {
         const defaultExperience = queryParams.get("defaultExperience");
         switch (defaultExperience) {
           case "NG":
-            window.location.href = `${baseUrl}ng/#/account/${accountId}/projects`;
+            window.location.href = `${baseUrl}ng/#/account/${accountId}`;
             return;
           case "CG":
           default:

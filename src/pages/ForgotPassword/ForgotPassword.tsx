@@ -1,16 +1,19 @@
 import React from "react";
 import cx from "classnames";
 import { Link } from "react-router-dom";
+import { Form } from "react-final-form";
 import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useResetPassword } from "services/portal";
-import { regexEmail } from "utils/StringUtils";
+import Field from "components/Field/Field";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import Text from "components/Text/Text";
+import { validateEmail } from "utils/FormValidationUtils";
+import { handleError } from "utils/ErrorUtils";
 
 interface ForgotPasswordFormData {
   email: string;
@@ -30,10 +33,10 @@ export default function ForgotPassword() {
           "An email has been sent to you with a link to reset your password"
         );
       } else {
-        // TODO: handle failure
+        handleError(response);
       }
     } catch (err) {
-      // TODO: handle error
+      handleError(err);
     }
   };
 
@@ -41,49 +44,40 @@ export default function ForgotPassword() {
     <BasicLayout>
       <div className={cx(css.signin)}>
         <div className={css.header}>
-          <img src={logo} width={120} className={css.logo} />
-          <div style={{ flex: 1 }}></div>
+          <img src={logo} width={120} className={css.logo} alt={"Harness"} />
+          <div style={{ flex: 1 }} />
           <Link to={RouteDefinitions.toSignIn()}>
             <Text icon="leftArrow">Sign In</Text>
           </Link>
         </div>
         <div className={css.title}>Forgot Password</div>
-        <div className={css.subtitle}></div>
-        <form
-          className="layout-vertical spacing-medium"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.target as HTMLFormElement);
-            const loginFormData = (Object.fromEntries(
-              data.entries()
-            ) as unknown) as ForgotPasswordFormData;
-            if (
-              loginFormData.email.length > 0 &&
-              regexEmail.test(loginFormData.email)
-            ) {
-              handleReset(loginFormData);
-            } else {
-              toast("Please enter a valid email ID");
-            }
+        <div className={css.subtitle} />
+        <Form
+          onSubmit={handleReset}
+          render={({ handleSubmit }) => {
+            return (
+              <form
+                className="layout-vertical spacing-medium"
+                onSubmit={handleSubmit}
+              >
+                <Field
+                  name="email"
+                  type="email"
+                  label="Email"
+                  placeholder="email@work.com"
+                  disabled={loading}
+                  validate={validateEmail}
+                />
+                <input
+                  type="submit"
+                  value="Reset Password"
+                  className="button primary"
+                  disabled={loading}
+                />
+              </form>
+            );
           }}
-        >
-          <div className="layout-vertical spacing-small">
-            <label htmlFor="email">Email</label>
-            <input
-              name="email"
-              type="email"
-              id="email"
-              placeholder="email@work.com"
-              disabled={loading}
-            />
-          </div>
-          <input
-            type="submit"
-            value="Reset Password"
-            className="button primary"
-            disabled={loading}
-          />
-        </form>
+        />
       </div>
     </BasicLayout>
   );

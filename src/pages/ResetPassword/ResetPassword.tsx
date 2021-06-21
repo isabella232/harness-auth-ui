@@ -1,16 +1,19 @@
 import React from "react";
 import cx from "classnames";
+import { Form } from "react-final-form";
 import { Link, useHistory, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useUpdatePassword } from "services/portal";
+import Field from "components/Field/Field";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import Text from "components/Text/Text";
 import { handleError } from "utils/ErrorUtils";
+import { validatePassword } from "utils/FormValidationUtils";
 
 interface UpdatePasswordFormData {
   password: string;
@@ -27,6 +30,11 @@ export default function ResetPassword() {
   const { mutate: updatePassword, loading } = useUpdatePassword({ token });
 
   const handleReset = async (data: UpdatePasswordFormData) => {
+    if (data.password != data.confirmPassword) {
+      toast("Passwords do not match");
+      return;
+    }
+
     try {
       const response = await updatePassword({ password: data.password });
       if (response.resource) {
@@ -44,59 +52,46 @@ export default function ResetPassword() {
     <BasicLayout>
       <div className={cx(css.signin)}>
         <div className={css.header}>
-          <img src={logo} width={120} className={css.logo} />
-          <div style={{ flex: 1 }}></div>
+          <img src={logo} width={120} className={css.logo} alt={"Harness"} />
+          <div style={{ flex: 1 }} />
           <Link to={RouteDefinitions.toSignIn()}>
             <Text icon="leftArrow">Sign In</Text>
           </Link>
         </div>
         <div className={css.title}>Reset Password</div>
-        <div className={css.subtitle}></div>
-        <form
-          className="layout-vertical spacing-medium"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.target as HTMLFormElement);
-            const loginFormData = (Object.fromEntries(
-              data.entries()
-            ) as unknown) as UpdatePasswordFormData;
-            if (
-              loginFormData.password.length > 0 &&
-              loginFormData.confirmPassword.length > 0
-            ) {
-              if (loginFormData.password === loginFormData.confirmPassword) {
-                handleReset(loginFormData);
-              } else {
-                toast("Passwords do not match");
-              }
-            }
+        <div className={css.subtitle} />
+        <Form
+          onSubmit={handleReset}
+          render={({ handleSubmit }) => {
+            return (
+              <form
+                className="layout-vertical spacing-medium"
+                onSubmit={handleSubmit}
+              >
+                <Field
+                  name="password"
+                  type="password"
+                  label="Password"
+                  disabled={loading}
+                  validate={validatePassword}
+                />
+                <Field
+                  name="confirmPassword"
+                  type="password"
+                  label="Confirm Password"
+                  disabled={loading}
+                  validate={validatePassword}
+                />
+                <input
+                  type="submit"
+                  value="Reset Password"
+                  className="button primary"
+                  disabled={loading}
+                />
+              </form>
+            );
           }}
-        >
-          <div className="layout-vertical spacing-small">
-            <label htmlFor="password">Password</label>
-            <input
-              name="password"
-              type="password"
-              id="password"
-              disabled={loading}
-            />
-          </div>
-          <div className="layout-vertical spacing-small">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              id="confirmPassword"
-              disabled={loading}
-            />
-          </div>
-          <input
-            type="submit"
-            value="Reset Password"
-            className="button primary"
-            disabled={loading}
-          />
-        </form>
+        />
       </div>
     </BasicLayout>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import cx from "classnames";
 import { Form } from "react-final-form";
 import { useQueryParams } from "hooks/useQueryParams";
-
+import { useHistory } from "react-router-dom";
 import { useCompleteInviteAndSignIn1 } from "services/portal";
 import { handleError } from "utils/ErrorUtils";
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -36,6 +36,7 @@ const SignUp: React.FC = () => {
     accountIdentifier,
     email
   } = useQueryParams<AcceptInviteQueryParams>();
+  const history = useHistory();
 
   const {
     mutate: completeInviteAndSignIn,
@@ -54,7 +55,7 @@ const SignUp: React.FC = () => {
         name: data.name
       });
 
-      handleLoginSuccess(response.resource);
+      handleLoginSuccess({ resource: response.resource, history });
     } catch (error) {
       handleError(error);
     }
