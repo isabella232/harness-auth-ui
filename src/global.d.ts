@@ -6,7 +6,6 @@ declare interface Window {
   invisibleCaptchaToken: string;
   segmentToken: string;
   bugSnagReleaseVersion: string;
-  __DEV__: boolean;
 }
 
 declare const Bugsnag: any;

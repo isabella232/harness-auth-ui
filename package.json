@@ -9,6 +9,7 @@
     "dev": " NODE_ENV=development  vite",
     "pretty": "prettier --write src",
     "build-main": "vite build",
+    "build-onprem": " ON_PREM=true yarn build",
     "build-saml": "vite build -c saml.config.ts",
     "build": "yarn build-main && yarn build-saml",
     "serve": "vite preview",

@@ -37,7 +37,7 @@ class AppErrorBoundary extends React.Component<unknown, AppErrorBoundaryState> {
             </a>
             {i18n.continue}
           </div>
-          {window.__DEV__ && (
+          {import.meta.env.DEV && (
             <React.Fragment>
               <div>{error.message}</div>
               <div>

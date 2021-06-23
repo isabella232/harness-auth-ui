@@ -15,7 +15,7 @@ import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
 
 export function App() {
-  if (window.bugsnagToken && typeof Bugsnag !== undefined && Bugsnag.start) {
+  if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
     window.bugsnagClient = Bugsnag.start({
       apiKey: window.bugsnagToken,
       appVersion: window.bugSnagReleaseVersion,

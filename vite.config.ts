@@ -8,9 +8,7 @@ const buildVersion = JSON.stringify(require("./package.json").version);
 const DEV = process.env.NODE_ENV === "development";
 const ON_PREM = `${process.env.ON_PREM}` === "true";
 const headScripts = [];
-const scripts = [
-  `window.bugSnagReleaseVersion=${buildVersion};window.__DEV__=${DEV}`
-] as any;
+const scripts = [`window.bugSnagReleaseVersion=${buildVersion};`] as any;
 if (!DEV && !ON_PREM)
   headScripts.push({
     src: "//d2wy8f7a9ursnm.cloudfront.net/v7/bugsnag.min.js"
