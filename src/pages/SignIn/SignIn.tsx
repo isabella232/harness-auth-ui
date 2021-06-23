@@ -55,6 +55,11 @@ const SignIn: React.FC = () => {
       case "invalidsso":
         toast.error("Invalid SSO Login.");
         return;
+      case "email_verify_fail":
+        toast.error(
+          "Email verification failed. Please sign in to resend the email."
+        );
+        return;
     }
   }, []);
 
