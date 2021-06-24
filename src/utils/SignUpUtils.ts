@@ -14,7 +14,17 @@ export function handleSignUpSuccess(resource?: UserInfo): void {
     AppStorage.set("lastTokenSetTime", +new Date());
 
     if (module) {
-      window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/${module}/home?source=signup`;
+      switch (module.toUpperCase()) {
+        case "CE":
+          window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/continuous-efficiency/settings?source=signup`;
+          break;
+        case "CD":
+          window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/onboarding`;
+          break;
+        default:
+          window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/${module}/home?source=signup`;
+          break;
+      }
     } else {
       window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/purpose?source=signup`;
     }
