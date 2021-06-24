@@ -1,3 +1,4 @@
 allowpaths:
   - "/signup"
   - "/signup/verify/{token}"
+  - "/accounts/{accountIdentifier}/default-experience"

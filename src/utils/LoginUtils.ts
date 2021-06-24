@@ -2,6 +2,7 @@ import type { User } from "services/portal";
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
+import { DefaultExperience } from "utils/DefaultExperienceTypes";
 
 interface AuthHeader {
   authorization: string;
@@ -86,10 +87,10 @@ export function handleLoginSuccess({
     )?.defaultExperience;
 
     switch (experience) {
-      case "NG":
+      case DefaultExperience.NG:
         window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}`;
         return;
-      case "CG":
+      case DefaultExperience.CG:
       default:
         window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/dashboard`;
         return;
