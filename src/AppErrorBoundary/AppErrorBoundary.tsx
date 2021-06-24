@@ -15,7 +15,6 @@ class AppErrorBoundary extends React.Component<unknown, AppErrorBoundaryState> {
     }
     return false;
   }
-
   render(): React.ReactNode {
     const { error } = this.state;
 
@@ -37,7 +36,7 @@ class AppErrorBoundary extends React.Component<unknown, AppErrorBoundaryState> {
             </a>
             {i18n.continue}
           </div>
-          {import.meta.env.DEV && (
+          {__DEV__ && (
             <React.Fragment>
               <div>{error.message}</div>
               <div>

@@ -19,7 +19,7 @@ export function App() {
   if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
     window.bugsnagClient = Bugsnag.start({
       apiKey: window.bugsnagToken,
-      appVersion: window.bugSnagReleaseVersion,
+      appVersion: __BUGSNAG_RELEASE_VERSION__,
       releaseStage: `ng-auth-ui-${window.location.hostname.split(".")[0]}`
     });
   }
