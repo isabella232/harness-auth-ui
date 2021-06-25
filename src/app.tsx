@@ -12,28 +12,41 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
+import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
 import { VerifyEmail } from "./pages/VerifyEmail/VerifyEmail";
 
 export function App() {
+  if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
+    window.bugsnagClient = Bugsnag.start({
+      apiKey: window.bugsnagToken,
+      appVersion: __BUGSNAG_RELEASE_VERSION__,
+      releaseStage: `ng-auth-ui-${window.location.hostname.split(".")[0]}`
+    });
+  }
   return (
     <RestfulProvider base="/">
-      <Toaster />
-      <HashRouter>
-        <Switch>
-          <Route path={routes.toSignIn()} component={SignIn} />
-          <Route path={routes.toLocalLogin()} component={LocalLogin} />
-          <Route path={routes.toSignUp()} component={SignUp} />
-          <Route path={routes.toForgotPassword()} component={ForgotPassword} />
-          <Route path={routes.toResetPassword()} component={ResetPassword} />
-          <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
-          <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
-          <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
-          <Route path="/" exact>
-            <Redirect to={routes.toSignIn()} />
-          </Route>
-          <Route path={routes.toVerifyEmail()} component={VerifyEmail} />
-        </Switch>
-      </HashRouter>
+      <AppErrorBoundary>
+        <Toaster />
+        <HashRouter>
+          <Switch>
+            <Route path={routes.toSignIn()} component={SignIn} />
+            <Route path={routes.toLocalLogin()} component={LocalLogin} />
+            <Route path={routes.toSignUp()} component={SignUp} />
+            <Route
+              path={routes.toForgotPassword()}
+              component={ForgotPassword}
+            />
+            <Route path={routes.toResetPassword()} component={ResetPassword} />
+            <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
+            <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
+            <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
+            <Route path="/" exact>
+              <Redirect to={routes.toSignIn()} />
+            </Route>
+            <Route path={routes.toVerifyEmail()} component={VerifyEmail} />
+          </Switch>
+        </HashRouter>
+      </AppErrorBoundary>
     </RestfulProvider>
   );
 }

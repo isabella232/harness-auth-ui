@@ -2,6 +2,17 @@
 
 import { defineConfig } from "vite";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import htmlPlugin from "vite-plugin-html-config";
+import { version } from "./package.json";
+import replace from "@rollup/plugin-replace";
+
+const DEV = process.env.NODE_ENV === "development";
+const ON_PREM = `${process.env.ON_PREM}` === "true";
+const headScripts = [];
+if (!DEV && !ON_PREM)
+  headScripts.push({
+    src: "//d2wy8f7a9ursnm.cloudfront.net/v7/bugsnag.min.js"
+  });
 
 export default defineConfig({
   server: {
@@ -31,6 +42,13 @@ export default defineConfig({
     nodeResolve({
       moduleDirectories: ["node_modules", "src"],
       extensions: [".js", ".ts", ".tsx"]
+    }),
+    htmlPlugin({
+      headScripts
+    }),
+    replace({
+      __DEV__: DEV,
+      __BUGSNAG_RELEASE_VERSION__: JSON.stringify(version)
     })
   ],
   base: ""
