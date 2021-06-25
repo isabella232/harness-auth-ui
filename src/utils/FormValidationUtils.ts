@@ -16,20 +16,13 @@ export function validateEmail(email: string): string | undefined {
   }
 }
 
-export function validatePassword(
-  password: string,
-  confirmPassword?: string
-): string | undefined {
+export function validatePassword(password: string): string | undefined {
   if (!password) {
     return "A password is required";
   }
 
   if (password.length < 8 || password.length > 64) {
     return "The password must be between 8 and 64 characters long";
-  }
-
-  if (confirmPassword && password !== confirmPassword) {
-    return "Your password and confirmation password do not match";
   }
 }
 

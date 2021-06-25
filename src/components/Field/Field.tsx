@@ -2,7 +2,6 @@ import React, { FocusEvent } from "react";
 import cx from "classnames";
 
 import { Field as FinalField } from "react-final-form";
-import { FieldValidator } from "final-form";
 
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 
@@ -34,11 +33,7 @@ const Field: React.FC<FieldProps> = (props) => {
   } = props;
 
   return (
-    <FinalField
-      name={name}
-      validate={validate as FieldValidator<string>}
-      initialValue={initialValue}
-    >
+    <FinalField name={name} validate={validate} initialValue={initialValue}>
       {({ input, meta }) => {
         const showError = meta.error && meta.touched;
 

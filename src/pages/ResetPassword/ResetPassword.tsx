@@ -43,6 +43,20 @@ export default function ResetPassword() {
     }
   };
 
+  const validateConfirmPassword = (
+    confirmPassword: string,
+    password: string
+  ) => {
+    const returnMessage = validatePassword(confirmPassword);
+    if (returnMessage) {
+      return returnMessage;
+    }
+
+    if (password !== confirmPassword) {
+      return "Your password and confirmation password do not match";
+    }
+  };
+
   return (
     <BasicLayout>
       <div className={cx(css.signin)}>
@@ -68,7 +82,7 @@ export default function ResetPassword() {
                   type="password"
                   label="Password"
                   disabled={loading}
-                  validate={(password: string) => validatePassword(password)}
+                  validate={validatePassword}
                 />
                 <Field
                   name="confirmPassword"
@@ -76,7 +90,7 @@ export default function ResetPassword() {
                   label="Confirm Password"
                   disabled={loading}
                   validate={(confirmPassword: string) =>
-                    validatePassword(confirmPassword, values.password)
+                    validateConfirmPassword(confirmPassword, values.password)
                   }
                 />
                 <input
