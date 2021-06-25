@@ -31,6 +31,19 @@ function saml(): void {
       if (isNG) {
         const module = queryParams.get("module");
 
+        if (module) {
+          switch (module.toUpperCase()) {
+            case "CE":
+              window.location.href = `${baseUrl}#/account/${accountId}/continuous-efficiency/settings?source=signup`;
+              break;
+            case "CD":
+              window.location.href = `${baseUrl}#/account/${accountId}/onboarding`;
+              break;
+            default:
+              break;
+          }
+        }
+
         const base = `${baseUrl}ng/#/account/${accountId}`;
 
         const completeLink = module

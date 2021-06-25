@@ -5,7 +5,11 @@ import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useSignup } from "services/ng";
+import {
+  UserInfo,
+  useSignup,
+  useUpdateAccountDefaultExperienceNG
+} from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -13,10 +17,15 @@ import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
-import { handleSignUpSuccess } from "utils/SignUpUtils";
+import {
+  handleSignUpSuccess,
+  getSignupHeaders,
+  getSignupUrlParams
+} from "utils/SignUpUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
+import { DefaultExperience } from "utils/DefaultExperienceTypes";
 
 interface SignUpFormData {
   email: string;
@@ -26,11 +35,34 @@ interface SignUpFormData {
 const SignUp: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [signupData, setSignupData] = useState({ email: "", password: "" });
+  const [completedSignupData, setCompletedSignupData] = useState<UserInfo>();
   const { mutate: signup, loading } = useSignup({});
+  const {
+    mutate: updateDefaultExperience
+  } = useUpdateAccountDefaultExperienceNG({
+    accountIdentifier: completedSignupData?.defaultAccountId || "",
+    requestOptions: { headers: getSignupHeaders() }
+  });
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
 
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
+
+  async function handleSignupComplete() {
+    const { module } = getSignupUrlParams();
+
+    if (module?.toUpperCase() === "CE" || module?.toUpperCase() === "CD") {
+      await updateDefaultExperience({
+        defaultExperience: DefaultExperience.CG
+      });
+    }
+
+    handleSignUpSuccess(completedSignupData);
+  }
+
+  useEffect(() => {
+    handleSignupComplete();
+  }, [completedSignupData]);
 
   useEffect(() => {
     const { email, password } = signupData;
@@ -49,7 +81,7 @@ const SignUp: React.FC = () => {
       const userInfo = await signup(data, {
         queryParams: { captchaToken: captchaToken }
       });
-      handleSignUpSuccess(userInfo.resource);
+      setCompletedSignupData(userInfo.resource);
     } catch (error) {
       captchaRef.current?.reset();
 
