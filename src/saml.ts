@@ -35,10 +35,10 @@ function saml(): void {
           switch (module.toUpperCase()) {
             case "CE":
               window.location.href = `${baseUrl}#/account/${accountId}/continuous-efficiency/settings?source=signup`;
-              break;
+              return;
             case "CD":
               window.location.href = `${baseUrl}#/account/${accountId}/onboarding`;
-              break;
+              return;
             default:
               break;
           }
