@@ -30,11 +30,6 @@ export default function ResetPassword() {
   const { mutate: updatePassword, loading } = useUpdatePassword({ token });
 
   const handleReset = async (data: UpdatePasswordFormData) => {
-    if (data.password != data.confirmPassword) {
-      toast("Passwords do not match");
-      return;
-    }
-
     try {
       const response = await updatePassword({ password: data.password });
       if (response.resource) {
@@ -45,6 +40,20 @@ export default function ResetPassword() {
       }
     } catch (err) {
       handleError(err);
+    }
+  };
+
+  const validateConfirmPassword = (
+    confirmPassword: string,
+    password: string
+  ) => {
+    const returnMessage = validatePassword(confirmPassword);
+    if (returnMessage) {
+      return returnMessage;
+    }
+
+    if (password !== confirmPassword) {
+      return "Your password and confirmation password do not match";
     }
   };
 
@@ -62,7 +71,7 @@ export default function ResetPassword() {
         <div className={css.subtitle} />
         <Form
           onSubmit={handleReset}
-          render={({ handleSubmit }) => {
+          render={({ handleSubmit, values }) => {
             return (
               <form
                 className="layout-vertical spacing-medium"
@@ -80,7 +89,9 @@ export default function ResetPassword() {
                   type="password"
                   label="Confirm Password"
                   disabled={loading}
-                  validate={validatePassword}
+                  validate={(confirmPassword: string) =>
+                    validateConfirmPassword(confirmPassword, values.password)
+                  }
                 />
                 <input
                   type="submit"
