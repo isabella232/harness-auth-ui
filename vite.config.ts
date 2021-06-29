@@ -2,6 +2,7 @@
 
 import { defineConfig } from "vite";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import emitEJS from "rollup-plugin-emit-ejs";
 import htmlPlugin from "vite-plugin-html-config";
 import { version } from "./package.json";
 import replace from "@rollup/plugin-replace";
@@ -49,6 +50,14 @@ export default defineConfig({
     replace({
       __DEV__: DEV,
       __BUGSNAG_RELEASE_VERSION__: JSON.stringify(version)
+    }),
+    emitEJS({
+      src: ".",
+      data: {
+        version,
+        gitCommit: process.env.GIT_COMMIT,
+        gitBranch: process.env.GIT_BRANCH
+      }
     })
   ],
   base: ""
