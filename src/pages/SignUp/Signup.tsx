@@ -41,7 +41,13 @@ const SignUp: React.FC = () => {
     mutate: updateDefaultExperience
   } = useUpdateAccountDefaultExperienceNG({
     accountIdentifier: completedSignupData?.defaultAccountId || "",
-    requestOptions: { headers: getSignupHeaders() }
+    requestOptions: { headers: getSignupHeaders() },
+    queryParams: {
+      routingId: completedSignupData?.defaultAccountId || ""
+
+      // use 'any' here because routingId is not part of the swagger file generated in NG
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
   });
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
@@ -52,16 +58,23 @@ const SignUp: React.FC = () => {
     const { module } = getSignupUrlParams();
 
     if (module?.toUpperCase() === "CE" || module?.toUpperCase() === "CD") {
-      await updateDefaultExperience({
-        defaultExperience: DefaultExperience.CG
-      });
+      try {
+        await updateDefaultExperience({
+          defaultExperience: DefaultExperience.CG
+        });
+      } catch (error) {
+        setCompletedSignupData(undefined);
+        handleError(error);
+      }
     }
 
     handleSignUpSuccess(completedSignupData);
   }
 
   useEffect(() => {
-    handleSignupComplete();
+    if (completedSignupData) {
+      handleSignupComplete();
+    }
   }, [completedSignupData]);
 
   useEffect(() => {
