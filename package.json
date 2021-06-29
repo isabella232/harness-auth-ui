@@ -82,6 +82,7 @@
     "path-to-regexp": "^6.2.0",
     "postcss-nesting": "^7.0.1",
     "prettier": "^2.2.1",
+    "rollup-plugin-emit-ejs": "^3.1.0",
     "rollup-plugin-visualizer": "^4.2.2",
     "ts-jest": "^26.5.5",
     "typescript": "^4.2.3",
