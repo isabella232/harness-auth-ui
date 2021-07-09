@@ -15,7 +15,8 @@ export enum VERIFY_EMAIL_STATUS {
   IN_PROGRESS = "IN_PROGRESS",
   EMAIL_SENT = "EMAIL_SENT",
   SIGNED_UP = "SIGNED_UP",
-  VERIFY_FAILED = "VERIFY_FAILED"
+  VERIFY_FAILED = "VERIFY_FAILED",
+  VERIFY_SUCCESS = "VERIFY_SUCCESS"
 }
 
 const harnessLogo = (
@@ -41,6 +42,15 @@ const VerifyInProgress = (): React.ReactElement => {
       {harnessLogo}
       <Spinner className={cx(css.spinner, css.marginBottomLarge)} />
       <Text className={css.title}>{EMAIL_VERIFY_STATUS.IN_PROGRESS}</Text>
+    </div>
+  );
+};
+
+const VerifySuccess = (): React.ReactElement => {
+  return (
+    <div>
+      {harnessLogo}
+      <Text className={css.title}>{EMAIL_VERIFY_STATUS.SUCCESS}</Text>
     </div>
   );
 };
@@ -130,6 +140,8 @@ const VerifyEmailStatus = ({
       return <EmailSignedUp email={email} />;
     case VERIFY_EMAIL_STATUS.VERIFY_FAILED:
       return <VerifyFailed />;
+    case VERIFY_EMAIL_STATUS.VERIFY_SUCCESS:
+      return <VerifySuccess />;
   }
 };
 
