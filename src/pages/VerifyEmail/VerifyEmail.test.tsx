@@ -3,15 +3,15 @@ import { render, waitFor, act } from "@testing-library/react";
 
 import { TestWrapper } from "utils/TestUtils";
 import { EMAIL_VERIFY_STATUS } from "utils/StringUtils";
-import { useVerifyToken } from "services/ng";
+import { useCompleteSignupInvite } from "services/ng";
 import { VerifyEmail } from "./VerifyEmail";
 
 jest.mock("services/ng");
-const useVerifyTokenMock = useVerifyToken as jest.MockedFunction<any>;
+const useCompleteSignupInviteMock = useCompleteSignupInvite as jest.MockedFunction<any>;
 
 describe("Verify Email", () => {
   test("should display success msg if verify success", async () => {
-    useVerifyTokenMock.mockImplementation(() => {
+    useCompleteSignupInviteMock.mockImplementation(() => {
       return {
         loading: false,
         mutate: jest.fn().mockImplementation(() => {
@@ -35,7 +35,7 @@ describe("Verify Email", () => {
   });
 
   test("should display in progress msg while verify in progress", async () => {
-    useVerifyTokenMock.mockImplementation(() => {
+    useCompleteSignupInviteMock.mockImplementation(() => {
       return {
         loading: true,
         mutate: jest.fn()
@@ -53,7 +53,7 @@ describe("Verify Email", () => {
   });
 
   test("should display failure msg while verify fails", async () => {
-    useVerifyTokenMock.mockImplementation(() => {
+    useCompleteSignupInviteMock.mockImplementation(() => {
       return {
         loading: false,
         mutate: jest.fn().mockRejectedValue(() => {
