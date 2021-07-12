@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, FocusEvent } from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useCreateSignupInvite } from "services/ng";
+import { useSignup } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -16,6 +16,7 @@ import { handleError } from "utils/ErrorUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
+import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
 
 interface SignUpFormData {
   email: string;
@@ -24,8 +25,9 @@ interface SignUpFormData {
 
 const SignUp: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const history = useHistory();
   const [signupData, setSignupData] = useState({ email: "", password: "" });
-  const { mutate: signup, loading } = useCreateSignupInvite({});
+  const { mutate: signup, loading } = useSignup({});
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
 
@@ -54,7 +56,10 @@ const SignUp: React.FC = () => {
         }
       );
 
-      // TODO: reroute to UI screens when complete
+      history.push({
+        pathname: RouteDefinitions.toEmailVerification(),
+        search: `?status=${VERIFY_EMAIL_STATUS.EMAIL_SENT}&email=${data.email}`
+      });
     } catch (error) {
       captchaRef.current?.reset();
 
@@ -62,10 +67,13 @@ const SignUp: React.FC = () => {
         error?.data?.responseMessages?.length &&
         error?.data?.responseMessages[0]?.code === "USER_ALREADY_REGISTERED"
       ) {
-        // TODO: route the user to the "already signed up" page
+        history.push({
+          pathname: RouteDefinitions.toEmailVerification(),
+          search: `?status=${VERIFY_EMAIL_STATUS.SIGNED_UP}&email=${data.email}`
+        });
+      } else {
+        handleError(error);
       }
-
-      handleError(error);
     }
   };
 
