@@ -26,8 +26,29 @@ function saml(): void {
       secureStorage.setItem("acctId", accountId);
       secureStorage.setItem("lastTokenSetTime", +new Date());
 
-      const isNG = queryParams.get("isNG");
+      // user might be coming from oauth redirect
+      const returnUrl = sessionStorage.getItem("returnUrl");
+      if (returnUrl) {
+        sessionStorage.removeItem("returnUrl");
+        try {
+          const returnUrlObject = new URL(returnUrl);
+          // only redirect to same hostname
+          if (returnUrlObject.hostname === window.location.hostname) {
+            // only redirect if returnUrl is a deep link
+            const matches = returnUrl.match(/\/account\/(.+?)\//);
+            const accountId =
+              matches && matches.length > 1 ? matches[1] : undefined;
+            if (accountId) {
+              window.location.href = returnUrl;
+              return;
+            }
+          }
+        } catch (_err) {
+          // ignore returnUrl if it's not a valid URL
+        }
+      }
 
+      const isNG = queryParams.get("isNG");
       if (isNG) {
         const module = queryParams.get("module");
 
@@ -46,11 +67,9 @@ function saml(): void {
 
         const base = `${baseUrl}ng/#/account/${accountId}`;
 
-        const completeLink = module
+        window.location.href = module
           ? `${base}/${module}/home?source=signup`
           : `${base}/purpose?source=signup`;
-
-        window.location.href = completeLink;
 
         return;
       } else {
