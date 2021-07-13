@@ -14,6 +14,12 @@ export function validateEmail(email: string): string | undefined {
   if (!regexEmail.test(email)) {
     return "This email is not valid";
   }
+
+  const [username, domain] = email.split("@");
+
+  if (username.length > 64 || domain.length > 255) {
+    return "This email is not valid";
+  }
 }
 
 export function validatePassword(password: string): string | undefined {
