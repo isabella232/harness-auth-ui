@@ -38,15 +38,15 @@ const SignIn: React.FC = () => {
   });
   const captchaRef = useRef<ReCAPTCHA>(null);
   const queryString = window.location.hash?.split("?")?.[1];
-  const queryPrams = new URLSearchParams(queryString);
+  const queryParams = new URLSearchParams(queryString);
   const history = useHistory();
 
   useEffect(() => {
     // save returnUrl for SAML flow
-    const returnUrl = queryPrams.get("returnUrl");
+    const returnUrl = queryParams.get("returnUrl");
     returnUrl && sessionStorage.setItem("returnUrl", returnUrl);
 
-    const errorCode = queryPrams.get("errorCode");
+    const errorCode = queryParams.get("errorCode");
     switch (errorCode) {
       case "GATEWAY_SSO_REDIRECT_ERROR":
         toast.error(
