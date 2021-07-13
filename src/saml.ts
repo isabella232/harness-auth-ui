@@ -30,17 +30,21 @@ function saml(): void {
       const returnUrl = sessionStorage.getItem("returnUrl");
       if (returnUrl) {
         sessionStorage.removeItem("returnUrl");
-        const returnUrlObject = new URL(returnUrl);
-        // only redirect to same hostname
-        if (returnUrlObject.hostname === window.location.hostname) {
-          // only redirect if returnUrl is a deep link
-          const matches = returnUrl.match(/\/account\/(.+?)\//);
-          const accountId =
-            matches && matches.length > 1 ? matches[1] : undefined;
-          if (accountId) {
-            window.location.href = returnUrl;
-            return;
+        try {
+          const returnUrlObject = new URL(returnUrl);
+          // only redirect to same hostname
+          if (returnUrlObject.hostname === window.location.hostname) {
+            // only redirect if returnUrl is a deep link
+            const matches = returnUrl.match(/\/account\/(.+?)\//);
+            const accountId =
+              matches && matches.length > 1 ? matches[1] : undefined;
+            if (accountId) {
+              window.location.href = returnUrl;
+              return;
+            }
           }
+        } catch (_err) {
+          // ignore returnUrl if it's not a valid URL
         }
       }
 
