@@ -12,8 +12,9 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorAuth from "./pages/TwoFactorAuth/TwoFactorAuth";
 import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
+import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
+import CompleteInvitePage from "./pages/CompleteInvite/CompleteInvitePage";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
-import { VerifyEmail } from "./pages/VerifyEmail/VerifyEmail";
 
 export function App() {
   if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
@@ -43,7 +44,14 @@ export function App() {
             <Route path="/" exact>
               <Redirect to={routes.toSignIn()} />
             </Route>
-            <Route path={routes.toVerifyEmail()} component={VerifyEmail} />
+            <Route
+              path={routes.toEmailVerification()}
+              component={VerifyEmailPage}
+            />
+            <Route
+              path={routes.toCompleteInvite()}
+              component={CompleteInvitePage}
+            />
           </Switch>
         </HashRouter>
       </AppErrorBoundary>

@@ -1,0 +1,27 @@
+.marginBottomHuge {
+  margin-bottom: var(--spacing-huge);
+}
+
+.marginBottomLarge {
+  margin-bottom: var(--spacing-large);
+}
+
+.lineHeight1dot5 {
+  line-height: 1.5;
+}
+
+.title {
+  font-weight: bold;
+  font-size: xx-large;
+}
+
+.spinner {
+  margin-left: var(--spacing-xsmall);
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
+.resendButton {
+  margin-top: 10px;
+}

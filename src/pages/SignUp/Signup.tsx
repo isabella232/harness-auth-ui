@@ -1,15 +1,11 @@
 import React, { useEffect, useRef, useState, FocusEvent } from "react";
 import cx from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import {
-  UserInfo,
-  useSignup,
-  useUpdateAccountDefaultExperienceNG
-} from "services/ng";
+import { useSignup } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -17,15 +13,10 @@ import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
-import {
-  handleSignUpSuccess,
-  getSignupHeaders,
-  getSignupUrlParams
-} from "utils/SignUpUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
-import { DefaultExperience } from "utils/DefaultExperienceTypes";
+import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
 
 interface SignUpFormData {
   email: string;
@@ -34,49 +25,13 @@ interface SignUpFormData {
 
 const SignUp: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const history = useHistory();
   const [signupData, setSignupData] = useState({ email: "", password: "" });
-  const [completedSignupData, setCompletedSignupData] = useState<UserInfo>();
   const { mutate: signup, loading } = useSignup({});
-  const {
-    mutate: updateDefaultExperience
-  } = useUpdateAccountDefaultExperienceNG({
-    accountIdentifier: completedSignupData?.defaultAccountId || "",
-    requestOptions: { headers: getSignupHeaders() },
-    queryParams: {
-      routingId: completedSignupData?.defaultAccountId || ""
-
-      // use 'any' here because routingId is not part of the swagger file generated in NG
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
-  });
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { module } = useQueryParams<{ module?: string }>();
 
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
-
-  async function handleSignupComplete() {
-    const { module } = getSignupUrlParams();
-
-    if (module?.toUpperCase() === "CE" || module?.toUpperCase() === "CD") {
-      try {
-        await updateDefaultExperience({
-          defaultExperience: DefaultExperience.CG
-        });
-      } catch (error) {
-        setCompletedSignupData(undefined);
-        handleError(error);
-      }
-    }
-
-    handleSignUpSuccess(completedSignupData);
-  }
-
-  useEffect(() => {
-    if (completedSignupData) {
-      handleSignupComplete();
-    }
-  }, [completedSignupData]);
-
   useEffect(() => {
     const { email, password } = signupData;
 
@@ -91,14 +46,34 @@ const SignUp: React.FC = () => {
     captchaToken: string
   ): Promise<void> => {
     try {
-      const userInfo = await signup(data, {
-        queryParams: { captchaToken: captchaToken }
+      await signup(
+        {
+          ...data,
+          intent: module
+        },
+        {
+          queryParams: { captchaToken: captchaToken }
+        }
+      );
+
+      history.push({
+        pathname: RouteDefinitions.toEmailVerification(),
+        search: `?status=${VERIFY_EMAIL_STATUS.EMAIL_SENT}&email=${data.email}`
       });
-      setCompletedSignupData(userInfo.resource);
     } catch (error) {
       captchaRef.current?.reset();
 
-      handleError(error);
+      if (
+        error?.data?.responseMessages?.length &&
+        error?.data?.responseMessages[0]?.code === "USER_ALREADY_REGISTERED"
+      ) {
+        history.push({
+          pathname: RouteDefinitions.toEmailVerification(),
+          search: `?status=${VERIFY_EMAIL_STATUS.SIGNED_UP}&email=${data.email}`
+        });
+      } else {
+        handleError(error);
+      }
     }
   };
 
