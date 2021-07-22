@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import cx from "classnames";
 import { Form } from "react-final-form";
 import { useQueryParams } from "hooks/useQueryParams";
@@ -8,7 +8,6 @@ import { handleError } from "utils/ErrorUtils";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
-import toast from "react-hot-toast";
 import {
   validateEmail,
   validateName,
@@ -29,25 +28,15 @@ interface AcceptInviteQueryParams {
   token: string;
   accountIdentifier: string;
   email: string;
-  errorCode?: string;
 }
 
 const SignUp: React.FC = () => {
   const {
     token,
     accountIdentifier,
-    email,
-    errorCode
+    email
   } = useQueryParams<AcceptInviteQueryParams>();
   const history = useHistory();
-
-  useEffect(() => {
-    switch (errorCode) {
-      case "INVALID_TOKEN":
-        toast.error("Invalid Token");
-        break;
-    }
-  }, [errorCode]);
 
   const {
     mutate: completeInviteAndSignIn,
