@@ -18,8 +18,6 @@ import {
 import logo from "static/images/harness-logo.svg";
 import css from "./AcceptInvite.module.css";
 import { handleLoginSuccess } from "utils/LoginUtils";
-import { Simulate } from "react-dom/test-utils";
-import error = Simulate.error;
 
 interface AcceptInviteFormData {
   name: string;
