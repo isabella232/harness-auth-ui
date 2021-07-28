@@ -1,4 +1,4 @@
-import type { User } from "services/portal";
+import type { Account, User } from "services/portal";
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
@@ -21,6 +21,55 @@ export function formatJWTHeader(authCode: string): AuthHeader {
     authorization: `JWT ${token}`
   };
   return header;
+}
+
+interface handleReturnUrlProps {
+  returnUrl: string;
+  accounts: Account[];
+  history: History;
+}
+
+export function handleReturnUrl({
+  returnUrl,
+  accounts,
+  history
+}: handleReturnUrlProps): void {
+  try {
+    const returnUrlObject = new URL(returnUrl);
+    // only redirect to same hostname
+    if (returnUrlObject.hostname === window.location.hostname) {
+      // Checking the authorized accounts id in the returnUrl. If any account id exist, then redirecting to returnURL, else clearing the AppStorage and redirecting to signin without returnURL.
+      // TODO: If accountId is not valid, then need to redirect with default account to dashboard and show a proper message.
+      const splitReturnUrl = returnUrl.split("/");
+      if (accounts?.find((account) => splitReturnUrl.includes(account.uuid))) {
+        window.location.href = returnUrl;
+        return;
+      }
+      AppStorage.clear();
+      history.push(RouteDefinitions.toSignIn());
+      return;
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `"${returnUrl}" is a not a valid redirect due to hostname mismatch`
+      );
+    }
+  } catch (err) {
+    // returnUrl is not a valid url. do nothing.
+    // eslint-disable-next-line no-console
+    console.warn(`"${returnUrl}" is not a valid URL`);
+  }
+}
+
+export function createDefaultExperienceMap(accounts: Account[]): void {
+  // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
+  const defaultExperienceMap = accounts.reduce((previousValue, account) => {
+    return {
+      ...previousValue,
+      [account.uuid]: account.defaultExperience
+    };
+  }, {});
+  AppStorage.set("defaultExperienceMap", defaultExperienceMap);
 }
 
 export function handleLoginSuccess({
@@ -50,37 +99,11 @@ export function handleLoginSuccess({
       return;
     }
 
-    if (returnUrl) {
-      try {
-        const returnUrlObject = new URL(returnUrl);
-        // only redirect to same hostname
-        if (returnUrlObject.hostname === window.location.hostname) {
-          // Checking the authorized accounts id in the returnUrl. If any account id exist, then redirecting to returnURL, else clearing the AppStorage and redirecting to signin without returnURL.
-          // TODO: If accountId is not valid, then need to redirect with default account to dashboard and show a proper message.
-          const splitReturnUrl = returnUrl.split("/");
-          if (
-            resource.accounts?.find((account) =>
-              splitReturnUrl.includes(account.uuid)
-            )
-          ) {
-            window.location.href = returnUrl;
-            return;
-          }
-          AppStorage.clear();
-          history.push(RouteDefinitions.toSignIn());
-          return;
-        } else {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `"${returnUrl}" is a not a valid redirect due to hostname mismatch`
-          );
-        }
-      } catch (err) {
-        // returnUrl is not a valid url. do nothing.
-        // eslint-disable-next-line no-console
-        console.warn(`"${returnUrl}" is not a valid URL`);
-      }
+    if (returnUrl && resource.accounts) {
+      handleReturnUrl({ returnUrl, accounts: resource.accounts, history });
     }
+
+    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     const experience = resource.accounts?.find(
       (account) => account.uuid === resource.defaultAccountId
