@@ -99,11 +99,11 @@ export function handleLoginSuccess({
       return;
     }
 
+    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
+
     if (returnUrl && resource.accounts) {
       handleReturnUrl({ returnUrl, accounts: resource.accounts, history });
     }
-
-    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     const experience = resource.accounts?.find(
       (account) => account.uuid === resource.defaultAccountId
