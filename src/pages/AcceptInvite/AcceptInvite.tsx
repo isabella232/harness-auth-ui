@@ -28,13 +28,15 @@ interface AcceptInviteQueryParams {
   token: string;
   accountIdentifier: string;
   email: string;
+  generation: string;
 }
 
 const SignUp: React.FC = () => {
   const {
     token,
     accountIdentifier,
-    email
+    email,
+    generation
   } = useQueryParams<AcceptInviteQueryParams>();
   const history = useHistory();
 
@@ -42,7 +44,7 @@ const SignUp: React.FC = () => {
     mutate: completeInviteAndSignIn,
     loading
   } = useCompleteInviteAndSignIn1({
-    queryParams: { accountId: accountIdentifier }
+    queryParams: { accountId: accountIdentifier, generation }
   });
 
   const handleInvite = async (data: AcceptInviteFormData) => {
