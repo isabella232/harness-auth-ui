@@ -64,6 +64,12 @@ const SignIn: React.FC = () => {
           "Email verification failed. Please sign in to resend the email."
         );
         return;
+      case "INVITE_EXPIRED":
+        toast("This invitation URL has expired. Please request a new invite.");
+        return;
+      case "INVITE_INVALID":
+        toast("This invitation URL is not valid. Please request a new invite.");
+        return;
     }
   }, []);
 
