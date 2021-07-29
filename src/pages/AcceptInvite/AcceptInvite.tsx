@@ -3,7 +3,10 @@ import cx from "classnames";
 import { Form } from "react-final-form";
 import { useQueryParams } from "hooks/useQueryParams";
 import { useHistory } from "react-router-dom";
-import { useCompleteInviteAndSignIn1 } from "services/portal";
+import {
+  CompleteInviteAndSignIn1QueryParams,
+  useCompleteInviteAndSignIn1
+} from "services/portal";
 import { handleError } from "utils/ErrorUtils";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
@@ -28,7 +31,7 @@ interface AcceptInviteQueryParams {
   token: string;
   accountIdentifier: string;
   email: string;
-  generation: string;
+  generation: CompleteInviteAndSignIn1QueryParams["generation"];
 }
 
 const SignUp: React.FC = () => {
