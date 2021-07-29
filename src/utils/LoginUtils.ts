@@ -1,4 +1,4 @@
-import type { User } from "services/portal";
+import type { Account, User } from "services/portal";
 import AppStorage from "utils/AppStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
@@ -21,6 +21,17 @@ export function formatJWTHeader(authCode: string): AuthHeader {
     authorization: `JWT ${token}`
   };
   return header;
+}
+
+export function createDefaultExperienceMap(accounts: Account[]): void {
+  // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
+  const defaultExperienceMap = accounts.reduce((previousValue, account) => {
+    return {
+      ...previousValue,
+      [account.uuid]: account.defaultExperience
+    };
+  }, {});
+  AppStorage.set("defaultExperienceMap", defaultExperienceMap);
 }
 
 export function handleLoginSuccess({
@@ -49,6 +60,8 @@ export function handleLoginSuccess({
         : `${baseUrl}auth/#/two-factor-auth`;
       return;
     }
+
+    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     if (returnUrl) {
       try {
