@@ -66,7 +66,7 @@ const SignIn: React.FC = () => {
         return;
       case "INVITE_EXPIRED":
         toast(
-          "This invitation URL has expired. Please request for a new invitation from Harness or contact your admin."
+          "This invitation URL has expired. Please request for a new invitation from your admin."
         );
         return;
       case "INVITE_INVALID":
