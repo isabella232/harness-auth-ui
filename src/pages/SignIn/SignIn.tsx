@@ -65,10 +65,14 @@ const SignIn: React.FC = () => {
         );
         return;
       case "INVITE_EXPIRED":
-        toast("This invitation URL has expired. Please request a new invite.");
+        toast(
+          "This invitation URL has expired. Please request for a new invitation from Harness or contact your admin."
+        );
         return;
       case "INVITE_INVALID":
-        toast("This invitation URL is not valid. Please request a new invite.");
+        toast(
+          "We couldn’t find an invitation matching the email address you entered. Please search your email for an invitation from Harness or contact your admin."
+        );
         return;
     }
   }, []);
