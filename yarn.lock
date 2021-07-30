@@ -2565,11 +2565,6 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-generate-js@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/generate-js/-/generate-js-3.1.2.tgz#25ff8dd4c38090a938f648887d536bad46b47b62"
-  integrity sha1-Jf+N1MOAkKk49kiIfVNrrUa0e2I=
-
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
@@ -5451,13 +5446,6 @@ scheduler@^0.20.2:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-
-secure-web-storage@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/secure-web-storage/-/secure-web-storage-1.0.2.tgz#7309c35c3685f0a9e63a8c4964c6ecdc0f83839c"
-  integrity sha1-cwnDXDaF8KnmOoxJZMbs3A+Dg5w=
-  dependencies:
-    generate-js "^3.1.2"
 
 semver-compare@^1.0.0:
   version "1.0.0"

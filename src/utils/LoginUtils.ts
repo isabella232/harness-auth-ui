@@ -1,5 +1,5 @@
 import type { Account, User } from "services/portal";
-import AppStorage from "utils/AppStorage";
+import SecureStorage from "./SecureStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
 import { DefaultExperience } from "utils/DefaultExperienceTypes";
@@ -15,7 +15,7 @@ interface HandleLoginSuccess {
 
 export function formatJWTHeader(authCode: string): AuthHeader {
   const token = window.btoa(
-    `${AppStorage.get("twoFactorJwtToken")}:${authCode}`
+    `${SecureStorage.getItem("twoFactorJwtToken")}:${authCode}`
   );
   const header = {
     authorization: `JWT ${token}`
@@ -31,7 +31,7 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
       [account.uuid]: account.defaultExperience
     };
   }, {});
-  AppStorage.set("defaultExperienceMap", defaultExperienceMap);
+  SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
 }
 
 export function handleLoginSuccess({
@@ -44,16 +44,16 @@ export function handleLoginSuccess({
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
-    AppStorage.set("token", resource.token);
-    AppStorage.set("uuid", resource.uuid);
-    AppStorage.set("acctId", resource.defaultAccountId);
-    AppStorage.set("lastTokenSetTime", +new Date());
+    SecureStorage.setItem("token", resource.token);
+    SecureStorage.setItem("uuid", resource.uuid);
+    SecureStorage.setItem("acctId", resource.defaultAccountId);
+    SecureStorage.setItem("lastTokenSetTime", +new Date());
 
     if (
       resource.twoFactorAuthenticationEnabled === true &&
       resource.twoFactorJwtToken
     ) {
-      AppStorage.set("twoFactorJwtToken", resource.twoFactorJwtToken);
+      SecureStorage.setItem("twoFactorJwtToken", resource.twoFactorJwtToken);
       // TODO: history.push instead of window.location
       window.location.href = returnUrl
         ? `${baseUrl}auth/#/two-factor-auth?returnUrl=${returnUrl}`
@@ -68,8 +68,8 @@ export function handleLoginSuccess({
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
-          // Checking the authorized accounts id in the returnUrl. If any account id exist, then redirecting to returnURL, else clearing the AppStorage and redirecting to signin without returnURL.
-          // TODO: If accountId is not valid, then need to redirect with default account to dashboard and show a proper message.
+          // Checking if the accountId in the returnUrl is accessible or not
+          // If not, clearing the SecureStorage and redirecting to signin without returnURL.
           const splitReturnUrl = returnUrl.split("/");
           if (
             resource.accounts?.find((account) =>
@@ -79,7 +79,7 @@ export function handleLoginSuccess({
             window.location.href = returnUrl;
             return;
           }
-          AppStorage.clear();
+          SecureStorage.clear();
           history.push(RouteDefinitions.toSignIn());
           return;
         } else {

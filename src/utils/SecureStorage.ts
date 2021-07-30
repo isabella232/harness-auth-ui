@@ -16,4 +16,8 @@ export default class SecureStorage {
     const str = localStorage.getItem(key);
     if (str) return decode(str);
   }
+
+  public static clear(): void {
+    localStorage.clear();
+  }
 }
