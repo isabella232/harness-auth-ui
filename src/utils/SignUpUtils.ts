@@ -9,7 +9,7 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
     SecureStorage.setItem("acctId", resource.defaultAccountId);
-    SecureStorage.setItem("lastTokenSetTime", +new Date());
+    SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (intent) {
       switch (intent.toUpperCase()) {

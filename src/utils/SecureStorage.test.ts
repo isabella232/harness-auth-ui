@@ -14,34 +14,19 @@ describe("Decode", () => {
   });
 });
 
+const cases = [
+  "token",
+  10,
+  0,
+  true,
+  false,
+  { a: 1, b: "str", c: { d: 1 } },
+  [1, 2, 3]
+];
+
 describe("Encode and Decode", () => {
-  test("string", () => {
-    const input = "token";
+  test.each(cases)("for input %p", (input) => {
     const encoded = encode(input);
-    expect(decode(encoded)).toEqual(input);
-  });
-
-  test("number", () => {
-    const input = 10;
-    const encoded = encode(input);
-    expect(decode(encoded)).toEqual(input);
-  });
-
-  test("object", () => {
-    const input = { a: 1, b: "str", c: { d: 1 } };
-    const encoded = encode(input);
-    expect(decode(encoded)).toEqual(input);
-  });
-
-  test("empty", () => {
-    let input;
-    const encoded = encode(input);
-    expect(decode(encoded)).toEqual(input);
-  });
-
-  test("array", () => {
-    const input = [1, 2, 3];
-    const encoded = encode(input);
-    expect(decode(encoded)).toEqual(input);
+    if (encoded) expect(decode(encoded)).toEqual(input);
   });
 });

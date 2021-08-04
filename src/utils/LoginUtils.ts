@@ -47,7 +47,7 @@ export function handleLoginSuccess({
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
     SecureStorage.setItem("acctId", resource.defaultAccountId);
-    SecureStorage.setItem("lastTokenSetTime", +new Date());
+    SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (
       resource.twoFactorAuthenticationEnabled === true &&
