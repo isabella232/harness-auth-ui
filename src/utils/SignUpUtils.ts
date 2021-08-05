@@ -1,15 +1,15 @@
 import type { UserInfo } from "services/ng";
-import AppStorage from "utils/AppStorage";
+import SecureStorage from "./SecureStorage";
 
 export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
     const intent = resource.intent;
-    AppStorage.set("token", resource.token);
-    AppStorage.set("uuid", resource.uuid);
-    AppStorage.set("acctId", resource.defaultAccountId);
-    AppStorage.set("lastTokenSetTime", +new Date());
+    SecureStorage.setItem("token", resource.token);
+    SecureStorage.setItem("uuid", resource.uuid);
+    SecureStorage.setItem("acctId", resource.defaultAccountId);
+    SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (intent) {
       switch (intent.toUpperCase()) {

@@ -2,6 +2,7 @@ import React from "react";
 import cx from "classnames";
 import { Link, useHistory } from "react-router-dom";
 import toast from "react-hot-toast";
+import SecureStorage from "utils/SecureStorage";
 
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -15,14 +16,13 @@ import { handleError } from "utils/ErrorUtils";
 
 import css from "../SignIn/SignIn.module.css";
 import css2 from "./TwoFactorAuth.module.css";
-import AppStorage from "utils/AppStorage";
 
 interface TwoFactorAuthFormData {
   authCode: string;
 }
 
 const TwoFactorAuth: React.FC = () => {
-  const accountId = AppStorage.get("acctId");
+  const accountId = SecureStorage.getItem("acctId");
   const history = useHistory();
   const { mutate: login, loading } = useTwoFactorLogin({
     queryParams: {
