@@ -40,7 +40,8 @@ export function handleLoginSuccess({
 }: HandleLoginSuccess): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
-  const returnUrl = urlParams?.get("returnUrl");
+  const returnUrl =
+    urlParams?.get("returnUrl") || sessionStorage?.getItem("returnUrl");
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
@@ -64,6 +65,7 @@ export function handleLoginSuccess({
     if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     if (returnUrl) {
+      sessionStorage?.removeItem("returnUrl");
       try {
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
