@@ -31,9 +31,6 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
 
     if (intent) {
       switch (intent.toUpperCase()) {
-        case "CE":
-          window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/continuous-efficiency/settings?source=signup`;
-          break;
         case "CD":
           window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/onboarding`;
           break;
