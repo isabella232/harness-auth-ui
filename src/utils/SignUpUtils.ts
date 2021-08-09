@@ -32,7 +32,11 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     if (intent) {
       switch (intent.toUpperCase()) {
         case "CD":
-          window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/onboarding`;
+          if (!window.gtmCDEnabled) {
+            window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/onboarding`;
+          } else {
+            window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/${intent}/home?source=signup`;
+          }
           break;
         default:
           window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/${intent}/home?source=signup`;
