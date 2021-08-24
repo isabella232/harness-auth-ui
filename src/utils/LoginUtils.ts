@@ -34,6 +34,8 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
 }
 
+const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
+
 export function handleLoginSuccess({
   resource,
   history
@@ -68,20 +70,27 @@ export function handleLoginSuccess({
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
-          // Checking if the accountId in the returnUrl is accessible or not
-          // If not, clearing the SecureStorage and redirecting to signin without returnURL.
-          const splitReturnUrl = returnUrl.split("/");
-          if (
-            resource.accounts?.find((account) =>
-              splitReturnUrl.includes(account.uuid)
-            )
-          ) {
+          const accountId = returnUrl?.match(accountIdExtractionRegex)?.[1];
+          // if returnUrl contains an accountId
+          if (accountId) {
+            // if user has access to this accountId
+            if (
+              resource.accounts?.find((account) => account.uuid === accountId)
+            ) {
+              window.location.href = returnUrl;
+              return;
+            } else {
+              // user doesn't have access to this accountId
+              // clearing the SecureStorage and redirecting to signin without returnURL.
+              SecureStorage.clear();
+              history.push(RouteDefinitions.toSignIn());
+              return;
+            }
+          } else {
+            // returnUrl doesn't contain accountId, free to follow
             window.location.href = returnUrl;
             return;
           }
-          SecureStorage.clear();
-          history.push(RouteDefinitions.toSignIn());
-          return;
         } else {
           // eslint-disable-next-line no-console
           console.warn(
