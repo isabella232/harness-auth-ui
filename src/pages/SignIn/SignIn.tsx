@@ -42,9 +42,14 @@ const SignIn: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    // save returnUrl for SAML flow
     const returnUrl = queryParams.get("returnUrl");
-    returnUrl && sessionStorage.setItem("returnUrl", returnUrl);
+    if (returnUrl) {
+      // save returnUrl for SAML flow
+      sessionStorage.setItem("returnUrl", returnUrl);
+    } else {
+      // clearing sessionStorage in case previous login was cancelled
+      sessionStorage.removeItem("returnUrl");
+    }
 
     const errorCode = queryParams.get("errorCode");
     switch (errorCode) {

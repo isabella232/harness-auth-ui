@@ -49,6 +49,7 @@ export default defineConfig({
     }),
     replace({
       __DEV__: DEV,
+      __ON_PREM__: ON_PREM,
       __BUGSNAG_RELEASE_VERSION__: JSON.stringify(version)
     }),
     emitEJS({
