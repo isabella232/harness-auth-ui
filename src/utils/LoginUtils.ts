@@ -70,7 +70,9 @@ export function handleLoginSuccess({
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
-          const accountId = returnUrl?.match(accountIdExtractionRegex)?.[1];
+          const accountId = returnUrlObject.hash?.match(
+            accountIdExtractionRegex
+          )?.[1];
           // if returnUrl contains an accountId
           if (accountId) {
             // if user has access to this accountId
@@ -83,7 +85,7 @@ export function handleLoginSuccess({
               // user doesn't have access to this accountId
               // clearing the SecureStorage and redirecting to signin without returnURL.
               SecureStorage.clear();
-              history.push(RouteDefinitions.toSignIn());
+              history.replace(RouteDefinitions.toSignIn());
               return;
             }
           } else {
