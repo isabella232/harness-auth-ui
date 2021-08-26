@@ -9,7 +9,12 @@ export function useQueryParams<T = Record<string, unknown>>(
   const { search } = useLocation();
 
   const queryParams = React.useMemo(
-    () => qs.parse(search, { ignoreQueryPrefix: true, ...options }),
+    () =>
+      qs.parse(search, {
+        ignoreQueryPrefix: true,
+        decoder: (c) => c,
+        ...options
+      }),
     [search, options]
   );
 
