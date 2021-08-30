@@ -11,6 +11,7 @@ interface AuthHeader {
 interface HandleLoginSuccess {
   resource?: User;
   history: History;
+  selectedAccount?: string; // coming from returnUrl
 }
 
 export function formatJWTHeader(authCode: string): AuthHeader {
@@ -34,11 +35,12 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
 }
 
-const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
+export const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
 
 export function handleLoginSuccess({
   resource,
-  history
+  history,
+  selectedAccount
 }: HandleLoginSuccess): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
@@ -48,7 +50,10 @@ export function handleLoginSuccess({
   if (resource) {
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
-    SecureStorage.setItem("acctId", resource.defaultAccountId);
+    SecureStorage.setItem(
+      "acctId",
+      selectedAccount || resource.defaultAccountId
+    );
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (

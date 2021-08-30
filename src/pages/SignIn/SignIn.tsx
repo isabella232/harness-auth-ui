@@ -14,7 +14,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
-import { handleLoginSuccess } from "utils/LoginUtils";
+import { accountIdExtractionRegex, handleLoginSuccess } from "utils/LoginUtils";
 import {
   validateEmail,
   validatePasswordRequiredOnly
@@ -32,20 +32,21 @@ interface LoginFormData {
 
 const SignIn: React.FC = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
+  const [accountId, setAccountId] = useState<string | undefined>();
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
-  const { mutate: login, loading } = useLogin({
-    queryParams: { captcha: captchaReponse }
-  });
+  const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
   const queryString = window.location.hash?.split("?")?.[1];
   const queryParams = new URLSearchParams(queryString);
   const history = useHistory();
 
+  // this runs once on first mount
   useEffect(() => {
     const returnUrl = queryParams.get("returnUrl");
     if (returnUrl) {
       // save returnUrl for SAML flow
       sessionStorage.setItem("returnUrl", returnUrl);
+      setAccountId(returnUrl.match(accountIdExtractionRegex)?.[1]); // save accountId from returnUrl for login api
     } else {
       // clearing sessionStorage in case previous login was cancelled
       sessionStorage.removeItem("returnUrl");
@@ -84,10 +85,22 @@ const SignIn: React.FC = () => {
 
   const handleLogin = async (formData: LoginFormData) => {
     try {
-      const response = await login({
-        authorization: createAuthToken(formData.email, formData.password)
+      const response = await login(
+        {
+          authorization: createAuthToken(formData.email, formData.password)
+        },
+        {
+          queryParams: {
+            captcha: captchaReponse,
+            accountId: accountId
+          }
+        }
+      );
+      handleLoginSuccess({
+        resource: response?.resource,
+        history,
+        selectedAccount: accountId
       });
-      handleLoginSuccess({ resource: response?.resource, history });
     } catch (error) {
       captchaRef.current?.reset();
       setCaptchaResponse(undefined);
