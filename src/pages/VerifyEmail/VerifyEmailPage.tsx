@@ -7,10 +7,13 @@ const VerifyEmailPage = (): React.ReactElement => {
   const { status, email } = useQueryParams<{
     status?: VERIFY_EMAIL_STATUS;
     email?: string;
-  }>({ decoder: (c) => c });
+  }>();
   return (
     <BasicLayout>
-      <VerifyEmailStatus status={status} email={email} />
+      <VerifyEmailStatus
+        status={status}
+        email={decodeURIComponent(email || "")}
+      />
     </BasicLayout>
   );
 };
