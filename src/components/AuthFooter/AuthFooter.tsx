@@ -20,9 +20,14 @@ export enum AuthPage {
 interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
+  accountId?: string;
 }
 
-const AuthFooter: React.FC<AuthFooterProps> = ({ page, hideOAuth }) => {
+const AuthFooter: React.FC<AuthFooterProps> = ({
+  page,
+  hideOAuth,
+  accountId
+}) => {
   const history = useHistory();
 
   const isSignup = page === AuthPage.SignUp;
@@ -42,7 +47,11 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ page, hideOAuth }) => {
   ) {
     const { iconName, type, url } = oAuthProvider;
     const link = `${URLS.OAUTH}api/users/${url}${
-      isOauthSignup ? getSignupQueryParams() : ""
+      isOauthSignup
+        ? getSignupQueryParams()
+        : accountId
+        ? `&accountId=${accountId}`
+        : ""
     }`;
 
     return (
