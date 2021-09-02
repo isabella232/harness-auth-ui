@@ -14,6 +14,7 @@ import {
   validateEmail,
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
+import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
@@ -28,9 +29,13 @@ interface LoginFormData {
   password: string;
 }
 
+interface LocalLoginQueryParams {
+  returnUrl?: string;
+}
+
 const LocalLogin: React.FC = () => {
   const history = useHistory();
-  const returnUrl = sessionStorage.getItem("returnUrl");
+  const { returnUrl } = useQueryParams<LocalLoginQueryParams>();
   const accountId = returnUrl?.match(accountIdExtractionRegex)?.[1];
 
   const { mutate: login, loading } = useForceLoginUsingHarnessPassword({

@@ -11,6 +11,7 @@ import css from "./AuthFooter.module.css";
 import Icon from "components/Icon/Icon";
 import RouteDefinitions from "RouteDefinitions";
 import Text from "components/Text/Text";
+import { useQueryParams } from "hooks/useQueryParams";
 
 export enum AuthPage {
   SignIn,
@@ -29,7 +30,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   accountId
 }) => {
   const history = useHistory();
-
+  const { returnUrl } = useQueryParams();
   const isSignup = page === AuthPage.SignUp;
 
   function getSignupQueryParams() {
@@ -113,7 +114,12 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
           <button
             className={cx("button", css.ssoButton)}
             onClick={() => {
-              history.push(RouteDefinitions.toLocalLogin());
+              history.push({
+                pathname: RouteDefinitions.toLocalLogin(),
+                search: returnUrl
+                  ? `returnUrl=${encodeURIComponent(returnUrl as string)}`
+                  : void 0
+              });
             }}
           >
             <Text>Harness Local Login</Text>
