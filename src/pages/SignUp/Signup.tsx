@@ -23,19 +23,19 @@ interface SignUpFormData {
   password: string;
 }
 
-enum SignupAction {
+export enum SignupAction {
   REGULAR = "REGULAR",
   TRIAL = "TRIAL",
   SUBSCRIBE = "SUBSCRIBE"
 }
 
-enum Edition {
+export enum Edition {
   FREE = "FREE",
   TEAM = "TEAM",
   ENTERPRISE = "ENTERPRISE"
 }
 
-enum BillingFrequency {
+export enum BillingFrequency {
   MONTHLY = "MONTHLY",
   YEARLY = "YEARLY"
 }

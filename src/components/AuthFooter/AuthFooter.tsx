@@ -12,6 +12,7 @@ import Icon from "components/Icon/Icon";
 import RouteDefinitions from "RouteDefinitions";
 import Text from "components/Text/Text";
 import { useQueryParams } from "hooks/useQueryParams";
+import { BillingFrequency, Edition, SignupAction } from "pages/SignUp/Signup";
 
 export enum AuthPage {
   SignIn,
@@ -36,10 +37,29 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   function getSignupQueryParams() {
     const queryString = window.location.hash?.split("?")?.[1];
     const urlParams = new URLSearchParams(queryString);
+
     const module = urlParams?.get("module");
     const moduleParam = module ? `&module=${module}` : "";
 
-    return `&action=signup&isNG=true${moduleParam}`;
+    const signupAction = urlParams?.get("signupAction");
+    const signupParam =
+      signupAction && signupAction.toUpperCase() in SignupAction
+        ? `&signupAction=${signupAction.toUpperCase()}`
+        : "";
+
+    const edition = urlParams?.get("edition");
+    const editionParam =
+      edition && edition.toUpperCase() in Edition
+        ? `&edition=${edition.toUpperCase()}`
+        : "";
+
+    const billingFrequency = urlParams?.get("billingFrequency");
+    const billingFrequencyParam =
+      billingFrequency && billingFrequency.toUpperCase() in BillingFrequency
+        ? `&billingFrequency=${billingFrequency.toUpperCase()}`
+        : "";
+
+    return `&action=signup&isNG=true${moduleParam}${signupParam}${editionParam}${billingFrequencyParam}`;
   }
 
   function getOAuthLink(
