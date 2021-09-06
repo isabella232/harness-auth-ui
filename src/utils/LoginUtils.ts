@@ -35,7 +35,13 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
 }
 
-export const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
+const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
+
+export const getAccountIdFromUrl = (url: string): string | undefined => {
+  const urlObject = new URL(url);
+  const accountId = urlObject.hash?.match(accountIdExtractionRegex)?.[1];
+  return accountId;
+};
 
 export function handleLoginSuccess({
   resource,

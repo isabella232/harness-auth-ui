@@ -14,7 +14,7 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
-import { accountIdExtractionRegex, handleLoginSuccess } from "utils/LoginUtils";
+import { getAccountIdFromUrl, handleLoginSuccess } from "utils/LoginUtils";
 import {
   validateEmail,
   validatePasswordRequiredOnly
@@ -43,7 +43,7 @@ const SignIn: React.FC = () => {
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
-  const accountId = returnUrl?.match(accountIdExtractionRegex)?.[1];
+  const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
 
   // this runs once on first mount
   useEffect(() => {

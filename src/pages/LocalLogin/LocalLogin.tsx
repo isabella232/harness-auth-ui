@@ -8,7 +8,7 @@ import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useForceLoginUsingHarnessPassword } from "services/portal";
 import { handleError } from "utils/ErrorUtils";
 import Text from "components/Text/Text";
-import { accountIdExtractionRegex, handleLoginSuccess } from "utils/LoginUtils";
+import { getAccountIdFromUrl, handleLoginSuccess } from "utils/LoginUtils";
 import Field from "components/Field/Field";
 import {
   validateEmail,
@@ -36,7 +36,7 @@ interface LocalLoginQueryParams {
 const LocalLogin: React.FC = () => {
   const history = useHistory();
   const { returnUrl } = useQueryParams<LocalLoginQueryParams>();
-  const accountId = returnUrl?.match(accountIdExtractionRegex)?.[1];
+  const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
 
   const { mutate: login, loading } = useForceLoginUsingHarnessPassword({
     queryParams: accountId
