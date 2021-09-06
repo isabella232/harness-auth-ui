@@ -11,6 +11,7 @@ interface AuthHeader {
 interface HandleLoginSuccess {
   resource?: User;
   history: History;
+  selectedAccount?: string; // coming from returnUrl
 }
 
 export function formatJWTHeader(authCode: string): AuthHeader {
@@ -36,9 +37,16 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
 
 const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
 
+export const getAccountIdFromUrl = (url: string): string | undefined => {
+  const urlObject = new URL(url);
+  const accountId = urlObject.hash?.match(accountIdExtractionRegex)?.[1];
+  return accountId;
+};
+
 export function handleLoginSuccess({
   resource,
-  history
+  history,
+  selectedAccount
 }: HandleLoginSuccess): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
@@ -46,9 +54,13 @@ export function handleLoginSuccess({
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
+    const loginToAccountId =
+      selectedAccount ||
+      resource.defaultAccountId ||
+      resource.accounts?.[0]?.uuid;
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
-    SecureStorage.setItem("acctId", resource.defaultAccountId);
+    SecureStorage.setItem("acctId", loginToAccountId);
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (
@@ -56,10 +68,10 @@ export function handleLoginSuccess({
       resource.twoFactorJwtToken
     ) {
       SecureStorage.setItem("twoFactorJwtToken", resource.twoFactorJwtToken);
-      // TODO: history.push instead of window.location
-      window.location.href = returnUrl
-        ? `${baseUrl}auth/#/two-factor-auth?returnUrl=${returnUrl}`
-        : `${baseUrl}auth/#/two-factor-auth`;
+      history.push({
+        pathname: RouteDefinitions.toTwoFactorAuth(),
+        search: returnUrl ? `returnUrl=${returnUrl}` : undefined
+      });
       return;
     }
 
@@ -70,14 +82,13 @@ export function handleLoginSuccess({
         const returnUrlObject = new URL(returnUrl);
         // only redirect to same hostname
         if (returnUrlObject.hostname === window.location.hostname) {
-          const accountId = returnUrlObject.hash?.match(
-            accountIdExtractionRegex
-          )?.[1];
           // if returnUrl contains an accountId
-          if (accountId) {
+          if (selectedAccount) {
             // if user has access to this accountId
             if (
-              resource.accounts?.find((account) => account.uuid === accountId)
+              resource.accounts?.find(
+                (account) => account.uuid === selectedAccount
+              )
             ) {
               window.location.href = returnUrl;
               return;
@@ -107,16 +118,16 @@ export function handleLoginSuccess({
     }
 
     const experience = resource.accounts?.find(
-      (account) => account.uuid === resource.defaultAccountId
+      (account) => account.uuid === loginToAccountId
     )?.defaultExperience;
 
     switch (experience) {
       case DefaultExperience.NG:
-        window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}`;
+        window.location.href = `${baseUrl}ng/#/account/${loginToAccountId}`;
         return;
       case DefaultExperience.CG:
       default:
-        window.location.href = `${baseUrl}#/account/${resource.defaultAccountId}/dashboard`;
+        window.location.href = `${baseUrl}#/account/${loginToAccountId}/dashboard`;
         return;
     }
   } else {
