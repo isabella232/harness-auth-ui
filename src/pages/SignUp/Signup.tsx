@@ -157,7 +157,7 @@ const SignUp: React.FC = () => {
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
         </div>
-        <div className={css.title}>Sign Up</div>
+        <div className={css.title}>Sign up</div>
         <div className={css.subtitle}>and get ship done.</div>
         <Form
           onSubmit={onSubmit}
@@ -180,7 +180,7 @@ const SignUp: React.FC = () => {
               />
               <input
                 type="submit"
-                value="Sign Up"
+                value="Sign up"
                 className="button primary"
                 disabled={loading || captchaExecuting}
               />
@@ -190,7 +190,7 @@ const SignUp: React.FC = () => {
         <AuthFooter page={AuthPage.SignUp} />
         <div className={css.footer}>
           Already have an account?{" "}
-          <Link to={RouteDefinitions.toSignIn()}>Sign In</Link>
+          <Link to={RouteDefinitions.toSignIn()}>Sign in</Link>
         </div>
       </div>
     </BasicLayout>

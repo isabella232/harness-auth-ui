@@ -55,10 +55,10 @@ const TwoFactorAuth: React.FC = () => {
           <img src={logo} width={120} className={css.logo} />
           <div style={{ flex: 1 }}></div>
           <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Sign In</Text>
+            <Text icon="leftArrow">Sign in</Text>
           </Link>
         </div>
-        <div className={css.title}>Enter Authorization Code</div>
+        <div className={css.title}>Enter authorization code</div>
         <div className={css.subtitle}>and get ship done.</div>
         <form
           className="layout-vertical spacing-medium"
@@ -102,7 +102,7 @@ const TwoFactorAuth: React.FC = () => {
           account administrator to provide one.
         </div>
         <div className={css.footer}>
-          No account? <Link to={RouteDefinitions.toSignUp()}>Get Started</Link>
+          No account? <Link to={RouteDefinitions.toSignUp()}>Get started</Link>
         </div>
       </div>
     </BasicLayout>

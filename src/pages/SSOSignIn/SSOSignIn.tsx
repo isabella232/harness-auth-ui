@@ -35,7 +35,7 @@ const SSOSignIn: React.FC = () => {
           window.location.href = res.resource.ssorequest?.idpRedirectUrl;
         }
       } else {
-        toast("Single Sign-on is not enabled for your account");
+        toast("Single sign-on is not enabled for your account");
       }
     } catch (err) {
       toast("There was an error");
@@ -49,12 +49,12 @@ const SSOSignIn: React.FC = () => {
           <img src={logo} width={120} className={css.logo} alt={"Harness"} />
           <div style={{ flex: 1 }} />
           <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Main Sign In</Text>
+            <Text icon="leftArrow">Main sign in</Text>
           </Link>
         </div>
         <div className={css.title}>
-          Sign In with an <br />
-          SSO Identity Provider
+          Sign in with an <br />
+          SSO identity provider
         </div>
         <div className={css.subtitle}>and get ship done.</div>
         <Form
@@ -75,7 +75,7 @@ const SSOSignIn: React.FC = () => {
                 />
                 <input
                   type="submit"
-                  value="Sign In"
+                  value="Sign in"
                   className="button primary"
                   disabled={loading}
                 />

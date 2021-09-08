@@ -68,10 +68,10 @@ const LocalLogin: React.FC = () => {
           <img src={logo} width={120} className={css.logo} alt={"Harness"} />
           <div style={{ flex: 1 }} />
           <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Main Sign In</Text>
+            <Text icon="leftArrow">Main sign in</Text>
           </Link>
         </div>
-        <div className={css.title}>Local Login</div>
+        <div className={css.title}>Local login</div>
         <div className={css.subtitle} />
         <Form
           onSubmit={handleLogin}
@@ -98,7 +98,7 @@ const LocalLogin: React.FC = () => {
                 />
                 <input
                   type="submit"
-                  value="Sign In"
+                  value="Sign in"
                   className="button primary"
                   disabled={loading}
                 />

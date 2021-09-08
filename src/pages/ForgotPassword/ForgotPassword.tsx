@@ -47,10 +47,10 @@ export default function ForgotPassword() {
           <img src={logo} width={120} className={css.logo} alt={"Harness"} />
           <div style={{ flex: 1 }} />
           <Link to={RouteDefinitions.toSignIn()}>
-            <Text icon="leftArrow">Sign In</Text>
+            <Text icon="leftArrow">Sign in</Text>
           </Link>
         </div>
-        <div className={css.title}>Forgot Password</div>
+        <div className={css.title}>Forgot password</div>
         <div className={css.subtitle} />
         <Form
           onSubmit={handleReset}
@@ -70,7 +70,7 @@ export default function ForgotPassword() {
                 />
                 <input
                   type="submit"
-                  value="Reset Password"
+                  value="Reset password"
                   className="button primary"
                   disabled={loading}
                 />

@@ -120,7 +120,7 @@ const SignIn: React.FC = () => {
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} alt={"Harness"} />
         </div>
-        <div className={css.title}>Sign In</div>
+        <div className={css.title}>Sign in</div>
         <div className={css.subtitle}>and get ship done.</div>
         <Form
           onSubmit={handleLogin}
@@ -148,7 +148,7 @@ const SignIn: React.FC = () => {
                     className={css.forgotLink}
                     tabIndex={-1}
                   >
-                    Forgot Password?
+                    Forgot password?
                   </Link>
                   <Field
                     name="password"
@@ -170,7 +170,7 @@ const SignIn: React.FC = () => {
                 ) : null}
                 <input
                   type="submit"
-                  value={loading ? "Signing in..." : "Sign In"}
+                  value={loading ? "Signing in..." : "Sign in"}
                   className="button primary"
                   disabled={loading || (showCaptcha && !captchaReponse)}
                 />
@@ -181,7 +181,7 @@ const SignIn: React.FC = () => {
         <AuthFooter page={AuthPage.SignIn} accountId={accountId} />
         {window.signupExposed === "true" && (
           <div className={css.footer}>
-            No account? <Link to={RouteDefinitions.toSignUp()}>Sign Up</Link>
+            No account? <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
           </div>
         )}
       </div>
