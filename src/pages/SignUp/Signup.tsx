@@ -17,27 +17,15 @@ import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
+import {
+  BillingFrequency,
+  Edition,
+  SignupAction
+} from "components/AuthFooter/AuthFooter";
 
 interface SignUpFormData {
   email: string;
   password: string;
-}
-
-export enum SignupAction {
-  REGULAR = "REGULAR",
-  TRIAL = "TRIAL",
-  SUBSCRIBE = "SUBSCRIBE"
-}
-
-export enum Edition {
-  FREE = "FREE",
-  TEAM = "TEAM",
-  ENTERPRISE = "ENTERPRISE"
-}
-
-export enum BillingFrequency {
-  MONTHLY = "MONTHLY",
-  YEARLY = "YEARLY"
 }
 
 const SignUp: React.FC = () => {

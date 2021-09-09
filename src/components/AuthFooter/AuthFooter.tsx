@@ -12,11 +12,27 @@ import Icon from "components/Icon/Icon";
 import RouteDefinitions from "RouteDefinitions";
 import Text from "components/Text/Text";
 import { useQueryParams } from "hooks/useQueryParams";
-import { BillingFrequency, Edition, SignupAction } from "pages/SignUp/Signup";
 
 export enum AuthPage {
   SignIn,
   SignUp
+}
+
+export enum SignupAction {
+  REGULAR = "REGULAR",
+  TRIAL = "TRIAL",
+  SUBSCRIBE = "SUBSCRIBE"
+}
+
+export enum Edition {
+  FREE = "FREE",
+  TEAM = "TEAM",
+  ENTERPRISE = "ENTERPRISE"
+}
+
+export enum BillingFrequency {
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY"
 }
 
 interface AuthFooterProps {
