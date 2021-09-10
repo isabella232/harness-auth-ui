@@ -5,7 +5,7 @@ import { Form } from "react-final-form";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useSignup } from "services/ng";
+import { useSignup, SignupDTO } from "services/ng";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -17,6 +17,11 @@ import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
+import {
+  BillingFrequency,
+  Edition,
+  SignupAction
+} from "components/AuthFooter/AuthFooter";
 
 interface SignUpFormData {
   email: string;
@@ -29,7 +34,12 @@ const SignUp: React.FC = () => {
   const [signupData, setSignupData] = useState({ email: "", password: "" });
   const { mutate: signup, loading } = useSignup({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { module } = useQueryParams<{ module?: string }>();
+  const { module, signupAction, edition, billingFrequency } = useQueryParams<{
+    module?: string;
+    signupAction?: string;
+    edition?: string;
+    billingFrequency?: string;
+  }>();
 
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
   useEffect(() => {
@@ -47,15 +57,29 @@ const SignUp: React.FC = () => {
   ): Promise<void> => {
     const encodedEmail = encodeURIComponent(data.email);
     try {
-      await signup(
-        {
-          ...data,
-          intent: module
-        },
-        {
-          queryParams: { captchaToken: captchaToken }
-        }
-      );
+      const signupRequestData: SignupDTO = {
+        ...data,
+        intent: module
+      };
+
+      if (signupAction && signupAction.toUpperCase() in SignupAction) {
+        signupRequestData.signupAction = signupAction.toUpperCase() as SignupAction;
+      }
+
+      if (edition && edition.toUpperCase() in Edition) {
+        signupRequestData.edition = edition.toUpperCase() as Edition;
+      }
+
+      if (
+        billingFrequency &&
+        billingFrequency.toUpperCase() in BillingFrequency
+      ) {
+        signupRequestData.billingFrequency = billingFrequency.toUpperCase() as BillingFrequency;
+      }
+
+      await signup(signupRequestData, {
+        queryParams: { captchaToken: captchaToken }
+      });
 
       history.push({
         pathname: RouteDefinitions.toEmailVerification(),

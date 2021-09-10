@@ -18,6 +18,23 @@ export enum AuthPage {
   SignUp
 }
 
+export enum SignupAction {
+  REGULAR = "REGULAR",
+  TRIAL = "TRIAL",
+  SUBSCRIBE = "SUBSCRIBE"
+}
+
+export enum Edition {
+  FREE = "FREE",
+  TEAM = "TEAM",
+  ENTERPRISE = "ENTERPRISE"
+}
+
+export enum BillingFrequency {
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY"
+}
+
 interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
@@ -36,10 +53,29 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   function getSignupQueryParams() {
     const queryString = window.location.hash?.split("?")?.[1];
     const urlParams = new URLSearchParams(queryString);
+
     const module = urlParams?.get("module");
     const moduleParam = module ? `&module=${module}` : "";
 
-    return `&action=signup&isNG=true${moduleParam}`;
+    const signupAction = urlParams?.get("signupAction");
+    const signupParam =
+      signupAction && signupAction.toUpperCase() in SignupAction
+        ? `&signupAction=${signupAction.toUpperCase()}`
+        : "";
+
+    const edition = urlParams?.get("edition");
+    const editionParam =
+      edition && edition.toUpperCase() in Edition
+        ? `&edition=${edition.toUpperCase()}`
+        : "";
+
+    const billingFrequency = urlParams?.get("billingFrequency");
+    const billingFrequencyParam =
+      billingFrequency && billingFrequency.toUpperCase() in BillingFrequency
+        ? `&billingFrequency=${billingFrequency.toUpperCase()}`
+        : "";
+
+    return `&action=signup&isNG=true${moduleParam}${signupParam}${editionParam}${billingFrequencyParam}`;
   }
 
   function getOAuthLink(
