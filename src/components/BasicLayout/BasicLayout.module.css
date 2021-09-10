@@ -23,7 +23,7 @@
 
   & .imageColumn {
     overflow-y: hidden;
-    background-color: var(--theme-light-nav-panel-bg);
+    background-color: #07182B;
     padding-left: 0px;
 
     & .image {
