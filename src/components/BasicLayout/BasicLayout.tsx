@@ -1,6 +1,6 @@
 import React from "react";
 
-import AuthIllustration from "./AuthIllustration.png";
+import AuthIllustration from "./AuthIllustration.svg";
 import css from "./BasicLayout.module.css";
 
 interface BasicLayoutProps {
