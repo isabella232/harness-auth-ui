@@ -34,11 +34,26 @@ const SignUp: React.FC = () => {
   const [signupData, setSignupData] = useState({ email: "", password: "" });
   const { mutate: signup, loading } = useSignup({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { module, signupAction, edition, billingFrequency } = useQueryParams<{
+  const {
+    module,
+    signupAction,
+    edition,
+    billingFrequency,
+    utmSource,
+    utmContent,
+    utmMedium,
+    utmTerm,
+    utmCampaign
+  } = useQueryParams<{
     module?: string;
     signupAction?: string;
     edition?: string;
     billingFrequency?: string;
+    utmSource?: string;
+    utmContent?: string;
+    utmMedium?: string;
+    utmTerm?: string;
+    utmCampaign?: string;
   }>();
 
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
@@ -59,7 +74,14 @@ const SignUp: React.FC = () => {
     try {
       const signupRequestData: SignupDTO = {
         ...data,
-        intent: module
+        intent: module,
+        utmInfo: {
+          utmSource,
+          utmContent,
+          utmMedium,
+          utmTerm,
+          utmCampaign
+        }
       };
 
       if (signupAction && signupAction.toUpperCase() in SignupAction) {
