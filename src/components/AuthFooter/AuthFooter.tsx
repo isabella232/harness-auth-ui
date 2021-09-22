@@ -34,7 +34,6 @@ export enum BillingFrequency {
   MONTHLY = "MONTHLY",
   YEARLY = "YEARLY"
 }
-
 interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
@@ -50,13 +49,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   const { returnUrl } = useQueryParams();
   const isSignup = page === AuthPage.SignUp;
 
-  function getSignupQueryParams() {
-    const queryString = window.location.hash?.split("?")?.[1];
-    const urlParams = new URLSearchParams(queryString);
-
-    const module = urlParams?.get("module");
-    const moduleParam = module ? `&module=${module}` : "";
-
+  function getLicenseParams(urlParams?: URLSearchParams): string {
     const signupAction = urlParams?.get("signupAction");
     const signupParam =
       signupAction && signupAction.toUpperCase() in SignupAction
@@ -75,7 +68,40 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
         ? `&billingFrequency=${billingFrequency.toUpperCase()}`
         : "";
 
-    return `&action=signup&isNG=true${moduleParam}${signupParam}${editionParam}${billingFrequencyParam}`;
+    return `${signupParam}${editionParam}${billingFrequencyParam}`;
+  }
+
+  function getUTMInfoParams(urlParams?: URLSearchParams): string {
+    const utmCampaign = urlParams?.get("utmCampaign");
+    const utmCampaignParam = utmCampaign ? `&utm_campaign=${utmCampaign}` : "";
+
+    const utmSource = urlParams?.get("utmSource");
+    const utmSourceParam = utmSource ? `&utm_source=${utmSource}` : "";
+
+    const utmTerm = urlParams?.get("utmTerm");
+    const utmTermParam = utmTerm ? `&utm_term=${utmTerm}` : "";
+
+    const utmContent = urlParams?.get("utmContent");
+    const utmContentParam = utmContent ? `&utm_content=${utmContent}` : "";
+
+    const utmMedium = urlParams?.get("utmMedium");
+    const utmMediumParam = utmMedium ? `&utm_medium=${utmMedium}` : "";
+
+    return `${utmCampaignParam}${utmSourceParam}${utmTermParam}${utmContentParam}${utmMediumParam}`;
+  }
+
+  function getSignupQueryParams() {
+    const queryString = window.location.hash?.split("?")?.[1];
+    const urlParams = new URLSearchParams(queryString);
+
+    const module = urlParams?.get("module");
+    const moduleParam = module ? `&module=${module}` : "";
+
+    const licenseParams = getLicenseParams(urlParams);
+
+    const utmInfoParams = getUTMInfoParams(urlParams);
+
+    return `&action=signup&isNG=true${moduleParam}${licenseParams}${utmInfoParams}`;
   }
 
   function getOAuthLink(
