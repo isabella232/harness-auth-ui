@@ -155,6 +155,7 @@ const SignIn: React.FC = () => {
                     type="password"
                     disabled={loading}
                     validate={validatePasswordRequiredOnly}
+                    showErrorAsMessage={true}
                   />
                 </div>
                 {showCaptcha ? (

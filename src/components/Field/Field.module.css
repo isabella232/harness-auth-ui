@@ -5,11 +5,15 @@
 
   & .validation-outline:focus-visible {
     outline: 0;
-    border-color: var(--red-500);
+    border-color: var(--red-50);
   }
 
   & .validation-message {
     color: var(--red-500);
+  }
+
+  & .info-message {
+    color: var(--grey-500);
   }
 
   & input:disabled {

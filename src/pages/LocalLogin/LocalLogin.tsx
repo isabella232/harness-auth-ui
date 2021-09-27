@@ -95,6 +95,7 @@ const LocalLogin: React.FC = () => {
                   type="password"
                   disabled={loading}
                   validate={validatePasswordRequiredOnly}
+                  showErrorAsMessage={true}
                 />
                 <input
                   type="submit"

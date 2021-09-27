@@ -18,6 +18,7 @@ interface FieldProps {
   disabled?: boolean;
   initialValue?: string;
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
+  showErrorAsMessage?: boolean;
 }
 
 const Field: React.FC<FieldProps> = (props) => {
@@ -29,7 +30,8 @@ const Field: React.FC<FieldProps> = (props) => {
     placeholder,
     type,
     onBlur,
-    initialValue
+    initialValue,
+    showErrorAsMessage
   } = props;
 
   return (
@@ -53,6 +55,9 @@ const Field: React.FC<FieldProps> = (props) => {
               <span className={cx(css["validation-message"])}>
                 {meta.error}
               </span>
+            )}
+            {!showError && showErrorAsMessage && (
+              <span className={cx(css["info-message"])}>{meta.error}</span>
             )}
           </div>
         );
