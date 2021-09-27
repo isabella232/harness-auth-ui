@@ -78,6 +78,11 @@ exports[`SignIn render 1`] = `
                   type="password"
                   value=""
                 />
+                <span
+                  class="info-message"
+                >
+                  A password is required
+                </span>
               </div>
             </div>
             <input

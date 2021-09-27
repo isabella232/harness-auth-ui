@@ -64,6 +64,11 @@ exports[`SignUp render 1`] = `
                 type="password"
                 value=""
               />
+              <span
+                class="info-message"
+              >
+                A password is required
+              </span>
             </div>
             <div />
             <input
@@ -260,6 +265,9 @@ exports[`SignUp telemetry 1`] = `
                 placeholder="Password"
                 type="password"
                 value="12345678"
+              />
+              <span
+                class="info-message"
               />
             </div>
             <div />

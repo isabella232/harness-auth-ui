@@ -81,6 +81,11 @@ exports[`LocalLogin render 1`] = `
                 type="password"
                 value=""
               />
+              <span
+                class="info-message"
+              >
+                A password is required
+              </span>
             </div>
             <input
               class="button primary"
