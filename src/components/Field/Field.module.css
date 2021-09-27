@@ -13,7 +13,7 @@
   }
 
   & .info-message {
-    color: var(--grey-500);
+    color: var(--dark-outline);
   }
 
   & input:disabled {
