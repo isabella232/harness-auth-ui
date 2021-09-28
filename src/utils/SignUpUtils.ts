@@ -25,6 +25,7 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
     SecureStorage.setItem("acctId", resource.defaultAccountId);
+    SecureStorage.setItem("email", resource.email);
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     if (resource.accounts) createDefaultExperienceMap(resource.accounts);
