@@ -67,7 +67,7 @@ exports[`SignUp render 1`] = `
               <span
                 class="info-message"
               >
-                A password is required
+                The password must be between 8 and 64 characters long
               </span>
             </div>
             <div />
@@ -268,7 +268,9 @@ exports[`SignUp telemetry 1`] = `
               />
               <span
                 class="info-message"
-              />
+              >
+                The password must be between 8 and 64 characters long
+              </span>
             </div>
             <div />
             <input
