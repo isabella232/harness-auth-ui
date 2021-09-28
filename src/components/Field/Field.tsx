@@ -49,14 +49,12 @@ const Field: React.FC<FieldProps> = (props) => {
               className={cx(showError && css["validation-outline"])}
               onBlur={onBlur}
             />
-            {showError &&
-              meta.error !==
-                "The password must be between 8 and 64 characters long" && (
-                <span className={cx(css["validation-message"])}>
-                  {meta.error}
-                </span>
-              )}
-            {type === "password" && (
+            {showError && (
+              <span className={cx(css["validation-message"])}>
+                {meta.error}
+              </span>
+            )}
+            {type === "password" && !showError && (
               <span className={cx(css["info-message"])}>
                 The password must be between 8 and 64 characters long
               </span>
