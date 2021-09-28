@@ -49,7 +49,7 @@ const Field: React.FC<FieldProps> = (props) => {
               className={cx(showError && css["validation-outline"])}
               onBlur={onBlur}
             />
-            {showError && (
+            {showError && type !== "password" && (
               <span className={cx(css["validation-message"])}>
                 {meta.error}
               </span>
