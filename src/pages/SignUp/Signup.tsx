@@ -188,7 +188,6 @@ const SignUp: React.FC = () => {
       placeholder="Password"
       disabled={loading || captchaExecuting}
       validate={validatePassword}
-      showErrorAsMessage={true}
     />
   );
 

@@ -18,7 +18,6 @@ interface FieldProps {
   disabled?: boolean;
   initialValue?: string;
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
-  showErrorAsMessage?: boolean;
 }
 
 const Field: React.FC<FieldProps> = (props) => {
@@ -30,8 +29,7 @@ const Field: React.FC<FieldProps> = (props) => {
     placeholder,
     type,
     onBlur,
-    initialValue,
-    showErrorAsMessage
+    initialValue
   } = props;
 
   return (
@@ -56,8 +54,10 @@ const Field: React.FC<FieldProps> = (props) => {
                 {meta.error}
               </span>
             )}
-            {!showError && showErrorAsMessage && (
-              <span className={cx(css["info-message"])}>{meta.error}</span>
+            {type === "password" && (
+              <span className={cx(css["info-message"])}>
+                The password must be between 8 and 64 characters long
+              </span>
             )}
           </div>
         );

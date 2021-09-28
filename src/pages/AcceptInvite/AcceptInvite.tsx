@@ -107,7 +107,6 @@ const SignUp: React.FC = () => {
                 placeholder="Password"
                 disabled={loading}
                 validate={validatePassword}
-                showErrorAsMessage={true}
               />
               <input
                 type="submit"

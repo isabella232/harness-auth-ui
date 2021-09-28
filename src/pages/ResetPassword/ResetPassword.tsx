@@ -83,7 +83,6 @@ export default function ResetPassword() {
                   label="Password"
                   disabled={loading}
                   validate={validatePassword}
-                  showErrorAsMessage={true}
                 />
                 <Field
                   name="confirmPassword"
@@ -93,7 +92,6 @@ export default function ResetPassword() {
                   validate={(confirmPassword: string) =>
                     validateConfirmPassword(confirmPassword, values.password)
                   }
-                  showErrorAsMessage={true}
                 />
                 <input
                   type="submit"

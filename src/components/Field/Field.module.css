@@ -10,6 +10,7 @@
 
   & .validation-message {
     color: var(--red-500);
+    font-size: var(--font-size-xsmall);
   }
 
   & .info-message {
