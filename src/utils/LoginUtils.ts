@@ -60,6 +60,7 @@ export function handleLoginSuccess({
       resource.accounts?.[0]?.uuid;
     SecureStorage.setItem("token", resource.token);
     SecureStorage.setItem("uuid", resource.uuid);
+    SecureStorage.setItem("email", resource.email);
     SecureStorage.setItem("acctId", loginToAccountId);
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
