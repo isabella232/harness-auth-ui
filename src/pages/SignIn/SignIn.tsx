@@ -34,6 +34,7 @@ interface LoginFormData {
 interface SignInQueryParams {
   returnUrl?: string;
   errorCode?: string;
+  provider?: string;
 }
 
 const SignIn: React.FC = () => {
@@ -41,7 +42,11 @@ const SignIn: React.FC = () => {
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
+  const {
+    returnUrl,
+    errorCode,
+    provider
+  } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
   const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
 
@@ -67,6 +72,16 @@ const SignIn: React.FC = () => {
       case "invalidsso":
         toast.error("Invalid SSO Login.");
         return;
+      case "SAML_NOT_ENABLED":
+        toast.error("Sign-in using SAML SSO is not enabled for your account.");
+        return;
+      case "OAUTH_NOT_ENABLED":
+        toast.error(
+          `Sign-in using ${
+            provider ?? ""
+          } OAuth is not enabled for your account.`
+        );
+        return;
       case "email_verify_fail":
         toast.error(
           "Email verification failed. Please sign in to resend the email."
@@ -81,6 +96,9 @@ const SignIn: React.FC = () => {
         toast.error(
           "We couldn’t find an invitation matching the email address you entered. Please search your email for an invitation from Harness or contact your admin."
         );
+        return;
+      case "INTERNAL_ERROR":
+        toast.error("Something went wrong.");
         return;
     }
   }, []);
