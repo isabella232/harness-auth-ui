@@ -10,6 +10,12 @@
 
   & .validation-message {
     color: var(--red-500);
+    font-size: var(--font-size-small);
+  }
+
+  & .info-message {
+    color: var(--dark-outline);
+    font-size: var(--font-size-small);
   }
 
   & input:disabled {

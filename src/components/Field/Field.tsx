@@ -54,6 +54,11 @@ const Field: React.FC<FieldProps> = (props) => {
                 {meta.error}
               </span>
             )}
+            {type === "password" && !showError && (
+              <span className={cx(css["info-message"])}>
+                The password must be between 8 and 64 characters long
+              </span>
+            )}
           </div>
         );
       }}
