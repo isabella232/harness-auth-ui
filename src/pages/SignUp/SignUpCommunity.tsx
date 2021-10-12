@@ -229,16 +229,18 @@ const SignUp: React.FC = () => {
             >
               {emailField}
               {passwordField}
-              <ReCAPTCHA
-                ref={captchaRef}
-                sitekey={
-                  window.invisibleCaptchaToken ||
-                  "6LfMgvcaAAAAAHCctQKV5AsCYZJHsKOpGH5oGc5Q" // site key for dev environments
-                }
-                size="invisible"
-                onChange={setCaptchaToken}
-                onErrored={handleRecaptchaError}
-              />
+              {!__ON_PREM__ && (
+                <ReCAPTCHA
+                  ref={captchaRef}
+                  sitekey={
+                    window.invisibleCaptchaToken ||
+                    "6LfMgvcaAAAAAHCctQKV5AsCYZJHsKOpGH5oGc5Q" // site key for dev environments
+                  }
+                  size="invisible"
+                  onChange={setCaptchaToken}
+                  onErrored={handleRecaptchaError}
+                />
+              )}
               <input
                 type="submit"
                 value="Sign up"
@@ -248,7 +250,7 @@ const SignUp: React.FC = () => {
             </form>
           )}
         />
-        <AuthFooter page={AuthPage.SignUp} />
+        {!__ON_PREM__ && <AuthFooter page={AuthPage.SignUp} />}
         <div className={css.footer}>
           Already have an account?{" "}
           <Link to={RouteDefinitions.toSignIn()}>Sign in</Link>
