@@ -173,19 +173,6 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
               Single sign-on
             </Text>
           </button>
-          <button
-            className={cx("button", css.ssoButton)}
-            onClick={() => {
-              history.push({
-                pathname: RouteDefinitions.toLocalLogin(),
-                search: returnUrl
-                  ? `returnUrl=${encodeURIComponent(returnUrl as string)}`
-                  : void 0
-              });
-            }}
-          >
-            <Text>Harness local login</Text>
-          </button>
         </>
       )}
     </>
