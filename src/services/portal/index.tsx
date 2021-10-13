@@ -20779,3 +20779,63 @@ export const useCompleteInviteAndSignIn1 = (
     base: window.location.pathname.replace("auth/", "") + "gateway/api",
     ...props
   });
+
+export interface SignupPathParams {
+  source: string;
+}
+
+export type SignupProps = Omit<
+  MutateProps<
+    RestResponseBoolean,
+    unknown,
+    void,
+    UserInviteRequestBody,
+    SignupPathParams
+  >,
+  "path" | "verb"
+> &
+  SignupPathParams;
+
+export const Signup = ({ source, ...props }: SignupProps) => (
+  <Mutate<
+    RestResponseBoolean,
+    unknown,
+    void,
+    UserInviteRequestBody,
+    SignupPathParams
+  >
+    verb="POST"
+    path={`/signup/${source}`}
+    base={window.location.pathname.replace("auth/", "") + "gateway/api"}
+    {...props}
+  />
+);
+
+export type UseSignupProps = Omit<
+  UseMutateProps<
+    RestResponseBoolean,
+    unknown,
+    void,
+    UserInviteRequestBody,
+    SignupPathParams
+  >,
+  "path" | "verb"
+> &
+  SignupPathParams;
+
+export const useSignup = ({ source, ...props }: UseSignupProps) =>
+  useMutate<
+    RestResponseBoolean,
+    unknown,
+    void,
+    UserInviteRequestBody,
+    SignupPathParams
+  >(
+    "POST",
+    (paramsInPath: SignupPathParams) => `/signup/${paramsInPath.source}`,
+    {
+      base: window.location.pathname.replace("auth/", "") + "gateway/api",
+      pathParams: { source },
+      ...props
+    }
+  );

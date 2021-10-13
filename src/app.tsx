@@ -15,6 +15,7 @@ import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
 import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 import CompleteInvitePage from "./pages/CompleteInvite/CompleteInvitePage";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
+import SignUpCommunity from "./pages/SignUp/SignUpCommunity";
 
 export function App() {
   if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
@@ -33,6 +34,10 @@ export function App() {
             <Route path={routes.toSignIn()} component={SignIn} />
             <Route path={routes.toLocalLogin()} component={LocalLogin} />
             <Route path={routes.toSignUp()} component={SignUp} />
+            <Route
+              path={routes.toSignUpCommunity()}
+              component={SignUpCommunity}
+            />
             <Route
               path={routes.toForgotPassword()}
               component={ForgotPassword}

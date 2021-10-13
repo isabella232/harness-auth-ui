@@ -1,44 +1,35 @@
-import React, { useEffect, useRef, useState, FocusEvent } from "react";
+import React, { useState, FocusEvent } from "react";
 import cx from "classnames";
 import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
-import ReCAPTCHA from "react-google-recaptcha";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { useSignup, SignupDTO } from "services/ng";
+import {
+  useSignup,
+  UserInviteRequestBody,
+  UserInviteSource
+} from "services/portal";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
 import RouteDefinitions from "RouteDefinitions";
-import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
-import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
-import {
-  BillingFrequency,
-  Edition,
-  SignupAction
-} from "components/AuthFooter/AuthFooter";
+import { handleLoginSuccess } from "../../utils/LoginUtils";
 
 interface SignUpFormData {
   email: string;
   password: string;
 }
 
-const SignUp: React.FC = () => {
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+const SignUpCommunity: React.FC = () => {
   const history = useHistory();
-  const [signupData, setSignupData] = useState({ email: "", password: "" });
-  const { mutate: signup, loading } = useSignup({});
-  const captchaRef = useRef<ReCAPTCHA>(null);
+  const { mutate: signup, loading } = useSignup({ source: "" });
   const {
     module,
-    signupAction,
-    edition,
-    billingFrequency,
     utm_source,
     utm_content,
     utm_medium,
@@ -56,24 +47,16 @@ const SignUp: React.FC = () => {
     utm_campaign?: string;
   }>();
 
-  const [captchaExecuting, setCaptchaExecuting] = useState(false);
-  useEffect(() => {
-    const { email, password } = signupData;
-
-    if (email && password && captchaToken) {
-      setCaptchaExecuting(false);
-      handleSignup(signupData, captchaToken);
-    }
-  }, [captchaToken]);
-
-  const handleSignup = async (
-    data: SignUpFormData,
-    captchaToken: string
-  ): Promise<void> => {
+  const handleSignup = async (data: SignUpFormData): Promise<void> => {
     const encodedEmail = encodeURIComponent(data.email);
+
     try {
-      const signupRequestData: SignupDTO = {
-        ...data,
+      const signupRequestData: UserInviteRequestBody = {
+        appId: "",
+        lastUpdatedAt: 0,
+        uuid: "",
+        email: data.email,
+        password: [data.password],
         intent: module,
         utmInfo: {
           utmSource: utm_source,
@@ -81,78 +64,23 @@ const SignUp: React.FC = () => {
           utmMedium: utm_medium,
           utmTerm: utm_term,
           utmCampaign: utm_campaign
-        }
+        },
+        source: { type: "ONPREM" }
       };
 
-      if (signupAction && signupAction.toUpperCase() in SignupAction) {
-        signupRequestData.signupAction = signupAction.toUpperCase() as SignupAction;
-      }
+      const handleCommunitySignup = await signup(signupRequestData);
 
-      if (edition && edition.toUpperCase() in Edition) {
-        signupRequestData.edition = edition.toUpperCase() as Edition;
-      }
-
-      if (
-        billingFrequency &&
-        billingFrequency.toUpperCase() in BillingFrequency
-      ) {
-        signupRequestData.billingFrequency = billingFrequency.toUpperCase() as BillingFrequency;
-      }
-
-      await signup(signupRequestData, {
-        queryParams: { captchaToken: captchaToken }
-      });
-
-      history.push({
-        pathname: RouteDefinitions.toEmailVerification(),
-        search: `?status=${VERIFY_EMAIL_STATUS.EMAIL_SENT}&email=${encodedEmail}`
-      });
+      // handleCommunitySignup.
+      // const res
+      //handleLoginSuccess({ha  history: history});
     } catch (error) {
-      captchaRef.current?.reset();
-
-      if (
-        error?.data?.responseMessages?.length &&
-        error?.data?.responseMessages[0]?.code === "USER_ALREADY_REGISTERED"
-      ) {
-        history.push({
-          pathname: RouteDefinitions.toEmailVerification(),
-          search: `?status=${VERIFY_EMAIL_STATUS.SIGNED_UP}&email=${encodedEmail}`
-        });
-      } else {
-        handleError(error);
-      }
+      handleError(error);
     }
-  };
-
-  const manuallyExcecuteRecaptcha = (): boolean => {
-    if (captchaRef.current?.execute) {
-      captchaRef.current.execute();
-      setCaptchaExecuting(true);
-      return true;
-    }
-
-    handleError("Captcha failed to execute");
-    return false;
   };
 
   const onSubmit = (data: SignUpFormData) => {
-    if (manuallyExcecuteRecaptcha()) {
-      data.email = data.email.toLowerCase();
-      setSignupData(data);
-      telemetry.track({
-        event: "Signup submit",
-        properties: {
-          category: "SIGNUP",
-          userId: data.email,
-          groupId: "",
-          utm_source: utm_source || "",
-          utm_medium: utm_medium || "",
-          utm_campaign: utm_campaign || "",
-          utm_term: utm_term || "",
-          utm_content: utm_content || ""
-        }
-      });
-    }
+    data.email = data.email.toLowerCase();
+    handleSignup(data);
   };
 
   const emailField = (
@@ -160,23 +88,8 @@ const SignUp: React.FC = () => {
       name="email"
       label={"Email"}
       placeholder="email@work.com"
-      disabled={loading || captchaExecuting}
+      disabled={loading}
       validate={validateEmail}
-      onBlur={(e: FocusEvent<HTMLInputElement>) => {
-        telemetry.track({
-          event: "Email input",
-          properties: {
-            category: "SIGNUP",
-            userId: e.target.value,
-            groupId: "",
-            utm_source: utm_source || "",
-            utm_medium: utm_medium || "",
-            utm_campaign: utm_campaign || "",
-            utm_term: utm_term || "",
-            utm_content: utm_content || ""
-          }
-        });
-      }}
     />
   );
 
@@ -186,31 +99,10 @@ const SignUp: React.FC = () => {
       label="Password"
       type="password"
       placeholder="Password"
-      disabled={loading || captchaExecuting}
+      disabled={loading}
       validate={validatePassword}
     />
   );
-
-  telemetry.page({
-    name: "Signup Page",
-    category: "SIGNUP",
-    properties: {
-      userId: "",
-      groupId: "",
-      module: module || "",
-      utm_source: utm_source || "",
-      utm_medium: utm_medium || "",
-      utm_campaign: utm_campaign || "",
-      utm_term: utm_term || "",
-      utm_content: utm_content || ""
-    }
-  });
-
-  function handleRecaptchaError() {
-    // Block the user until they refresh
-    setCaptchaExecuting(true);
-    handleError("Captcha has failed, please refresh the page.");
-  }
 
   return (
     <BasicLayout>
@@ -229,28 +121,15 @@ const SignUp: React.FC = () => {
             >
               {emailField}
               {passwordField}
-              {!__ON_PREM__ && (
-                <ReCAPTCHA
-                  ref={captchaRef}
-                  sitekey={
-                    window.invisibleCaptchaToken ||
-                    "6LfMgvcaAAAAAHCctQKV5AsCYZJHsKOpGH5oGc5Q" // site key for dev environments
-                  }
-                  size="invisible"
-                  onChange={setCaptchaToken}
-                  onErrored={handleRecaptchaError}
-                />
-              )}
               <input
                 type="submit"
                 value="Sign up"
                 className="button primary"
-                disabled={loading || captchaExecuting}
+                disabled={loading}
               />
             </form>
           )}
         />
-        {!__ON_PREM__ && <AuthFooter page={AuthPage.SignUp} />}
         <div className={css.footer}>
           Already have an account?{" "}
           <Link to={RouteDefinitions.toSignIn()}>Sign in</Link>
@@ -260,4 +139,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default SignUpCommunity;

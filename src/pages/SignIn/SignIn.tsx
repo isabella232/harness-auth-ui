@@ -157,7 +157,7 @@ const SignIn: React.FC = () => {
                     validate={validatePasswordRequiredOnly}
                   />
                 </div>
-                {showCaptcha && !__ON_PREM__ ? (
+                {showCaptcha ? (
                   <ReCAPTCHA
                     sitekey={window.captchaToken || ""}
                     ref={captchaRef}
@@ -178,9 +178,7 @@ const SignIn: React.FC = () => {
             );
           }}
         />
-        {!__ON_PREM__ && (
-          <AuthFooter page={AuthPage.SignIn} accountId={accountId} />
-        )}
+        <AuthFooter page={AuthPage.SignIn} accountId={accountId} />
         {window.signupExposed === "true" && (
           <div className={css.footer}>
             No account? <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
