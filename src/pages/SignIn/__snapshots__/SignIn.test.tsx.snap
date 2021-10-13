@@ -179,15 +179,6 @@ exports[`SignIn render 1`] = `
               Single sign-on
             </span>
           </button>
-          <button
-            class="button ssoButton"
-          >
-            <span
-              class="text"
-            >
-              Harness local login
-            </span>
-          </button>
         </div>
       </div>
     </div>
