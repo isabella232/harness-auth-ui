@@ -1,14 +1,10 @@
-import React, { useState, FocusEvent } from "react";
+import React from "react";
 import cx from "classnames";
 import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import {
-  useSignup,
-  UserInviteRequestBody,
-  UserInviteSource
-} from "services/portal";
+import { UserInviteRequestBody, useSignup } from "services/portal";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -17,8 +13,6 @@ import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
-import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
-import { handleLoginSuccess } from "../../utils/LoginUtils";
 
 interface SignUpFormData {
   email: string;
