@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
@@ -21,7 +21,6 @@ interface SignUpFormData {
 }
 
 const SignUpCommunity: React.FC = () => {
-  const history = useHistory();
   const { mutate: signup, loading } = useCommunitySignup({});
   const {
     module,
