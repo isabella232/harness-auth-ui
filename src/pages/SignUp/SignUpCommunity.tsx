@@ -4,7 +4,6 @@ import { Link, useHistory } from "react-router-dom";
 import { Form } from "react-final-form";
 
 import BasicLayout from "components/BasicLayout/BasicLayout";
-import { UserInviteRequestBody, useSignup } from "services/portal";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
@@ -13,6 +12,8 @@ import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
 import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
+import { SignupDTO, useCommunitySignup } from "../../services/ng";
+import { handleSignUpSuccess } from "../../utils/SignUpUtils";
 
 interface SignUpFormData {
   email: string;
@@ -21,7 +22,7 @@ interface SignUpFormData {
 
 const SignUpCommunity: React.FC = () => {
   const history = useHistory();
-  const { mutate: signup, loading } = useSignup({ source: "" });
+  const { mutate: signup, loading } = useCommunitySignup({});
   const {
     module,
     utm_source,
@@ -42,15 +43,10 @@ const SignUpCommunity: React.FC = () => {
   }>();
 
   const handleSignup = async (data: SignUpFormData): Promise<void> => {
-    const encodedEmail = encodeURIComponent(data.email);
-
     try {
-      const signupRequestData: UserInviteRequestBody = {
-        appId: "",
-        lastUpdatedAt: 0,
-        uuid: "",
+      const signupRequestData: SignupDTO = {
         email: data.email,
-        password: [data.password],
+        password: data.password,
         intent: module,
         utmInfo: {
           utmSource: utm_source,
@@ -59,14 +55,13 @@ const SignUpCommunity: React.FC = () => {
           utmTerm: utm_term,
           utmCampaign: utm_campaign
         },
-        source: { type: "ONPREM" }
+        edition: "COMMUNITY",
+        signupAction: "REGULAR"
       };
 
       const handleCommunitySignup = await signup(signupRequestData);
 
-      // handleCommunitySignup.
-      // const res
-      //handleLoginSuccess({ha  history: history});
+      handleSignUpSuccess(handleCommunitySignup?.resource);
     } catch (error) {
       handleError(error);
     }
