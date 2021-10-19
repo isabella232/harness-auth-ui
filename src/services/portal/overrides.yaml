@@ -6,7 +6,7 @@ allowpaths:
   - "/users/harness-local-login"
   - "/users/two-factor-login"
   - "/users/invites/ngsignin"
-  - "/signup/{source}"
+  - "/signup/community"
 operationIdOverrides:
   /users/login: login
   /users/logintype: loginType
