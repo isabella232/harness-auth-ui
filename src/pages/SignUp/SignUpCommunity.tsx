@@ -22,14 +22,7 @@ interface SignUpFormData {
 
 const SignUpCommunity: React.FC = () => {
   const { mutate: signup, loading } = useCommunitySignup({});
-  const {
-    module,
-    utm_source,
-    utm_content,
-    utm_medium,
-    utm_term,
-    utm_campaign
-  } = useQueryParams<{
+  const { module } = useQueryParams<{
     module?: string;
     signupAction?: string;
     edition?: string;
@@ -47,19 +40,14 @@ const SignUpCommunity: React.FC = () => {
         email: data.email,
         password: data.password,
         intent: module,
-        utmInfo: {
-          utmSource: utm_source,
-          utmContent: utm_content,
-          utmMedium: utm_medium,
-          utmTerm: utm_term,
-          utmCampaign: utm_campaign
-        },
         edition: "COMMUNITY",
         signupAction: "REGULAR"
       };
 
       const handleCommunitySignup = await signup(signupRequestData);
-
+      if (handleCommunitySignup.resource) {
+        handleCommunitySignup.resource.intent = "COMMUNITY";
+      }
       handleSignUpSuccess(handleCommunitySignup?.resource);
     } catch (error) {
       handleError(error);
