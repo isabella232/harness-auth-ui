@@ -6,8 +6,9 @@ const stubTelemetry = {
   page: () => void 0
 };
 
-const TelemetryInstance = __ON_PREM__
-  ? stubTelemetry
-  : new Telemetry(window.segmentToken);
+const TelemetryInstance =
+  window.deploymentType !== "SAAS"
+    ? stubTelemetry
+    : new Telemetry(window.segmentToken);
 
 export default TelemetryInstance;

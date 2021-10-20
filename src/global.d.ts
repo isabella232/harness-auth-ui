@@ -7,9 +7,15 @@ declare interface Window {
   segmentToken: string;
   signupExposed: string;
   gtmCDEnabled: string;
+  deploymentType: DEPLOYMENT_TYPE;
+}
+
+declare enum DEPLOYMENT_TYPE {
+  SAAS = "SAAS",
+  ON_PREM = "ON_PREM",
+  COMMUNITY = "COMMUNITY"
 }
 
 declare const Bugsnag: any;
 declare const __DEV__: boolean;
-declare const __ON_PREM__: boolean;
 declare const __BUGSNAG_RELEASE_VERSION__: string;
