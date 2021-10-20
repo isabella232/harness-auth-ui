@@ -14,16 +14,16 @@ import AcceptInvite from "./pages/AcceptInvite/AcceptInvite";
 import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 import CompleteInvitePage from "./pages/CompleteInvite/CompleteInvitePage";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
-import { isCommunityPlan } from "utils/DeploymentTypeUtil";
+import { isCommunityPlan, isOnPrem, isSaas } from "utils/DeploymentTypeUtil";
 
 const initializeApp = () => {
-  // initialize deploymentType
-  if (!window.deploymentType) {
-    window.deploymentType = "COMMUNITY" as DEPLOYMENT_TYPE;
-  }
-
   // initialize bugsnagClient
-  if (window.bugsnagToken && typeof Bugsnag !== "undefined" && Bugsnag.start) {
+  if (
+    window.bugsnagToken &&
+    typeof Bugsnag !== "undefined" &&
+    Bugsnag.start &&
+    isSaas()
+  ) {
     window.bugsnagClient = Bugsnag.start({
       apiKey: window.bugsnagToken,
       appVersion: __BUGSNAG_RELEASE_VERSION__,
@@ -38,6 +38,7 @@ const AppWithCommunityRoutes: React.FC = () => {
       <Route path={routes.toSignIn()} component={SignIn} />
       <Route path={routes.toForgotPassword()} component={ForgotPassword} />
       <Route path={routes.toResetPassword()} component={ResetPassword} />
+      <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
@@ -45,54 +46,47 @@ const AppWithCommunityRoutes: React.FC = () => {
   );
 };
 
+const AppWithSaasRoutes: React.FC = () => {
+  return (
+    <>
+      <Route path={routes.toSignIn()} component={SignIn} />
+      <Route path={routes.toLocalLogin()} component={LocalLogin} />
+      <Route path={routes.toSignUp()} component={SignUp} />
+      <Route path={routes.toForgotPassword()} component={ForgotPassword} />
+      <Route path={routes.toResetPassword()} component={ResetPassword} />
+      <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
+      <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
+      <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
+      <Route path="/" exact>
+        <Redirect to={routes.toSignIn()} />
+      </Route>
+      <Route path={routes.toEmailVerification()} component={VerifyEmailPage} />
+      <Route path={routes.toCompleteInvite()} component={CompleteInvitePage} />
+    </>
+  );
+};
+
 export function App(): React.ReactElement {
   initializeApp();
 
-  const isCommunity = isCommunityPlan();
+  const renderRoutes = () => {
+    if (isCommunityPlan()) {
+      return <AppWithCommunityRoutes />;
+    }
+
+    if (isOnPrem()) {
+      return <AppWithSaasRoutes />;
+    }
+
+    return <AppWithSaasRoutes />;
+  };
+
   return (
     <RestfulProvider base="/">
       <AppErrorBoundary>
         <Toaster />
         <HashRouter>
-          <Switch>
-            {isCommunity ? (
-              <AppWithCommunityRoutes />
-            ) : (
-              <>
-                <Route path={routes.toSignIn()} component={SignIn} />
-                <Route path={routes.toLocalLogin()} component={LocalLogin} />
-                <Route path={routes.toSignUp()} component={SignUp} />
-                <Route
-                  path={routes.toForgotPassword()}
-                  component={ForgotPassword}
-                />
-                <Route
-                  path={routes.toResetPassword()}
-                  component={ResetPassword}
-                />
-                <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
-                <Route
-                  path={routes.toTwoFactorAuth()}
-                  component={TwoFactorAuth}
-                />
-                <Route
-                  path={routes.toAcceptInvite()}
-                  component={AcceptInvite}
-                />
-                <Route path="/" exact>
-                  <Redirect to={routes.toSignIn()} />
-                </Route>
-                <Route
-                  path={routes.toEmailVerification()}
-                  component={VerifyEmailPage}
-                />
-                <Route
-                  path={routes.toCompleteInvite()}
-                  component={CompleteInvitePage}
-                />
-              </>
-            )}
-          </Switch>
+          <Switch>{renderRoutes()}</Switch>
         </HashRouter>
       </AppErrorBoundary>
     </RestfulProvider>

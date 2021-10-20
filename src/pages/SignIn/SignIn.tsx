@@ -183,7 +183,7 @@ const SignIn: React.FC = () => {
           hideOAuth={isCommunityPlan()}
           page={AuthPage.SignIn}
           accountId={accountId}
-          disableSSO={isCommunityPlan()}
+          hideSSO={isCommunityPlan()}
         />
         {window.signupExposed === "true" && (
           <div className={css.footer}>

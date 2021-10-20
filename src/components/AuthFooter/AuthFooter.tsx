@@ -38,14 +38,14 @@ interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
   accountId?: string;
-  disableSSO?: boolean;
+  hideSSO?: boolean;
 }
 
 const AuthFooter: React.FC<AuthFooterProps> = ({
   page,
   hideOAuth,
   accountId,
-  disableSSO
+  hideSSO
 }) => {
   const history = useHistory();
   const { returnUrl } = useQueryParams();
@@ -165,7 +165,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
         </div>
       ) : (
         <>
-          {disableSSO ? undefined : (
+          {hideSSO ? undefined : (
             <button
               className={cx("button", css.ssoButton)}
               onClick={() => {

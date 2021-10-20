@@ -9,11 +9,25 @@ import replace from "@rollup/plugin-replace";
 
 const DEV = process.env.NODE_ENV === "development";
 
-const headScripts = [];
-if (!DEV)
-  headScripts.push({
-    src: "//d2wy8f7a9ursnm.cloudfront.net/v7/bugsnag.min.js"
-  });
+let headScripts = [];
+if (!DEV) {
+  headScripts = [
+    {
+      src: "//d2wy8f7a9ursnm.cloudfront.net/v7/bugsnag.min.js"
+    },
+    `
+    if(!window.deploymentType)
+    window.deploymentType="COMMUNITY"
+    `
+  ];
+} else {
+  headScripts = [
+    `
+    if(!window.deploymentType)
+    window.deploymentType="SAAS"
+  `
+  ];
+}
 
 export default defineConfig({
   server: {
