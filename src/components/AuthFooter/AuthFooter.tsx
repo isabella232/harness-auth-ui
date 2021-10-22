@@ -38,12 +38,14 @@ interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
   accountId?: string;
+  hideSSO?: boolean;
 }
 
 const AuthFooter: React.FC<AuthFooterProps> = ({
   page,
   hideOAuth,
-  accountId
+  accountId,
+  hideSSO
 }) => {
   const history = useHistory();
   const { returnUrl } = useQueryParams();
@@ -163,16 +165,18 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
         </div>
       ) : (
         <>
-          <button
-            className={cx("button", css.ssoButton)}
-            onClick={() => {
-              history.push(RouteDefinitions.toSSOSignIn());
-            }}
-          >
-            <Text icon="sso" iconProps={{ size: 24 }}>
-              Single sign-on
-            </Text>
-          </button>
+          {hideSSO ? undefined : (
+            <button
+              className={cx("button", css.ssoButton)}
+              onClick={() => {
+                history.push(RouteDefinitions.toSSOSignIn());
+              }}
+            >
+              <Text icon="sso" iconProps={{ size: 24 }}>
+                Single sign-on
+              </Text>
+            </button>
+          )}
         </>
       )}
     </>

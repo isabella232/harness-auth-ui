@@ -20,6 +20,7 @@ import {
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
+import { isCommunityPlan } from "utils/DeploymentTypeUtil";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -178,7 +179,12 @@ const SignIn: React.FC = () => {
             );
           }}
         />
-        <AuthFooter page={AuthPage.SignIn} accountId={accountId} />
+        <AuthFooter
+          hideOAuth={isCommunityPlan()}
+          page={AuthPage.SignIn}
+          accountId={accountId}
+          hideSSO={isCommunityPlan()}
+        />
         {window.signupExposed === "true" && (
           <div className={css.footer}>
             No account? <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>

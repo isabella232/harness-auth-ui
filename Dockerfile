@@ -21,4 +21,5 @@ CMD sed -i "s|<\!-- captchaToken -->|<script>window.captchaToken = '$CAPTCHA_TOK
   sed -i "s|<\!-- bugsnagToken -->|<script>window.bugsnagToken = '$BUGSNAG_TOKEN'</script>|" index.html && \
   sed -i "s|<\!-- signupExposed -->|<script>window.signupExposed = '$SIGNUP_EXPOSED'</script>|" index.html && \
   sed -i "s|<\!-- gtmCDEnabled -->|<script>window.gtmCDEnabled = '$GTM_CD_ENABLED'</script>|" index.html && \
+  sed -i "s|<\!-- deploymentType -->|<script>window.deploymentType = '$DEPLOYMENT_TYPE'</script>|" index.html && \
   nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
