@@ -214,6 +214,8 @@ export interface Failure {
     | "USAGE_RESTRICTION_ERROR"
     | "STATE_EXECUTION_INSTANCE_NOT_FOUND"
     | "DELEGATE_TASK_RETRY"
+    | "KUBERNETES_API_TASK_EXCEPTION"
+    | "KUBERNETES_TASK_EXCEPTION"
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
@@ -322,7 +324,9 @@ export interface Failure {
     | "JIRA_CLIENT_ERROR"
     | "SCM_NOT_MODIFIED"
     | "JIRA_STEP_ERROR"
-    | "BUCKET_SERVER_ERROR";
+    | "BUCKET_SERVER_ERROR"
+    | "GIT_SYNC_ERROR"
+    | "TEMPLATE_EXCEPTION";
   message?: string;
   correlationId?: string;
   errors?: ValidationError[];
@@ -514,6 +518,8 @@ export interface Error {
     | "USAGE_RESTRICTION_ERROR"
     | "STATE_EXECUTION_INSTANCE_NOT_FOUND"
     | "DELEGATE_TASK_RETRY"
+    | "KUBERNETES_API_TASK_EXCEPTION"
+    | "KUBERNETES_TASK_EXCEPTION"
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
@@ -622,7 +628,9 @@ export interface Error {
     | "JIRA_CLIENT_ERROR"
     | "SCM_NOT_MODIFIED"
     | "JIRA_STEP_ERROR"
-    | "BUCKET_SERVER_ERROR";
+    | "BUCKET_SERVER_ERROR"
+    | "GIT_SYNC_ERROR"
+    | "TEMPLATE_EXCEPTION";
   message?: string;
   correlationId?: string;
   detailedMessage?: string;
@@ -809,6 +817,8 @@ export interface ResponseMessage {
     | "USAGE_RESTRICTION_ERROR"
     | "STATE_EXECUTION_INSTANCE_NOT_FOUND"
     | "DELEGATE_TASK_RETRY"
+    | "KUBERNETES_API_TASK_EXCEPTION"
+    | "KUBERNETES_TASK_EXCEPTION"
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
@@ -917,7 +927,9 @@ export interface ResponseMessage {
     | "JIRA_CLIENT_ERROR"
     | "SCM_NOT_MODIFIED"
     | "JIRA_STEP_ERROR"
-    | "BUCKET_SERVER_ERROR";
+    | "BUCKET_SERVER_ERROR"
+    | "GIT_SYNC_ERROR"
+    | "TEMPLATE_EXCEPTION";
   level?: "INFO" | "ERROR";
   message?: string;
   exception?: Throwable;
@@ -984,17 +996,9 @@ export interface StepData {
     | "SERVICENOW"
     | "EMAIL"
     | "BARRIERS"
-    | "ShellScript"
     | "NEW_RELIC_DEPLOYMENT_MAKER"
     | "TEMPLATIZED_SECRET_MANAGER";
   name?: string;
-}
-
-export interface ResponseString {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: string;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface ResponseMapServiceDefinitionTypeListExecutionStrategyType {
@@ -1006,30 +1010,16 @@ export interface ResponseMapServiceDefinitionTypeListExecutionStrategyType {
   correlationId?: string;
 }
 
-export interface ResponseListServiceDefinitionType {
+export interface ResponseString {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: "Kubernetes"[];
+  data?: string;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
 
-export interface ConnectorValidationResult {
-  status?: "SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN";
-  errors?: ErrorDetail[];
-  errorSummary?: string;
-  testedAt?: number;
-  delegateId?: string;
-}
-
-export interface ErrorDetail {
-  reason?: string;
-  message?: string;
-  code?: number;
-}
-
-export interface ResponseConnectorValidationResult {
+export interface ResponseListServiceDefinitionType {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ConnectorValidationResult;
+  data?: "Kubernetes"[];
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -1399,6 +1389,12 @@ export interface EntityGitDetails {
   filePath?: string;
 }
 
+export interface ErrorDetail {
+  reason?: string;
+  message?: string;
+  code?: number;
+}
+
 export interface GcpBillingExportSpec {
   datasetId: string;
 }
@@ -1488,6 +1484,7 @@ export type GithubConnector = ConnectorConfigDTO & {
   authentication: GithubAuthentication;
   apiAccess?: GithubApiAccess;
   delegateSelectors?: string[];
+  executeOnManager?: boolean;
   type: "Account" | "Repo";
 };
 
@@ -1749,9 +1746,12 @@ export type VaultConnectorDTO = ConnectorConfigDTO & {
   secretId?: string;
   secretEngineVersion?: number;
   delegateSelectors?: string[];
-  accessType?: "APP_ROLE" | "TOKEN";
+  namespace?: string;
+  sinkPath?: string;
+  useVaultAgent?: boolean;
   default?: boolean;
   readOnly?: boolean;
+  accessType?: "APP_ROLE" | "TOKEN" | "VAULT_AGENT";
 };
 
 export interface Connector {
@@ -1852,57 +1852,17 @@ export type ConnectorFilterProperties = FilterProperties & {
   ccmConnectorFilter?: CcmConnectorFilter;
 };
 
-export interface ConnectorCatalogueItem {
-  category?:
-    | "CLOUD_PROVIDER"
-    | "SECRET_MANAGER"
-    | "CLOUD_COST"
-    | "ARTIFACTORY"
-    | "CODE_REPO"
-    | "MONITORING"
-    | "TICKETING";
-  connectors?: (
-    | "K8sCluster"
-    | "Git"
-    | "Splunk"
-    | "AppDynamics"
-    | "Prometheus"
-    | "Dynatrace"
-    | "Vault"
-    | "AzureKeyVault"
-    | "DockerRegistry"
-    | "Local"
-    | "AwsKms"
-    | "GcpKms"
-    | "AwsSecretManager"
-    | "Gcp"
-    | "Aws"
-    | "Artifactory"
-    | "Jira"
-    | "Nexus"
-    | "Github"
-    | "Gitlab"
-    | "Bitbucket"
-    | "Codecommit"
-    | "CEAws"
-    | "CEAzure"
-    | "GcpCloudCost"
-    | "CEK8sCluster"
-    | "HttpHelmRepo"
-    | "NewRelic"
-    | "Datadog"
-    | "SumoLogic"
-    | "PagerDuty"
-  )[];
+export interface ConnectorValidationResult {
+  status?: "SUCCESS" | "FAILURE" | "PARTIAL" | "UNKNOWN";
+  errors?: ErrorDetail[];
+  errorSummary?: string;
+  testedAt?: number;
+  delegateId?: string;
 }
 
-export interface ConnectorCatalogueResponse {
-  catalogue?: ConnectorCatalogueItem[];
-}
-
-export interface ResponseConnectorCatalogueResponse {
+export interface ResponseConnectorValidationResult {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ConnectorCatalogueResponse;
+  data?: ConnectorValidationResult;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -1980,6 +1940,298 @@ export interface ResponseFieldValues {
   correlationId?: string;
 }
 
+export interface ConnectorCatalogueItem {
+  category?:
+    | "CLOUD_PROVIDER"
+    | "SECRET_MANAGER"
+    | "CLOUD_COST"
+    | "ARTIFACTORY"
+    | "CODE_REPO"
+    | "MONITORING"
+    | "TICKETING";
+  connectors?: (
+    | "K8sCluster"
+    | "Git"
+    | "Splunk"
+    | "AppDynamics"
+    | "Prometheus"
+    | "Dynatrace"
+    | "Vault"
+    | "AzureKeyVault"
+    | "DockerRegistry"
+    | "Local"
+    | "AwsKms"
+    | "GcpKms"
+    | "AwsSecretManager"
+    | "Gcp"
+    | "Aws"
+    | "Artifactory"
+    | "Jira"
+    | "Nexus"
+    | "Github"
+    | "Gitlab"
+    | "Bitbucket"
+    | "Codecommit"
+    | "CEAws"
+    | "CEAzure"
+    | "GcpCloudCost"
+    | "CEK8sCluster"
+    | "HttpHelmRepo"
+    | "NewRelic"
+    | "Datadog"
+    | "SumoLogic"
+    | "PagerDuty"
+  )[];
+}
+
+export interface ConnectorCatalogueResponse {
+  catalogue?: ConnectorCatalogueItem[];
+}
+
+export interface ResponseConnectorCatalogueResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ConnectorCatalogueResponse;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export type AvailabilityRestrictionDTO = RestrictionDTO & {
+  enabled?: boolean;
+};
+
+export type CustomRestrictionDTO = RestrictionDTO & { [key: string]: any };
+
+export type DurationRestrictionDTO = RestrictionDTO & {
+  timeUnit?: TimeUnit;
+};
+
+export interface FeatureRestrictionDetailsDTO {
+  name?:
+    | "TEST1"
+    | "TEST2"
+    | "TEST3"
+    | "TEST4"
+    | "TEST5"
+    | "PERSPECTIVES"
+    | "MULTIPLE_ORGANIZATIONS"
+    | "MULTIPLE_PROJECTS"
+    | "INTEGRATED_APPROVALS_WITH_HARNESS_UI"
+    | "INTEGRATED_APPROVALS_WITH_JIRA"
+    | "SECRET_MANAGERS"
+    | "DEPLOYMENTS"
+    | "SERVICES"
+    | "BUILDS"
+    | "SAML_SUPPORT"
+    | "OAUTH_SUPPORT"
+    | "LDAP_SUPPORT"
+    | "TWO_FACTOR_AUTH_SUPPORT"
+    | "CUSTOM_ROLES"
+    | "CUSTOM_RESOURCE_GROUPS"
+    | "K8S_BG_SWAP_SERVICES"
+    | "K8S_BLUE_GREEN_DEPLOY"
+    | "K8S_APPLY"
+    | "K8S_DELETE"
+    | "K8S_CANARY_DELETE"
+    | "K8S_ROLLING_DEPLOY"
+    | "K8S_CANARY_DEPLOY"
+    | "K8S_SCALE"
+    | "K8S_ROLLING_ROLLBACK"
+    | "TERRAFORM_APPLY"
+    | "TERRAFORM_PLAN"
+    | "TERRAFORM_DESTROY"
+    | "TERRAFORM_ROLLBACK";
+  description?: string;
+  moduleType?:
+    | "CD"
+    | "CI"
+    | "CV"
+    | "CF"
+    | "CE"
+    | "CORE"
+    | "PMS"
+    | "TEMPLATESERVICE";
+  allowed?: boolean;
+  restrictionType?:
+    | "AVAILABILITY"
+    | "STATIC_LIMIT"
+    | "RATE_LIMIT"
+    | "CUSTOM"
+    | "DURATION";
+  restriction?: RestrictionDTO;
+}
+
+export type RateLimitRestrictionDTO = RestrictionDTO & {
+  limit?: number;
+  count?: number;
+  timeUnit?: TimeUnit;
+};
+
+export interface ResponseFeatureRestrictionDetailsDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: FeatureRestrictionDetailsDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface RestrictionDTO {
+  [key: string]: any;
+}
+
+export type StaticLimitRestrictionDTO = RestrictionDTO & {
+  limit?: number;
+  count?: number;
+};
+
+export interface TimeUnit {
+  unit?:
+    | "NANOS"
+    | "MICROS"
+    | "MILLIS"
+    | "SECONDS"
+    | "MINUTES"
+    | "HOURS"
+    | "HALF_DAYS"
+    | "DAYS"
+    | "WEEKS"
+    | "MONTHS"
+    | "YEARS"
+    | "DECADES"
+    | "CENTURIES"
+    | "MILLENNIA"
+    | "ERAS"
+    | "FOREVER";
+  numberOfUnits?: number;
+}
+
+export interface FeatureRestrictionDetailRequestDTO {
+  name:
+    | "TEST1"
+    | "TEST2"
+    | "TEST3"
+    | "TEST4"
+    | "TEST5"
+    | "PERSPECTIVES"
+    | "MULTIPLE_ORGANIZATIONS"
+    | "MULTIPLE_PROJECTS"
+    | "INTEGRATED_APPROVALS_WITH_HARNESS_UI"
+    | "INTEGRATED_APPROVALS_WITH_JIRA"
+    | "SECRET_MANAGERS"
+    | "DEPLOYMENTS"
+    | "SERVICES"
+    | "BUILDS"
+    | "SAML_SUPPORT"
+    | "OAUTH_SUPPORT"
+    | "LDAP_SUPPORT"
+    | "TWO_FACTOR_AUTH_SUPPORT"
+    | "CUSTOM_ROLES"
+    | "CUSTOM_RESOURCE_GROUPS"
+    | "K8S_BG_SWAP_SERVICES"
+    | "K8S_BLUE_GREEN_DEPLOY"
+    | "K8S_APPLY"
+    | "K8S_DELETE"
+    | "K8S_CANARY_DELETE"
+    | "K8S_ROLLING_DEPLOY"
+    | "K8S_CANARY_DEPLOY"
+    | "K8S_SCALE"
+    | "K8S_ROLLING_ROLLBACK"
+    | "TERRAFORM_APPLY"
+    | "TERRAFORM_PLAN"
+    | "TERRAFORM_DESTROY"
+    | "TERRAFORM_ROLLBACK";
+}
+
+export interface ResponseListFeatureRestrictionDetailsDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: FeatureRestrictionDetailsDTO[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export type AvailabilityRestrictionMetadataDTO = RestrictionMetadataDTO & {
+  enabled?: boolean;
+};
+
+export type CustomRestrictionMetadataDTO = RestrictionMetadataDTO & {};
+
+export type DurationRestrictionMetadataDTO = RestrictionMetadataDTO & {
+  timeUnit?: TimeUnit;
+};
+
+export interface FeatureRestrictionMetadataDTO {
+  name?:
+    | "TEST1"
+    | "TEST2"
+    | "TEST3"
+    | "TEST4"
+    | "TEST5"
+    | "PERSPECTIVES"
+    | "MULTIPLE_ORGANIZATIONS"
+    | "MULTIPLE_PROJECTS"
+    | "INTEGRATED_APPROVALS_WITH_HARNESS_UI"
+    | "INTEGRATED_APPROVALS_WITH_JIRA"
+    | "SECRET_MANAGERS"
+    | "DEPLOYMENTS"
+    | "SERVICES"
+    | "BUILDS"
+    | "SAML_SUPPORT"
+    | "OAUTH_SUPPORT"
+    | "LDAP_SUPPORT"
+    | "TWO_FACTOR_AUTH_SUPPORT"
+    | "CUSTOM_ROLES"
+    | "CUSTOM_RESOURCE_GROUPS"
+    | "K8S_BG_SWAP_SERVICES"
+    | "K8S_BLUE_GREEN_DEPLOY"
+    | "K8S_APPLY"
+    | "K8S_DELETE"
+    | "K8S_CANARY_DELETE"
+    | "K8S_ROLLING_DEPLOY"
+    | "K8S_CANARY_DEPLOY"
+    | "K8S_SCALE"
+    | "K8S_ROLLING_ROLLBACK"
+    | "TERRAFORM_APPLY"
+    | "TERRAFORM_PLAN"
+    | "TERRAFORM_DESTROY"
+    | "TERRAFORM_ROLLBACK";
+  moduleType?:
+    | "CD"
+    | "CI"
+    | "CV"
+    | "CF"
+    | "CE"
+    | "CORE"
+    | "PMS"
+    | "TEMPLATESERVICE";
+  edition?: "COMMUNITY" | "FREE" | "TEAM" | "ENTERPRISE";
+  restrictionMetadata?: {
+    [key: string]: RestrictionMetadataDTO;
+  };
+}
+
+export type RateLimitRestrictionMetadataDTO = RestrictionMetadataDTO & {
+  limit?: number;
+  timeUnit?: TimeUnit;
+};
+
+export interface ResponseListFeatureRestrictionMetadataDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: FeatureRestrictionMetadataDTO[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface RestrictionMetadataDTO {
+  restrictionType?:
+    | "AVAILABILITY"
+    | "STATIC_LIMIT"
+    | "RATE_LIMIT"
+    | "CUSTOM"
+    | "DURATION";
+}
+
+export type StaticLimitRestrictionMetadataDTO = RestrictionMetadataDTO & {
+  limit?: number;
+};
+
 export type AuditFilterProperties = FilterProperties & {
   scopes?: ResourceScopeDTO[];
   resources?: ResourceDTO[];
@@ -2038,7 +2290,8 @@ export interface DelegateProfileFilterProperties {
     | "PipelineSetup"
     | "PipelineExecution"
     | "Deployment"
-    | "Audit";
+    | "Audit"
+    | "Template";
 }
 
 export interface Environment {
@@ -2066,7 +2319,8 @@ export interface FilterProperties {
     | "PipelineSetup"
     | "PipelineExecution"
     | "Deployment"
-    | "Audit";
+    | "Audit"
+    | "Template";
 }
 
 export interface NGTag {
@@ -2098,7 +2352,7 @@ export interface ResourceDTO {
 }
 
 export interface ResourceScopeDTO {
-  accountIdentifier: string;
+  accountIdentifier?: string;
   orgIdentifier?: string;
   projectIdentifier?: string;
   labels?: {
@@ -2126,6 +2380,66 @@ export interface PageFilterDTO {
 export interface ResponsePageFilterDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: PageFilterDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export type ConnectedArgoGitOpsInfoDTO = GitOpsInfoDTO & {
+  adapterUrl: string;
+};
+
+export interface GitOpsInfoDTO {
+  type?: "CONNECTED_ARGO_PROVIDER" | "MANAGED_ARGO_PROVIDER";
+}
+
+export interface GitopsProviderResponse {
+  name: string;
+  identifier: string;
+  description?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  tags?: {
+    [key: string]: string;
+  };
+  spec: GitOpsInfoDTO;
+}
+
+export type ManagedArgoGitOpsInfoDTO = GitOpsInfoDTO & {
+  namespace: string;
+};
+
+export interface ResponseGitopsProviderResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GitopsProviderResponse;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitOpsProvider {
+  name: string;
+  identifier: string;
+  description?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  tags?: {
+    [key: string]: string;
+  };
+  spec: GitOpsInfoDTO;
+}
+
+export interface PageGitopsProviderResponse {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: GitopsProviderResponse[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageGitopsProviderResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageGitopsProviderResponse;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -2158,9 +2472,9 @@ export interface ResponseGitBranchListDTO {
 }
 
 export interface EntityReference {
-  repoIdentifier?: string;
-  branch?: string;
   default?: boolean;
+  branch?: string;
+  repoIdentifier?: string;
   identifier?: string;
   accountIdentifier?: string;
   projectIdentifier?: string;
@@ -2191,7 +2505,8 @@ export interface GitSyncEntityDTO {
     | "FeatureFlagStage"
     | "Template"
     | "Triggers"
-    | "MonitoredService";
+    | "MonitoredService"
+    | "GitRepositories";
   entityIdentifier?: string;
   gitConnectorId?: string;
   repoUrl?: string;
@@ -2226,7 +2541,8 @@ export interface GitSyncEntityListDTO {
     | "FeatureFlagStage"
     | "Template"
     | "Triggers"
-    | "MonitoredService";
+    | "MonitoredService"
+    | "GitRepositories";
   count?: number;
   gitSyncEntities?: GitSyncEntityDTO[];
 }
@@ -2284,6 +2600,7 @@ export interface GitEntityBranchFilterSummaryProperties {
     | "Template"
     | "Triggers"
     | "MonitoredService"
+    | "GitRepositories"
   )[];
   searchTerm?: string;
 }
@@ -2347,6 +2664,7 @@ export interface GitEntityFilterProperties {
     | "Template"
     | "Triggers"
     | "MonitoredService"
+    | "GitRepositories"
   )[];
   searchTerm?: string;
 }
@@ -2382,16 +2700,22 @@ export interface ResponseGitSyncSettingsDTO {
   correlationId?: string;
 }
 
-export interface GitFileContent {
-  content?: string;
-  objectId?: string;
-}
-
-export interface ResponseGitFileContent {
+export interface ResponseListString {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: GitFileContent;
+  data?: string[];
   metaData?: { [key: string]: any };
   correlationId?: string;
+}
+
+export interface ResponseSaasGitDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: SaasGitDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface SaasGitDTO {
+  saasGit?: boolean;
 }
 
 export interface CreatePRDTO {
@@ -2416,22 +2740,16 @@ export interface GitPRCreateRequest {
   useUserFromToken?: boolean;
 }
 
-export interface ResponseListString {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: string[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
+export interface GitFileContent {
+  content?: string;
+  objectId?: string;
 }
 
-export interface ResponseSaasGitDTO {
+export interface ResponseGitFileContent {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: SaasGitDTO;
+  data?: GitFileContent;
   metaData?: { [key: string]: any };
   correlationId?: string;
-}
-
-export interface SaasGitDTO {
-  saasGit?: boolean;
 }
 
 export interface GitSyncConfig {
@@ -2464,6 +2782,104 @@ export interface RestResponse {
   };
   resource?: { [key: string]: any };
   responseMessages?: ResponseMessage[];
+}
+
+export interface GitSyncErrorDTO {
+  accountIdentifier?: string;
+  repoUrl?: string;
+  repoId?: string;
+  branchName?: string;
+  changeType?: "ADD" | "RENAME" | "MODIFY" | "DELETE" | "NONE";
+  completeFilePath?: string;
+  entityType?:
+    | "Projects"
+    | "Pipelines"
+    | "PipelineSteps"
+    | "Connectors"
+    | "Secrets"
+    | "Service"
+    | "Environment"
+    | "InputSets"
+    | "CvConfig"
+    | "Delegates"
+    | "DelegateConfigurations"
+    | "CvVerificationJob"
+    | "IntegrationStage"
+    | "IntegrationSteps"
+    | "CvKubernetesActivitySource"
+    | "DeploymentSteps"
+    | "DeploymentStage"
+    | "ApprovalStage"
+    | "FeatureFlagStage"
+    | "Template"
+    | "Triggers"
+    | "MonitoredService"
+    | "GitRepositories";
+  failureReason?: string;
+  status?: "ACTIVE" | "DISCARDED" | "EXPIRED" | "RESOLVED" | "OVERRIDDEN";
+  errorType?: "GIT_TO_HARNESS" | "CONNECTIVITY_ISSUE" | "FULL_SYNC";
+  additionalErrorDetails?: GitSyncErrorDetailsDTO;
+  createdAt?: number;
+}
+
+export interface GitSyncErrorDetailsDTO {
+  [key: string]: any;
+}
+
+export interface PageGitSyncErrorDTO {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: GitSyncErrorDTO[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageGitSyncErrorDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageGitSyncErrorDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitSyncErrorAggregateByCommitDTO {
+  gitCommitId?: string;
+  failedCount?: number;
+  repoId?: string;
+  branchName?: string;
+  commitMessage?: string;
+  createdAt?: number;
+  errorsForSummaryView?: GitSyncErrorDTO[];
+}
+
+export interface PageGitSyncErrorAggregateByCommitDTO {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: GitSyncErrorAggregateByCommitDTO[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageGitSyncErrorAggregateByCommitDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageGitSyncErrorAggregateByCommitDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface GitSyncErrorCountDTO {
+  gitToHarnessErrorCount?: number;
+  connectivityErrorCount?: number;
+}
+
+export interface ResponseGitSyncErrorCountDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GitSyncErrorCountDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
 }
 
 export type CDModuleLicenseDTO = ModuleLicenseDTO & {
@@ -2499,7 +2915,7 @@ export interface ModuleLicenseDTO {
     | "CORE"
     | "PMS"
     | "TEMPLATESERVICE";
-  edition?: "FREE" | "TEAM" | "ENTERPRISE";
+  edition?: "COMMUNITY" | "FREE" | "TEAM" | "ENTERPRISE";
   licenseType?: "TRIAL" | "PAID";
   status?: "ACTIVE" | "DELETED" | "EXPIRED";
   startTime?: number;
@@ -2518,6 +2934,30 @@ export interface ResponseModuleLicenseDTO {
 export interface ResponseListModuleLicenseDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: ModuleLicenseDTO[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface EditionActionDTO {
+  action?:
+    | "START_FREE"
+    | "START_TRIAL"
+    | "EXTEND_TRIAL"
+    | "SUBSCRIBE"
+    | "UPGRADE"
+    | "CONTACT_SALES"
+    | "CONTACT_SUPPORT"
+    | "MANAGE"
+    | "DISABLED_BY_TEAM"
+    | "DISABLED_BY_ENTERPRISE";
+  reason?: string;
+}
+
+export interface ResponseMapEditionSetEditionActionDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: {
+    [key: string]: EditionActionDTO[];
+  };
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -2543,7 +2983,7 @@ export type CILicenseSummaryDTO = LicensesWithSummaryDTO & {
 export type CVLicenseSummaryDTO = LicensesWithSummaryDTO & {};
 
 export interface LicensesWithSummaryDTO {
-  edition?: "FREE" | "TEAM" | "ENTERPRISE";
+  edition?: "COMMUNITY" | "FREE" | "TEAM" | "ENTERPRISE";
   licenseType?: "TRIAL" | "PAID";
   moduleType?:
     | "CD"
@@ -2593,6 +3033,7 @@ export interface StartTrialDTO {
     | "CORE"
     | "PMS"
     | "TEMPLATESERVICE";
+  edition: "COMMUNITY" | "FREE" | "TEAM" | "ENTERPRISE";
 }
 
 export interface PageRoleAssignmentResponse {
@@ -2668,25 +3109,43 @@ export interface BatchRoleAssignmentCreateRequest {
   roleAssignments?: RoleAssignment[];
 }
 
-export interface RestResponseBoolean {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: boolean;
-  responseMessages?: ResponseMessage[];
+export interface ResourceGroupDTO {
+  identifier?: string;
+  name?: string;
 }
 
-export type OAuthSettings = NGAuthSettings & {
-  filter?: string;
-  allowedProviders?: (
-    | "AZURE"
-    | "BITBUCKET"
-    | "GITHUB"
-    | "GITLAB"
-    | "GOOGLE"
-    | "LINKEDIN"
-  )[];
-};
+export interface ResponseRoleAssignmentAggregateResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: RoleAssignmentAggregateResponse;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface Role {
+  identifier: string;
+  name: string;
+  permissions?: string[];
+  allowedScopeLevels?: string[];
+  description?: string;
+  tags?: {
+    [key: string]: string;
+  };
+}
+
+export interface RoleAssignmentAggregateResponse {
+  roleAssignments?: RoleAssignment[];
+  scope?: ScopeDTO;
+  roles?: RoleResponse[];
+  resourceGroups?: ResourceGroupDTO[];
+}
+
+export interface RoleResponse {
+  role: Role;
+  scope: ScopeDTO;
+  harnessManaged?: boolean;
+  createdAt?: number;
+  lastModifiedAt?: number;
+}
 
 export interface Account {
   uuid: string;
@@ -2769,6 +3228,7 @@ export interface AccountPermissions {
     | "ACCOUNT_MANAGEMENT"
     | "PROVISIONER"
     | "TEMPLATE_MANAGEMENT"
+    | "APP_TEMPLATE"
     | "USER_PERMISSION_READ"
     | "AUDIT_VIEWER"
     | "TAG_MANAGEMENT"
@@ -2795,6 +3255,7 @@ export interface AccountPermissions {
     | "MANAGE_PIPELINE_GOVERNANCE_STANDARDS"
     | "MANAGE_API_KEYS"
     | "MANAGE_TAGS"
+    | "MANAGE_ACCOUNT_DEFAULTS"
     | "MANAGE_CUSTOM_DASHBOARDS"
     | "CREATE_CUSTOM_DASHBOARDS"
     | "MANAGE_RESTRICTED_ACCESS"
@@ -2823,6 +3284,7 @@ export interface AppPermission {
     | "ACCOUNT_MANAGEMENT"
     | "PROVISIONER"
     | "TEMPLATE_MANAGEMENT"
+    | "APP_TEMPLATE"
     | "USER_PERMISSION_READ"
     | "AUDIT_VIEWER"
     | "TAG_MANAGEMENT"
@@ -2849,6 +3311,7 @@ export interface AppPermission {
     | "MANAGE_PIPELINE_GOVERNANCE_STANDARDS"
     | "MANAGE_API_KEYS"
     | "MANAGE_TAGS"
+    | "MANAGE_ACCOUNT_DEFAULTS"
     | "MANAGE_CUSTOM_DASHBOARDS"
     | "CREATE_CUSTOM_DASHBOARDS"
     | "MANAGE_RESTRICTED_ACCESS";
@@ -2866,13 +3329,6 @@ export interface AppPermission {
     | "EXECUTE_WORKFLOW_ROLLBACK"
     | "DEFAULT"
   )[];
-}
-
-export interface AuthenticationSettingsResponse {
-  ngAuthSettings?: NGAuthSettings[];
-  whitelistedDomains?: string[];
-  authenticationMechanism?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
-  twoFactorEnabled?: boolean;
 }
 
 export interface CeLicenseInfo {
@@ -2903,43 +3359,6 @@ export type GenericEntityFilter = Filter & {
   filterType?: string;
 };
 
-export type LDAPSettings = NGAuthSettings & {
-  connectionSettings: LdapConnectionSettings;
-  identifier: string;
-  userSettingsList?: LdapUserSettings[];
-  groupSettingsList?: LdapGroupSettings[];
-};
-
-export interface LdapConnectionSettings {
-  host: string;
-  port?: number;
-  sslEnabled?: boolean;
-  referralsEnabled?: boolean;
-  maxReferralHops?: number;
-  bindDN?: string;
-  bindPassword?: string;
-  connectTimeout?: number;
-  responseTimeout?: number;
-  useRecursiveGroupMembershipSearch?: boolean;
-}
-
-export interface LdapGroupSettings {
-  baseDN?: string;
-  searchFilter?: string;
-  nameAttr?: string;
-  descriptionAttr?: string;
-  userMembershipAttr?: string;
-  referencedUserAttr?: string;
-}
-
-export interface LdapUserSettings {
-  baseDN?: string;
-  searchFilter?: string;
-  emailAttr?: string;
-  displayNameAttr?: string;
-  groupMembershipAttr?: string;
-}
-
 export interface LicenseInfo {
   accountType?: string;
   accountStatus?: string;
@@ -2955,10 +3374,6 @@ export interface LoginSettings {
   userLockoutPolicy: UserLockoutPolicy;
   passwordExpirationPolicy: PasswordExpirationPolicy;
   passwordStrengthPolicy: PasswordStrengthPolicy;
-}
-
-export interface NGAuthSettings {
-  settingsType?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
 }
 
 export interface NotificationSettings {
@@ -2985,22 +3400,13 @@ export interface PasswordStrengthPolicy {
   minNumberOfDigits?: number;
 }
 
-export interface RestResponseAuthenticationSettingsResponse {
+export interface RestResponseLoginSettings {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: AuthenticationSettingsResponse;
+  resource?: LoginSettings;
   responseMessages?: ResponseMessage[];
 }
-
-export type SAMLSettings = NGAuthSettings & {
-  origin: string;
-  identifier: string;
-  logoutUrl?: string;
-  groupMembershipAttr?: string;
-  displayName?: string;
-  authorizationEnabled?: boolean;
-};
 
 export interface SlackNotificationSetting {
   name?: string;
@@ -3094,10 +3500,6 @@ export interface UserLockoutPolicy {
   userGroupsToNotify?: UserGroup[];
 }
 
-export type UsernamePasswordSettings = NGAuthSettings & {
-  loginSettings: LoginSettings;
-};
-
 export interface UtmInfo {
   utmSource?: string;
   utmContent?: string;
@@ -3110,24 +3512,34 @@ export type WorkflowFilter = Filter & {
   filterTypes?: string[];
 };
 
-export interface RestResponseLoginSettings {
+export interface RestResponseBoolean {
   metaData?: {
     [key: string]: { [key: string]: any };
   };
-  resource?: LoginSettings;
+  resource?: boolean;
   responseMessages?: ResponseMessage[];
 }
 
-export interface TwoFactorAdminOverrideSettings {
-  adminOverrideTwoFactorEnabled?: boolean;
+export interface LdapConnectionSettings {
+  host: string;
+  port?: number;
+  sslEnabled?: boolean;
+  referralsEnabled?: boolean;
+  maxReferralHops?: number;
+  bindDN?: string;
+  bindPassword?: string;
+  connectTimeout?: number;
+  responseTimeout?: number;
+  useRecursiveGroupMembershipSearch?: boolean;
 }
 
-export interface RestResponsePasswordStrengthPolicy {
-  metaData?: {
-    [key: string]: { [key: string]: any };
-  };
-  resource?: PasswordStrengthPolicy;
-  responseMessages?: ResponseMessage[];
+export interface LdapGroupSettings {
+  baseDN?: string;
+  searchFilter?: string;
+  nameAttr?: string;
+  descriptionAttr?: string;
+  userMembershipAttr?: string;
+  referencedUserAttr?: string;
 }
 
 export type LdapSettings = SSOSettings & {
@@ -3136,7 +3548,16 @@ export type LdapSettings = SSOSettings & {
   groupSettings?: LdapGroupSettings;
   userSettingsList?: LdapUserSettings[];
   groupSettingsList?: LdapGroupSettings[];
+  cronExpression?: string;
 };
+
+export interface LdapUserSettings {
+  baseDN?: string;
+  searchFilter?: string;
+  emailAttr?: string;
+  displayNameAttr?: string;
+  groupMembershipAttr?: string;
+}
 
 export type OauthSettings = SSOSettings & {
   filter?: string;
@@ -3175,6 +3596,7 @@ export interface SSOSettings {
   displayName?: string;
   url?: string;
   nextIteration?: number;
+  nextIterations?: number[];
   accountId?: string;
 }
 
@@ -3221,10 +3643,73 @@ export interface SSORequest {
   )[];
 }
 
+export type OAuthSettings = NGAuthSettings & {
+  filter?: string;
+  allowedProviders?: (
+    | "AZURE"
+    | "BITBUCKET"
+    | "GITHUB"
+    | "GITLAB"
+    | "GOOGLE"
+    | "LINKEDIN"
+  )[];
+};
+
+export interface AuthenticationSettingsResponse {
+  ngAuthSettings?: NGAuthSettings[];
+  whitelistedDomains?: string[];
+  authenticationMechanism?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
+  twoFactorEnabled?: boolean;
+}
+
+export type LDAPSettings = NGAuthSettings & {
+  connectionSettings: LdapConnectionSettings;
+  identifier: string;
+  userSettingsList?: LdapUserSettings[];
+  groupSettingsList?: LdapGroupSettings[];
+};
+
+export interface NGAuthSettings {
+  settingsType?: "USER_PASSWORD" | "SAML" | "LDAP" | "OAUTH";
+}
+
+export interface RestResponseAuthenticationSettingsResponse {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: AuthenticationSettingsResponse;
+  responseMessages?: ResponseMessage[];
+}
+
+export type SAMLSettings = NGAuthSettings & {
+  origin: string;
+  identifier: string;
+  logoutUrl?: string;
+  groupMembershipAttr?: string;
+  displayName?: string;
+  authorizationEnabled?: boolean;
+};
+
+export type UsernamePasswordSettings = NGAuthSettings & {
+  loginSettings: LoginSettings;
+};
+
+export interface TwoFactorAdminOverrideSettings {
+  adminOverrideTwoFactorEnabled?: boolean;
+}
+
+export interface RestResponsePasswordStrengthPolicy {
+  metaData?: {
+    [key: string]: { [key: string]: any };
+  };
+  resource?: PasswordStrengthPolicy;
+  responseMessages?: ResponseMessage[];
+}
+
 export interface InstanceCountDetailsByEnvTypeBase {
-  totalInstances?: number;
   nonProdInstances?: number;
   prodInstances?: number;
+  totalInstances?: number;
 }
 
 export interface ResponseServiceDetailsInfoDTO {
@@ -3368,48 +3853,20 @@ export interface ServiceDeploymentInfo {
   serviceTag?: string;
 }
 
-export interface DashboardWorkloadDeployment {
-  workloadDeploymentInfoList?: WorkloadDeploymentInfo[];
-}
-
-export interface LastWorkloadInfo {
-  startTime?: number;
-  endTime?: number;
-  deploymentType?: string;
-  status?: string;
-}
-
-export interface ResponseDashboardWorkloadDeployment {
+export interface ResponseServiceHeaderInfo {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: DashboardWorkloadDeployment;
+  data?: ServiceHeaderInfo;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
 
-export interface WorkloadCountInfo {
-  count?: number;
-}
-
-export interface WorkloadDateCountInfo {
-  date?: number;
-  execution?: WorkloadCountInfo;
-}
-
-export interface WorkloadDeploymentInfo {
-  serviceName?: string;
-  serviceId?: string;
-  lastExecuted?: LastWorkloadInfo;
-  deploymentTypeList?: string[];
-  totalDeployments?: number;
-  totalDeploymentChangeRate?: number;
-  percentSuccess?: number;
-  rateSuccess?: number;
-  failureRate?: number;
-  failureRateChangeRate?: number;
-  frequency?: number;
-  frequencyChangeRate?: number;
-  lastPipelineExecutionId?: string;
-  workload?: WorkloadDateCountInfo[];
+export interface ServiceHeaderInfo {
+  name?: string;
+  identifier?: string;
+  description?: string;
+  deploymentTypes?: string[];
+  createdAt?: number;
+  lastModifiedAt?: number;
 }
 
 export interface InfrastructureDetails {
@@ -3601,6 +4058,168 @@ export interface ResponseEnvBuildIdAndInstanceCountInfoList {
   correlationId?: string;
 }
 
+export interface DashboardWorkloadDeployment {
+  workloadDeploymentInfoList?: WorkloadDeploymentInfo[];
+}
+
+export interface LastWorkloadInfo {
+  startTime?: number;
+  endTime?: number;
+  deploymentType?: string;
+  status?: string;
+}
+
+export interface ResponseDashboardWorkloadDeployment {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: DashboardWorkloadDeployment;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface WorkloadCountInfo {
+  count?: number;
+}
+
+export interface WorkloadDateCountInfo {
+  date?: number;
+  execution?: WorkloadCountInfo;
+}
+
+export interface WorkloadDeploymentInfo {
+  serviceName?: string;
+  serviceId?: string;
+  lastExecuted?: LastWorkloadInfo;
+  deploymentTypeList?: string[];
+  totalDeployments?: number;
+  totalDeploymentChangeRate?: number;
+  percentSuccess?: number;
+  rateSuccess?: number;
+  failureRate?: number;
+  failureRateChangeRate?: number;
+  frequency?: number;
+  frequencyChangeRate?: number;
+  lastPipelineExecutionId?: string;
+  workload?: WorkloadDateCountInfo[];
+}
+
+export interface ProjectDashBoardInfo {
+  projectIdentifier?: string;
+  orgIdentifier?: string;
+  accountId?: string;
+  deploymentsCount?: number;
+  deploymentsCountChangeRate?: number;
+  successDeploymentsCount?: number;
+  failedDeploymentsCount?: number;
+}
+
+export interface ProjectsDashboardInfo {
+  projectDashBoardInfoList?: ProjectDashBoardInfo[];
+}
+
+export interface ResponseProjectsDashboardInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ProjectsDashboardInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseServicesDashboardInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ServicesDashboardInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServiceDashboardInfo {
+  name?: string;
+  identifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  accountIdentifier?: string;
+  totalDeploymentsCount?: number;
+  successDeploymentsCount?: number;
+  failureDeploymentsCount?: number;
+  totalDeploymentsChangeRate?: number;
+  instancesCount?: number;
+  instancesCountChangeRate?: number;
+}
+
+export interface ServicesDashboardInfo {
+  serviceDashboardInfoList?: ServiceDashboardInfo[];
+}
+
+export interface ResponseServicesCount {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ServicesCount;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ServicesCount {
+  totalCount?: number;
+  newCount?: number;
+}
+
+export interface EnvCount {
+  totalCount?: number;
+  newCount?: number;
+}
+
+export interface ResponseEnvCount {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: EnvCount;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface PipelineExecutionDashboardInfo {
+  name?: string;
+  identifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  accountIdentifier?: string;
+  planExecutionId?: string;
+  startTs?: number;
+}
+
+export interface PipelinesExecutionDashboardInfo {
+  runningExecutions?: PipelineExecutionDashboardInfo[];
+  pendingApprovalExecutions?: PipelineExecutionDashboardInfo[];
+  pendingManualInterventionExecutions?: PipelineExecutionDashboardInfo[];
+  failed24HrsExecutions?: PipelineExecutionDashboardInfo[];
+}
+
+export interface ResponsePipelinesExecutionDashboardInfo {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PipelinesExecutionDashboardInfo;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface DeploymentStatsSummary {
+  totalCount?: number;
+  totalCountChangeRate?: number;
+  failureRate?: number;
+  failureRateChangeRate?: number;
+  deploymentRate?: number;
+  deploymentRateChangeRate?: number;
+  timeBasedDeploymentInfoList?: TimeBasedDeploymentInfo[];
+}
+
+export interface ResponseDeploymentStatsSummary {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: DeploymentStatsSummary;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface TimeBasedDeploymentInfo {
+  epochTime?: number;
+  totalCount?: number;
+  successCount?: number;
+  failedCount?: number;
+}
+
 export interface Activity {
   accountIdentifier?: string;
   referredEntity?: EntityDetail;
@@ -3642,29 +4261,30 @@ export interface EntityDetail {
     | "FeatureFlagStage"
     | "Template"
     | "Triggers"
-    | "MonitoredService";
+    | "MonitoredService"
+    | "GitRepositories";
   entityRef?: EntityReference;
   name?: string;
 }
 
 export interface PageActivity {
-  totalElements?: number;
   totalPages?: number;
-  last?: boolean;
-  pageable?: Pageable;
-  numberOfElements?: number;
+  totalElements?: number;
   size?: number;
   content?: Activity[];
   number?: number;
   first?: boolean;
   sort?: Sort;
+  last?: boolean;
+  numberOfElements?: number;
+  pageable?: Pageable;
   empty?: boolean;
 }
 
 export interface Pageable {
-  pageSize?: number;
   offset?: number;
   sort?: Sort;
+  pageSize?: number;
   paged?: boolean;
   unpaged?: boolean;
   pageNumber?: number;
@@ -3681,13 +4301,6 @@ export interface Sort {
   sorted?: boolean;
   unsorted?: boolean;
   empty?: boolean;
-}
-
-export interface ResponseActivity {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: Activity;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface ConnectivityCheckSummary {
@@ -3714,16 +4327,16 @@ export interface ActivitySummary {
 }
 
 export interface PageActivitySummary {
-  totalElements?: number;
   totalPages?: number;
-  last?: boolean;
-  pageable?: Pageable;
-  numberOfElements?: number;
+  totalElements?: number;
   size?: number;
   content?: ActivitySummary[];
   number?: number;
   first?: boolean;
   sort?: Sort;
+  last?: boolean;
+  numberOfElements?: number;
+  pageable?: Pageable;
   empty?: boolean;
 }
 
@@ -3746,13 +4359,9 @@ export interface DockerBuildDetailsDTO {
   imagePath?: string;
 }
 
-export interface DockerResponseDTO {
-  buildDetailsList?: DockerBuildDetailsDTO[];
-}
-
-export interface ResponseDockerResponseDTO {
+export interface ResponseDockerBuildDetailsDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: DockerResponseDTO;
+  data?: DockerBuildDetailsDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -3763,20 +4372,13 @@ export interface DockerRequestDTO {
   tagsList?: string[];
 }
 
-export interface ResponseDockerBuildDetailsDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: DockerBuildDetailsDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
+export interface DockerResponseDTO {
+  buildDetailsList?: DockerBuildDetailsDTO[];
 }
 
-export interface EcrListImagesDTO {
-  images?: string[];
-}
-
-export interface ResponseEcrListImagesDTO {
+export interface ResponseDockerResponseDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: EcrListImagesDTO;
+  data?: DockerResponseDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -3793,17 +4395,6 @@ export interface EcrBuildDetailsDTO {
   imagePath?: string;
 }
 
-export interface EcrResponseDTO {
-  buildDetailsList?: EcrBuildDetailsDTO[];
-}
-
-export interface ResponseEcrResponseDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: EcrResponseDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
 export interface ResponseEcrBuildDetailsDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: EcrBuildDetailsDTO;
@@ -3818,6 +4409,28 @@ export interface EcrRequestDTO {
   region?: string;
 }
 
+export interface EcrResponseDTO {
+  buildDetailsList?: EcrBuildDetailsDTO[];
+}
+
+export interface ResponseEcrResponseDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: EcrResponseDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface EcrListImagesDTO {
+  images?: string[];
+}
+
+export interface ResponseEcrListImagesDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: EcrListImagesDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
 export interface GcrBuildDetailsDTO {
   tag?: string;
   buildUrl?: string;
@@ -3828,17 +4441,6 @@ export interface GcrBuildDetailsDTO {
     [key: string]: string;
   };
   imagePath?: string;
-}
-
-export interface GcrResponseDTO {
-  buildDetailsList?: GcrBuildDetailsDTO[];
-}
-
-export interface ResponseGcrResponseDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: GcrResponseDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface ResponseGcrBuildDetailsDTO {
@@ -3853,6 +4455,17 @@ export interface GcrRequestDTO {
   tagRegex?: string;
   tagsList?: string[];
   registryHostname?: string;
+}
+
+export interface GcrResponseDTO {
+  buildDetailsList?: GcrBuildDetailsDTO[];
+}
+
+export interface ResponseGcrResponseDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: GcrResponseDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
 }
 
 export interface ResponseMapStringString {
@@ -3938,16 +4551,16 @@ export interface EntitySetupUsageDTO {
 }
 
 export interface PageEntitySetupUsageDTO {
-  totalElements?: number;
   totalPages?: number;
-  last?: boolean;
-  pageable?: Pageable;
-  numberOfElements?: number;
+  totalElements?: number;
   size?: number;
   content?: EntitySetupUsageDTO[];
   number?: number;
   first?: boolean;
   sort?: Sort;
+  last?: boolean;
+  numberOfElements?: number;
+  pageable?: Pageable;
   empty?: boolean;
 }
 
@@ -3990,9 +4603,9 @@ export interface ResponseEnvironmentResponseDTO {
 }
 
 export interface EnvironmentRequestDTO {
-  orgIdentifier: string;
-  projectIdentifier: string;
-  identifier: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  identifier?: string;
   tags?: {
     [key: string]: string;
   };
@@ -4065,6 +4678,7 @@ export interface Invite {
   orgIdentifier?: string;
   projectIdentifier?: string;
   roleBindings: RoleBinding[];
+  userGroups?: string[];
   inviteType: "USER_INITIATED_INVITE" | "ADMIN_INITIATED_INVITE";
   approved?: boolean;
 }
@@ -4082,28 +4696,6 @@ export interface RoleBinding {
   resourceGroupIdentifier?: string;
   resourceGroupName?: string;
   managedRole: boolean;
-}
-
-export interface PageInvite {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: Invite[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageInvite {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageInvite;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ACLAggregateFilter {
-  resourceGroupIdentifiers?: string[];
-  roleIdentifiers?: string[];
 }
 
 export interface ResponseInvite {
@@ -4133,6 +4725,29 @@ export interface CreateInvite {
   users: string[];
   roleBindings: RoleBinding[];
   inviteType: "USER_INITIATED_INVITE" | "ADMIN_INITIATED_INVITE";
+  userGroups?: string[];
+}
+
+export interface PageInvite {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: Invite[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageInvite {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageInvite;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ACLAggregateFilter {
+  resourceGroupIdentifiers?: string[];
+  roleIdentifiers?: string[];
 }
 
 export interface GcpResponseDTO {
@@ -4502,6 +5117,10 @@ export interface SecretManagerMetadataRequestSpecDTO {
   [key: string]: any;
 }
 
+export type VaultAgentCredentialDTO = VaultCredentialDTO & {
+  sinkPath?: string;
+};
+
 export type VaultAppRoleCredentialDTO = VaultCredentialDTO & {
   appRoleId?: string;
   secretId?: string;
@@ -4517,9 +5136,10 @@ export interface VaultCredentialDTO {
 
 export type VaultMetadataRequestSpecDTO = SecretManagerMetadataRequestSpecDTO & {
   url: string;
-  accessType: "APP_ROLE" | "TOKEN";
+  accessType: "APP_ROLE" | "TOKEN" | "VAULT_AGENT";
   spec?: VaultCredentialDTO;
   delegateSelectors?: string[];
+  namespace?: string;
 };
 
 export interface BaseSSHSpecDTO {
@@ -4643,21 +5263,6 @@ export interface ResponsePageSecretResponseWrapper {
   correlationId?: string;
 }
 
-export interface SecretResourceFilterDTO {
-  identifiers?: string[];
-  searchTerm?: string;
-  secretTypes?: ("SecretFile" | "SecretText" | "SSHKey")[];
-  sourceCategory?:
-    | "CLOUD_PROVIDER"
-    | "SECRET_MANAGER"
-    | "CLOUD_COST"
-    | "ARTIFACTORY"
-    | "CODE_REPO"
-    | "MONITORING"
-    | "TICKETING";
-  includeSecretsFromEverySubScope?: boolean;
-}
-
 export interface ResponseSecretValidationResultDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
   data?: SecretValidationResultDTO;
@@ -4676,6 +5281,21 @@ export type SSHKeyValidationMetadata = SecretValidationMetaData & {
 
 export interface SecretValidationMetaData {
   type: "SecretFile" | "SecretText" | "SSHKey";
+}
+
+export interface SecretResourceFilterDTO {
+  identifiers?: string[];
+  searchTerm?: string;
+  secretTypes?: ("SecretFile" | "SecretText" | "SSHKey")[];
+  sourceCategory?:
+    | "CLOUD_PROVIDER"
+    | "SECRET_MANAGER"
+    | "CLOUD_COST"
+    | "ARTIFACTORY"
+    | "CODE_REPO"
+    | "MONITORING"
+    | "TICKETING";
+  includeSecretsFromEverySubScope?: boolean;
 }
 
 export interface ResponseOrganizationResponse {
@@ -4734,6 +5354,13 @@ export interface ResponsePageProjectResponse {
   correlationId?: string;
 }
 
+export interface ResponseTokenDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: TokenDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
 export interface TokenDTO {
   identifier: string;
   name: string;
@@ -4754,13 +5381,6 @@ export interface TokenDTO {
   email?: string;
   username?: string;
   encodedPassword?: string;
-}
-
-export interface ResponseTokenDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: TokenDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface PageTokenAggregateDTO {
@@ -4975,6 +5595,8 @@ export interface AccessControlCheckError {
     | "USAGE_RESTRICTION_ERROR"
     | "STATE_EXECUTION_INSTANCE_NOT_FOUND"
     | "DELEGATE_TASK_RETRY"
+    | "KUBERNETES_API_TASK_EXCEPTION"
+    | "KUBERNETES_TASK_EXCEPTION"
     | "KUBERNETES_YAML_ERROR"
     | "SAVE_FILE_INTO_GCP_STORAGE_FAILED"
     | "READ_FILE_FROM_GCP_STORAGE_FAILED"
@@ -5083,7 +5705,9 @@ export interface AccessControlCheckError {
     | "JIRA_CLIENT_ERROR"
     | "SCM_NOT_MODIFIED"
     | "JIRA_STEP_ERROR"
-    | "BUCKET_SERVER_ERROR";
+    | "BUCKET_SERVER_ERROR"
+    | "GIT_SYNC_ERROR"
+    | "TEMPLATE_EXCEPTION";
   message?: string;
   correlationId?: string;
   detailedMessage?: string;
@@ -5104,22 +5728,6 @@ export interface ResourceScope {
   projectIdentifier?: string;
 }
 
-export interface ResponseListUserGroupDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: UserGroupDTO[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface UserGroupFilterDTO {
-  databaseIdFilter?: string[];
-  identifierFilter?: string[];
-  userIdentifierFilter?: string[];
-  accountIdentifier?: string;
-  orgIdentifier?: string;
-  projectIdentifier?: string;
-}
-
 export interface PageUserGroupDTO {
   totalPages?: number;
   totalItems?: number;
@@ -5135,6 +5743,49 @@ export interface ResponsePageUserGroupDTO {
   data?: PageUserGroupDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
+}
+
+export interface ResponseListUserGroupDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: UserGroupDTO[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface UserGroupFilterDTO {
+  databaseIdFilter?: string[];
+  identifierFilter?: string[];
+  userIdentifierFilter?: string[];
+  accountIdentifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
+  searchTerm?: string;
+}
+
+export interface PageUserMetadataDTO {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: UserMetadataDTO[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageUserMetadataDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageUserMetadataDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface UserFilter {
+  searchTerm?: string;
+  identifiers?: string[];
+  parentFilter?:
+    | "NO_PARENT_SCOPES"
+    | "INCLUDE_PARENT_SCOPES"
+    | "STRICTLY_PARENT_SCOPES";
 }
 
 export type EmailConfig = NotificationSettingConfig & {
@@ -5165,32 +5816,6 @@ export type SlackConfig = NotificationSettingConfig & {
   slackWebhookUrl?: string;
 };
 
-export interface PageUserMetadataDTO {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: UserMetadataDTO[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageUserMetadataDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageUserMetadataDTO;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface UserFilter {
-  searchTerm?: string;
-  identifiers?: string[];
-  parentFilter?:
-    | "NO_PARENT_SCOPES"
-    | "INCLUDE_PARENT_SCOPES"
-    | "STRICTLY_PARENT_SCOPES";
-}
-
 export interface SamlLinkGroupRequest {
   samlGroupName?: string;
 }
@@ -5217,9 +5842,9 @@ export interface ServiceResponseDTO {
 }
 
 export interface ServiceRequestDTO {
-  identifier: string;
-  orgIdentifier: string;
-  projectIdentifier: string;
+  identifier?: string;
+  orgIdentifier?: string;
+  projectIdentifier?: string;
   name?: string;
   description?: string;
   tags?: {
@@ -5304,13 +5929,6 @@ export interface UserAggregate {
   roleAssignmentMetadata: RoleAssignmentMetadataDTO[];
 }
 
-export interface ResponseUserAggregate {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: UserAggregate;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
 export interface GatewayAccountRequestDTO {
   uuid?: string;
   accountName?: string;
@@ -5339,9 +5957,76 @@ export interface UserInfo {
   twoFactorAuthenticationEnabled?: boolean;
   emailVerified?: boolean;
   locked?: boolean;
-  signupAction?: "REGULAR" | "TRIAL" | "SUBSCRIBE";
-  edition?: "FREE" | "TEAM" | "ENTERPRISE";
-  billingFrequency?: "MONTHLY" | "YEARLY";
+  signupAction?: string;
+  edition?: string;
+  billingFrequency?: string;
+  utmInfo?: UtmInfo;
+}
+
+export interface AddUsersResponse {
+  addUserResponseMap?: {
+    [key: string]:
+      | "USER_INVITED_SUCCESSFULLY"
+      | "USER_ADDED_SUCCESSFULLY"
+      | "USER_ALREADY_ADDED"
+      | "USER_ALREADY_INVITED"
+      | "FAIL";
+  };
+}
+
+export interface ResponseAddUsersResponse {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: AddUsersResponse;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface AddUsers {
+  emails: string[];
+  roleBindings: RoleBinding[];
+  userGroups?: string[];
+}
+
+export interface PageProject {
+  totalPages?: number;
+  totalItems?: number;
+  pageItemCount?: number;
+  pageSize?: number;
+  content?: Project[];
+  pageIndex?: number;
+  empty?: boolean;
+}
+
+export interface ResponsePageProject {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: PageProject;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseListProject {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: Project[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ActiveProjectsCountDTO {
+  count?: number;
+}
+
+export interface ResponseActiveProjectsCountDTO {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: ActiveProjectsCountDTO;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
+}
+
+export interface ResponseUserAggregate {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: UserAggregate;
+  metaData?: { [key: string]: any };
+  correlationId?: string;
 }
 
 export interface ResponseTwoFactorAuthSettingsInfo {
@@ -5373,23 +6058,6 @@ export interface ResponsePasswordChangeResponse {
 export interface PasswordChangeDTO {
   currentPassword?: string;
   newPassword?: string;
-}
-
-export interface PageProject {
-  totalPages?: number;
-  totalItems?: number;
-  pageItemCount?: number;
-  pageSize?: number;
-  content?: Project[];
-  pageIndex?: number;
-  empty?: boolean;
-}
-
-export interface ResponsePageProject {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: PageProject;
-  metaData?: { [key: string]: any };
-  correlationId?: string;
 }
 
 export interface ResponseListExecutionStatus {
@@ -5465,6 +6133,19 @@ export interface ServiceExecutionSummary {
 export type AbortFailureActionConfig = FailureStrategyActionConfig & {
   type: "Abort";
 };
+
+export type AddRuleYaml = PatchInstruction & {
+  type: "AddRule";
+  identifier: string;
+  spec: AddRuleYamlSpec;
+};
+
+export interface AddRuleYamlSpec {
+  priority?: number;
+  distribution?: DistributionYamlSpec;
+  serve?: Serve;
+  clauses?: Clause[];
+}
 
 export type AddSegmentToVariationTargetMapYaml = PatchInstruction & {
   type: "AddSegmentToVariationTargetMap";
@@ -5559,6 +6240,20 @@ export interface CIProperties {
   codebase?: CodeBase;
 }
 
+export interface Clause {
+  id: string;
+  attribute: string;
+  op: string;
+  values: string[];
+  negate: boolean;
+}
+
+export interface ClauseYamlSpec {
+  attribute?: string;
+  op: string;
+  values: string[];
+}
+
 export interface CodeBase {
   connectorRef: string;
   repoName?: string;
@@ -5619,6 +6314,17 @@ export type DeploymentStageConfig = StageInfoConfig & {
   infrastructure: PipelineInfrastructure;
   execution: ExecutionElementConfig;
 };
+
+export interface Distribution {
+  bucketBy: string;
+  variations: WeightedVariation[];
+}
+
+export interface DistributionYamlSpec {
+  bucketBy: string;
+  variations?: VariationYamlSpec[];
+  clauses?: ClauseYamlSpec[];
+}
 
 export type DockerHubArtifactConfig = ArtifactConfig & {
   connectorRef: string;
@@ -5866,6 +6572,39 @@ export type JiraUpdateStepInfo = StepSpecType & {
   delegateSelectors?: string[];
 };
 
+export interface JsonNode {
+  array?: boolean;
+  null?: boolean;
+  object?: boolean;
+  valueNode?: boolean;
+  containerNode?: boolean;
+  missingNode?: boolean;
+  nodeType?:
+    | "ARRAY"
+    | "BINARY"
+    | "BOOLEAN"
+    | "MISSING"
+    | "NULL"
+    | "NUMBER"
+    | "OBJECT"
+    | "POJO"
+    | "STRING";
+  pojo?: boolean;
+  number?: boolean;
+  integralNumber?: boolean;
+  floatingPointNumber?: boolean;
+  short?: boolean;
+  int?: boolean;
+  long?: boolean;
+  float?: boolean;
+  double?: boolean;
+  bigDecimal?: boolean;
+  bigInteger?: boolean;
+  textual?: boolean;
+  boolean?: boolean;
+  binary?: boolean;
+}
+
 export type K8SDirectInfrastructure = Infrastructure & {
   connectorRef: string;
   namespace: string;
@@ -6007,9 +6746,9 @@ export interface NGProperties {
 }
 
 export interface NGVariable {
-  description?: string;
   name?: string;
   type?: "String" | "Number" | "Secret";
+  description?: string;
   required?: boolean;
   metadata?: string;
 }
@@ -6124,6 +6863,10 @@ export interface ParameterFieldString {
 export interface PatchInstruction {
   type?:
     | "SetFeatureFlagState"
+    | "SetOnVariation"
+    | "SetOffVariation"
+    | "AddRule"
+    | "UpdateRule"
     | "AddTargetsToVariationTargetMap"
     | "RemoveTargetsToVariationTargetMap"
     | "AddSegmentsToVariationTargetMap"
@@ -6275,6 +7018,11 @@ export type SecretNGVariable = NGVariable & {
   default?: string;
 };
 
+export interface Serve {
+  distribution?: Distribution;
+  variation?: string;
+}
+
 export interface ServiceConfig {
   useFromStage?: ServiceUseFromStage;
   service?: ServiceYaml;
@@ -6294,12 +7042,12 @@ export interface ServiceOverrides {
 }
 
 export interface ServiceSpec {
-  artifacts?: ArtifactListConfig;
   variables?: NGVariable[];
-  variableOverrideSets?: NGVariableOverrideSetWrapper[];
-  artifactOverrideSets?: ArtifactOverrideSetWrapper[];
-  manifestOverrideSets?: ManifestOverrideSetWrapper[];
+  artifacts?: ArtifactListConfig;
   manifests?: ManifestConfigWrapper[];
+  manifestOverrideSets?: ManifestOverrideSetWrapper[];
+  artifactOverrideSets?: ArtifactOverrideSetWrapper[];
+  variableOverrideSets?: NGVariableOverrideSetWrapper[];
 }
 
 export interface ServiceUseFromStage {
@@ -6325,6 +7073,26 @@ export type SetFeatureFlagStateYaml = PatchInstruction & {
 
 export interface SetFeatureFlagStateYamlSpec {
   state: string;
+}
+
+export type SetOffVariationYaml = PatchInstruction & {
+  type: "SetOffVariation";
+  identifier: string;
+  spec: SetOffVariationYamlSpec;
+};
+
+export interface SetOffVariationYamlSpec {
+  variation: string;
+}
+
+export type SetOnVariationYaml = PatchInstruction & {
+  type: "SetOnVariation";
+  identifier: string;
+  spec: SetOnVariationYamlSpec;
+};
+
+export interface SetOnVariationYamlSpec {
+  variation: string;
 }
 
 export interface ShellScriptBaseSource {
@@ -6410,6 +7178,7 @@ export interface StepElementConfig {
   failureStrategies?: FailureStrategyConfig[];
   when?: StepWhenCondition;
   type: string;
+  template?: TemplateLinkConfig;
   spec?: StepSpecType;
 }
 
@@ -6419,7 +7188,6 @@ export interface StepGroupElementConfig {
   when?: StepWhenCondition;
   failureStrategies?: FailureStrategyConfig[];
   steps: ExecutionWrapperConfig[];
-  rollbackSteps?: ExecutionWrapperConfig[];
 }
 
 export type StepGroupFailureActionConfig = FailureStrategyActionConfig & {
@@ -6455,6 +7223,12 @@ export type StringNGVariable = NGVariable & {
 export type TagBuildSpec = BuildSpec & {
   tag: string;
 };
+
+export interface TemplateLinkConfig {
+  templateRef: string;
+  versionLabel?: string;
+  templateInputs?: JsonNode;
+}
 
 export type TerraformApplyStepInfo = StepSpecType & {
   provisionerIdentifier: string;
@@ -6538,10 +7312,33 @@ export interface TransitionTo {
   transitionName?: string;
 }
 
+export type UpdateRuleYaml = PatchInstruction & {
+  type: "UpdateRule";
+  identifier: string;
+  spec: UpdateRuleYamlSpec;
+};
+
+export interface UpdateRuleYamlSpec {
+  ruleID: string;
+  bucketBy: string;
+  variations?: VariationYamlSpec[];
+  serve?: Serve;
+}
+
 export type ValuesManifest = ManifestAttributes & {
   store?: StoreConfigWrapper;
   metadata?: string;
 };
+
+export interface VariationYamlSpec {
+  variation: string;
+  weight: number;
+}
+
+export interface WeightedVariation {
+  variation: string;
+  weight: number;
+}
 
 export interface CDPipelineModuleInfo {
   serviceIdentifiers?: string[];
@@ -6652,10 +7449,11 @@ export interface Document {
   documentURI?: string;
   domConfig?: DOMConfiguration;
   implementation?: DOMImplementation;
-  namespaceURI?: string;
+  localName?: string;
   prefix?: string;
   attributes?: NamedNodeMap;
-  localName?: string;
+  nodeType?: number;
+  namespaceURI?: string;
   nodeName?: string;
   nodeValue?: string;
   parentNode?: Node;
@@ -6667,7 +7465,6 @@ export interface Document {
   ownerDocument?: Document;
   baseURI?: string;
   textContent?: string;
-  nodeType?: number;
 }
 
 export interface DocumentType {
@@ -6677,10 +7474,11 @@ export interface DocumentType {
   entities?: NamedNodeMap;
   notations?: NamedNodeMap;
   internalSubset?: string;
-  namespaceURI?: string;
+  localName?: string;
   prefix?: string;
   attributes?: NamedNodeMap;
-  localName?: string;
+  nodeType?: number;
+  namespaceURI?: string;
   nodeName?: string;
   nodeValue?: string;
   parentNode?: Node;
@@ -6692,16 +7490,16 @@ export interface DocumentType {
   ownerDocument?: Document;
   baseURI?: string;
   textContent?: string;
-  nodeType?: number;
 }
 
 export interface Element {
   tagName?: string;
   schemaTypeInfo?: TypeInfo;
-  namespaceURI?: string;
+  localName?: string;
   prefix?: string;
   attributes?: NamedNodeMap;
-  localName?: string;
+  nodeType?: number;
+  namespaceURI?: string;
   nodeName?: string;
   nodeValue?: string;
   parentNode?: Node;
@@ -6713,7 +7511,6 @@ export interface Element {
   ownerDocument?: Document;
   baseURI?: string;
   textContent?: string;
-  nodeType?: number;
 }
 
 export interface ExecutionDataValue {
@@ -6785,10 +7582,11 @@ export interface NamedNodeMap {
 }
 
 export interface Node {
-  namespaceURI?: string;
+  localName?: string;
   prefix?: string;
   attributes?: NamedNodeMap;
-  localName?: string;
+  nodeType?: number;
+  namespaceURI?: string;
   nodeName?: string;
   nodeValue?: string;
   parentNode?: Node;
@@ -6800,7 +7598,6 @@ export interface Node {
   ownerDocument?: Document;
   baseURI?: string;
   textContent?: string;
-  nodeType?: number;
 }
 
 export interface NodeList {
@@ -6859,6 +7656,19 @@ export type ScriptStateExecutionData = DelegateResponseData & {
 export interface TypeInfo {
   typeName?: string;
   typeNamespace?: string;
+}
+
+export interface JiraProjectBasicNG {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface ResponseListJiraProjectBasicNG {
+  status?: "SUCCESS" | "FAILURE" | "ERROR";
+  data?: JiraProjectBasicNG[];
+  metaData?: { [key: string]: any };
+  correlationId?: string;
 }
 
 export interface JiraStatusCategoryNG {
@@ -6948,22 +7758,9 @@ export interface ResponseJiraIssueUpdateMetadataNG {
   correlationId?: string;
 }
 
-export interface JiraProjectBasicNG {
-  id: string;
-  key: string;
-  name: string;
-}
-
-export interface ResponseListJiraProjectBasicNG {
+export interface ResponseListServiceAccountDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: JiraProjectBasicNG[];
-  metaData?: { [key: string]: any };
-  correlationId?: string;
-}
-
-export interface ResponseServiceAccountDTO {
-  status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ServiceAccountDTO;
+  data?: ServiceAccountDTO[];
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -6981,9 +7778,9 @@ export interface ServiceAccountDTO {
   projectIdentifier?: string;
 }
 
-export interface ResponseListServiceAccountDTO {
+export interface ResponseServiceAccountDTO {
   status?: "SUCCESS" | "FAILURE" | "ERROR";
-  data?: ServiceAccountDTO[];
+  data?: ServiceAccountDTO;
   metaData?: { [key: string]: any };
   correlationId?: string;
 }
@@ -7054,6 +7851,7 @@ export interface SourceCodeManagerAuthentication {
 export interface SourceCodeManagerDTO {
   id?: string;
   userIdentifier?: string;
+  accountIdentifier?: string;
   name: string;
   createdAt?: number;
   lastModifiedAt?: number;
@@ -7092,13 +7890,19 @@ export interface RestResponseUserInfo {
   responseMessages?: ResponseMessage[];
 }
 
+export interface OAuthSignupDTO {
+  email?: string;
+  name?: string;
+  utmInfo?: UtmInfo;
+}
+
 export interface SignupDTO {
   email?: string;
   password?: string;
   utmInfo?: UtmInfo;
   intent?: string;
   signupAction?: "REGULAR" | "TRIAL" | "SUBSCRIBE";
-  edition?: "FREE" | "TEAM" | "ENTERPRISE";
+  edition?: "COMMUNITY" | "FREE" | "TEAM" | "ENTERPRISE";
   billingFrequency?: "MONTHLY" | "YEARLY";
 }
 
@@ -7112,45 +7916,6 @@ export interface RestResponseVerifyTokenResponseDTO {
 
 export interface VerifyTokenResponseDTO {
   accountIdentifier?: string;
-}
-
-export interface OAuthSignupDTO {
-  email?: string;
-  name?: string;
-  utmInfo?: UtmInfo;
-}
-
-export interface JsonNode {
-  array?: boolean;
-  null?: boolean;
-  containerNode?: boolean;
-  valueNode?: boolean;
-  missingNode?: boolean;
-  object?: boolean;
-  nodeType?:
-    | "ARRAY"
-    | "BINARY"
-    | "BOOLEAN"
-    | "MISSING"
-    | "NULL"
-    | "NUMBER"
-    | "OBJECT"
-    | "POJO"
-    | "STRING";
-  pojo?: boolean;
-  number?: boolean;
-  integralNumber?: boolean;
-  floatingPointNumber?: boolean;
-  short?: boolean;
-  int?: boolean;
-  long?: boolean;
-  float?: boolean;
-  double?: boolean;
-  bigDecimal?: boolean;
-  bigInteger?: boolean;
-  textual?: boolean;
-  boolean?: boolean;
-  binary?: boolean;
 }
 
 export interface PartialSchemaDTO {
@@ -7205,6 +7970,8 @@ export interface YamlSnippets {
 
 export type ServiceRequestDTORequestBody = ServiceRequestDTO;
 
+export type SignupDTORequestBody = SignupDTO;
+
 export type ApiKeyDTORequestBody = ApiKeyDTO;
 
 export type TokenDTORequestBody = TokenDTO;
@@ -7215,6 +7982,8 @@ export type UploadSamlMetaDataRequestBody = void;
 
 export type GcrRequestDTORequestBody = GcrRequestDTO;
 
+export type GitOpsProviderRequestBody = GitOpsProvider;
+
 export type ProjectRequestRequestBody = ProjectRequest;
 
 export type GitSyncConfigRequestBody = GitSyncConfig;
@@ -7222,6 +7991,8 @@ export type GitSyncConfigRequestBody = GitSyncConfig;
 export type DelegateProfileDetailsNgRequestBody = DelegateProfileDetailsNg;
 
 export type WebhookCatcherBodyRequestBody = string;
+
+export type RoleAssignmentFilterRequestBody = RoleAssignmentFilter;
 
 export type ServiceAccountDTORequestBody = ServiceAccountDTO;
 
@@ -7268,14 +8039,20 @@ export type SignupProps = Omit<
     RestResponseVoid,
     Failure | Error,
     SignupQueryParams,
-    SignupDTO,
+    SignupDTORequestBody,
     void
   >,
   "path" | "verb"
 >;
 
 export const Signup = (props: SignupProps) => (
-  <Mutate<RestResponseVoid, Failure | Error, SignupQueryParams, SignupDTO, void>
+  <Mutate<
+    RestResponseVoid,
+    Failure | Error,
+    SignupQueryParams,
+    SignupDTORequestBody,
+    void
+  >
     verb="POST"
     path={`/signup`}
     base={window.location.pathname.replace("auth/", "") + "gateway/ng/api"}
@@ -7288,7 +8065,7 @@ export type UseSignupProps = Omit<
     RestResponseVoid,
     Failure | Error,
     SignupQueryParams,
-    SignupDTO,
+    SignupDTORequestBody,
     void
   >,
   "path" | "verb"
@@ -7299,7 +8076,7 @@ export const useSignup = (props: UseSignupProps) =>
     RestResponseVoid,
     Failure | Error,
     SignupQueryParams,
-    SignupDTO,
+    SignupDTORequestBody,
     void
   >("POST", `/signup`, {
     base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
@@ -7428,6 +8205,55 @@ export const useResendVerifyEmail = (props: UseResendVerifyEmailProps) =>
     void,
     void
   >("POST", `/signup/verify-notification`, {
+    base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
+    ...props
+  });
+
+export type CommunitySignupProps = Omit<
+  MutateProps<
+    RestResponseUserInfo,
+    Failure | Error,
+    void,
+    SignupDTORequestBody,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const CommunitySignup = (props: CommunitySignupProps) => (
+  <Mutate<
+    RestResponseUserInfo,
+    Failure | Error,
+    void,
+    SignupDTORequestBody,
+    void
+  >
+    verb="POST"
+    path={`/signup/community`}
+    base={window.location.pathname.replace("auth/", "") + "gateway/ng/api"}
+    {...props}
+  />
+);
+
+export type UseCommunitySignupProps = Omit<
+  UseMutateProps<
+    RestResponseUserInfo,
+    Failure | Error,
+    void,
+    SignupDTORequestBody,
+    void
+  >,
+  "path" | "verb"
+>;
+
+export const useCommunitySignup = (props: UseCommunitySignupProps) =>
+  useMutate<
+    RestResponseUserInfo,
+    Failure | Error,
+    void,
+    SignupDTORequestBody,
+    void
+  >("POST", `/signup/community`, {
     base: window.location.pathname.replace("auth/", "") + "gateway/ng/api",
     ...props
   });
