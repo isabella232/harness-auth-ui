@@ -188,6 +188,7 @@ const SignUp: React.FC = () => {
       placeholder="Password"
       disabled={loading || captchaExecuting}
       validate={validatePassword}
+      infoMessage={"The password must be between 8 and 64 characters long"}
     />
   );
 

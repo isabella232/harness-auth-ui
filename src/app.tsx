@@ -15,6 +15,7 @@ import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 import CompleteInvitePage from "./pages/CompleteInvite/CompleteInvitePage";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
 import { isCommunityPlan, isOnPrem, isSaas } from "utils/DeploymentTypeUtil";
+import SignUpCommunity from "./pages/SignUp/SignUpCommunity";
 
 const initializeApp = () => {
   // initialize bugsnagClient
@@ -39,6 +40,7 @@ const AppWithCommunityRoutes: React.FC = () => {
       <Route path={routes.toForgotPassword()} component={ForgotPassword} />
       <Route path={routes.toResetPassword()} component={ResetPassword} />
       <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
+      <Route path={routes.toSignUp()} component={SignUpCommunity} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
