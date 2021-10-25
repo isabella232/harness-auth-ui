@@ -40,7 +40,7 @@ const AppWithCommunityRoutes: React.FC = () => {
       <Route path={routes.toForgotPassword()} component={ForgotPassword} />
       <Route path={routes.toResetPassword()} component={ResetPassword} />
       <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
-      <Route path={routes.toSignUpCommunity()} component={SignUpCommunity} />
+      <Route path={routes.toSignUp()} component={SignUpCommunity} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
