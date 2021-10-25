@@ -80,7 +80,6 @@ export function App(): React.ReactElement {
 
     return <AppWithSaasRoutes />;
   };
-
   return (
     <RestfulProvider base="/">
       <AppErrorBoundary>
