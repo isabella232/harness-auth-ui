@@ -78,11 +78,6 @@ exports[`SignIn render 1`] = `
                   type="password"
                   value=""
                 />
-                <span
-                  class="info-message"
-                >
-                  The password must be between 8 and 64 characters long
-                </span>
               </div>
             </div>
             <input
