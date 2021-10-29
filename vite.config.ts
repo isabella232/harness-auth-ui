@@ -25,6 +25,9 @@ if (!DEV) {
     `
     if(!window.deploymentType)
     window.deploymentType="SAAS"
+
+    if(!window.apiUrl)
+    window.apiUrl = "gateway"
   `
   ];
 }
