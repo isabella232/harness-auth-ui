@@ -25,9 +25,6 @@ if (!DEV) {
     `
     if(!window.deploymentType)
     window.deploymentType="SAAS"
-
-    if(!window.apiUrl)
-    window.apiUrl = "gateway"
   `
   ];
 }
@@ -38,11 +35,6 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3457",
         changeOrigin: true
-      },
-      "/gateway/api": {
-        target: "http://localhost:3457",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/gateway/, "")
       },
       "/ng/api": {
         target: "http://localhost:7457",
