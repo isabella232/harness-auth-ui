@@ -1,0 +1,24 @@
+name: PR Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  dockerize:
+    name: Dockerize
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.comment.body == 'dockerize') && (github.event.comment.user.type == 'User') }}
+    steps: 
+      - name: Initialize
+        run: |
+          PR_DATA=$(curl --silent -H "Authorization: token ${{ secrets.GIT_BOT_TOKEN }}" "${{ github.event.issue.pull_request.url }}")
+          BRANCH=$(echo $PR_DATA | jq -r .head.ref)
+          BRANCH_SANITIZED=$(echo $BRANCH | sed -e 's/[^A-Za-z0-9\-_]/-/g')
+          SHA=$(echo $PR_DATA | jq -r .head.sha | cut -c1-6)
+          DOCKER_TAG="$BRANCH_SANITIZED-$SHA"
+          echo "Branch is $BRANCH"
+          echo "Docker tag is $DOCKER_TAG"
+
+
+ 
