@@ -17,7 +17,7 @@ module.exports = {
   },
   ng: {
     output: "src/services/ng/index.tsx",
-    url: "http://localhost:7457/swagger.json",
+    url: "https://qa.harness.io/prod1/ng/api/swagger.json",
     validation: false,
     transformer: "scripts/swagger-transform.js",
     customImport: `import { getConfig } from "../config";`,
