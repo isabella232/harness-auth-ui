@@ -8,6 +8,7 @@ declare interface Window {
   signupExposed: string;
   gtmCDEnabled: string;
   deploymentType: DEPLOYMENT_TYPE;
+  apiUrl: string;
 }
 
 declare enum DEPLOYMENT_TYPE {

@@ -10,8 +10,9 @@ module.exports = {
     file: "src/services/portal/swagger.json", // we are using file instead of url because "version" field is missing in actual response
     validation: false,
     transformer: "scripts/swagger-transform.js",
+    customImport: `import { getConfig } from "../config";`,
     customProps: {
-      base: `{window.location.pathname.replace("auth/", "") + 'gateway/api'}`
+      base: `{getConfig("api")}`
     }
   },
   ng: {
@@ -19,8 +20,9 @@ module.exports = {
     url: "http://localhost:7457/swagger.json",
     validation: false,
     transformer: "scripts/swagger-transform.js",
+    customImport: `import { getConfig } from "../config";`,
     customProps: {
-      base: `{window.location.pathname.replace("auth/", "") + 'gateway/ng/api'}`
+      base: `{getConfig("ng/api")}`
     }
   }
 };
