@@ -36,11 +36,6 @@ export default defineConfig({
         target: "http://localhost:3457",
         changeOrigin: true
       },
-      "/ng/api": {
-        target: "http://localhost:7457",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ng\/api/, "")
-      },
       "/gateway/ng/api": {
         target: "http://localhost:7457",
         changeOrigin: true,
