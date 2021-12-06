@@ -6,7 +6,6 @@ declare interface Window {
   invisibleCaptchaToken: string;
   segmentToken: string;
   signupExposed: string;
-  gtmCDEnabled: string;
   deploymentType: DEPLOYMENT_TYPE;
   apiUrl: string;
 }
