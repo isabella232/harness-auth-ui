@@ -14,9 +14,19 @@
 
   & .subtitle {
     font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-huge);
+    color: var(--dark-400);
+  }
+
+  & .communitySubtitle {
+    font-size: var(--font-size-medium);
     margin-top: var(--spacing-huge);
     margin-bottom: var(--spacing-medium);
     color: var(--dark-400);
+  }
+
+  & .footer {
+    margin-top: var(--spacing-huge);
   }
 
   & .disclaimer {

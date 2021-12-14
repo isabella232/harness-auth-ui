@@ -93,7 +93,7 @@ const SignUpCommunity: React.FC = () => {
           </Link>
         </div>
         <div className={css.title}>Welcome to Harness CD Community Plan</div>
-        <div className={css.subtitle}>Set up an admin user</div>
+        <div className={css.communitySubtitle}>Set up an admin user</div>
         <Form
           onSubmit={onSubmit}
           render={({ handleSubmit }) => (
