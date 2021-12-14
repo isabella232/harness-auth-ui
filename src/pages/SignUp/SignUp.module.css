@@ -18,7 +18,24 @@
     color: var(--dark-400);
   }
 
+  & .communitySubtitle {
+    font-size: var(--font-size-medium);
+    margin-top: var(--spacing-huge);
+    margin-bottom: var(--spacing-medium);
+    color: var(--dark-400);
+  }
+
   & .footer {
     margin-top: var(--spacing-huge);
+  }
+
+  & .disclaimer {
+    margin-top: var(--spacing-huge);
+    text-align: center;
+    font-size: var(--font-size-normal);
+
+    & .externalLink {
+      color: var(--blue-500);
+    }
   }
 }
