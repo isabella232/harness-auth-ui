@@ -99,7 +99,7 @@ const SignUpCommunity: React.FC = () => {
               {passwordField}
               <input
                 type="submit"
-                value="Sign up"
+                value="Register"
                 className="button primary"
                 disabled={loading}
               />
