@@ -86,7 +86,7 @@ const SignUpCommunity: React.FC = () => {
         <div className={css.header}>
           <img src={logo} width={120} className={css.logo} />
         </div>
-        <div className={css.title}>Sign up</div>
+        <div className={css.title}>Register</div>
         <div className={css.subtitle}>and get ship done.</div>
         <Form
           onSubmit={onSubmit}
