@@ -3,6 +3,7 @@ import SecureStorage from "./SecureStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
 import { DefaultExperience } from "utils/DefaultExperienceTypes";
+import telemetry from "telemetry/Telemetry";
 
 interface AuthHeader {
   authorization: string;
@@ -63,6 +64,9 @@ export function handleLoginSuccess({
     SecureStorage.setItem("email", resource.email);
     SecureStorage.setItem("acctId", loginToAccountId);
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
+
+    // send identify user event to telemetry to update the identity
+    telemetry.identify(resource.email || "");
 
     if (
       resource.twoFactorAuthenticationEnabled === true &&
