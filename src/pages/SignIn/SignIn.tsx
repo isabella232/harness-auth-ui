@@ -21,6 +21,8 @@ import {
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
 import { isCommunityPlan } from "utils/DeploymentTypeUtil";
+import { AuthenticationInfo, useGetAuthenticationInfo } from "services/gateway";
+import Spinner from "static/icons/spinner/Spinner";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -46,6 +48,52 @@ const SignIn: React.FC = () => {
   const history = useHistory();
   const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
 
+  const {
+    data,
+    loading: loadingAuthInfo,
+    refetch: getAuthenticationInfo
+  } = useGetAuthenticationInfo({ lazy: true });
+  const authenticationInfo = data?.resource;
+
+  // if expectedHostname is defined, and not equal to current hostname, we are on vanity URL
+  const isVanity =
+    window.expectedHostname &&
+    window.expectedHostname !== "" &&
+    window.location.hostname !== window.expectedHostname;
+
+  // easy-to-access derived flags for different auth mechanisms, used only for Vanity URL customers
+  const hideUsernamePasswordForm = !!(
+    isVanity &&
+    authenticationInfo &&
+    authenticationInfo.authenticationMechanism !== "USER_PASSWORD" &&
+    authenticationInfo.authenticationMechanism !== "LDAP"
+  );
+
+  const hideOauth = !!(
+    isVanity &&
+    authenticationInfo &&
+    !authenticationInfo.oauthEnabled
+  );
+
+  const hideSSO = !!(
+    isVanity &&
+    authenticationInfo &&
+    authenticationInfo.authenticationMechanism !== "SAML"
+  );
+
+  // redirect to SAML IDP if vanity URL and authMechanism is SAML
+  useEffect(() => {
+    if (!isVanity) return;
+
+    if (
+      authenticationInfo &&
+      authenticationInfo.authenticationMechanism === "SAML" &&
+      authenticationInfo.samlRedirectUrl
+    ) {
+      window.location.href = authenticationInfo.samlRedirectUrl;
+    }
+  }, [authenticationInfo]);
+
   // this runs once on first mount
   useEffect(() => {
     if (returnUrl) {
@@ -54,6 +102,11 @@ const SignIn: React.FC = () => {
     } else {
       // clearing sessionStorage in case previous login was cancelled
       sessionStorage.removeItem("returnUrl");
+    }
+
+    if (isVanity) {
+      // call gateway to find with auth mechanisms are enabled for this vanity url
+      getAuthenticationInfo();
     }
 
     switch (errorCode) {
@@ -123,72 +176,87 @@ const SignIn: React.FC = () => {
         </div>
         <div className={css.title}>Sign in</div>
         <div className={css.subtitle}>and get ship done.</div>
-        <Form
-          onSubmit={handleLogin}
-          render={({ handleSubmit }) => {
-            return (
-              <form
-                className="layout-vertical spacing-medium"
-                onSubmit={handleSubmit}
-              >
-                <Field
-                  name="email"
-                  type="email"
-                  label="Email"
-                  placeholder="email@work.com"
-                  disabled={loading}
-                  validate={validateEmail}
-                />
-                <div
-                  className="layout-vertical spacing-small"
-                  style={{ position: "relative" }}
-                >
-                  <label htmlFor="password">Password</label>
-                  <Link
-                    to={RouteDefinitions.toForgotPassword()}
-                    className={css.forgotLink}
-                    tabIndex={-1}
-                  >
-                    Forgot password?
-                  </Link>
-                  <Field
-                    name="password"
-                    type="password"
-                    disabled={loading}
-                    validate={validatePasswordRequiredOnly}
-                  />
-                </div>
-                {showCaptcha ? (
-                  <ReCAPTCHA
-                    sitekey={window.captchaToken || ""}
-                    ref={captchaRef}
-                    onChange={(token: string | null) => {
-                      if (token) {
-                        setCaptchaResponse(token);
-                      }
-                    }}
-                  />
-                ) : null}
-                <input
-                  type="submit"
-                  value={loading ? "Signing in..." : "Sign in"}
-                  className="button primary"
-                  disabled={loading || (showCaptcha && !captchaReponse)}
-                />
-              </form>
-            );
-          }}
-        />
-        <AuthFooter
-          hideOAuth={isCommunityPlan()}
-          page={AuthPage.SignIn}
-          accountId={accountId}
-          hideSSO={isCommunityPlan()}
-        />
-        {window.signupExposed === "true" && (
-          <div className={css.footer}>
-            No account? <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
+        {loadingAuthInfo ? (
+          <div className={css.center}>
+            <Spinner />
           </div>
+        ) : (
+          <>
+            {!hideUsernamePasswordForm ? (
+              <Form
+                onSubmit={handleLogin}
+                render={({ handleSubmit }) => {
+                  return (
+                    <form
+                      className="layout-vertical spacing-medium"
+                      onSubmit={handleSubmit}
+                    >
+                      <Field
+                        name="email"
+                        type="email"
+                        label="Email"
+                        placeholder="email@work.com"
+                        disabled={loading}
+                        validate={validateEmail}
+                      />
+                      <div
+                        className="layout-vertical spacing-small"
+                        style={{ position: "relative" }}
+                      >
+                        <label htmlFor="password">Password</label>
+                        <Link
+                          to={RouteDefinitions.toForgotPassword()}
+                          className={css.forgotLink}
+                          tabIndex={-1}
+                        >
+                          Forgot password?
+                        </Link>
+                        <Field
+                          name="password"
+                          type="password"
+                          disabled={loading}
+                          validate={validatePasswordRequiredOnly}
+                        />
+                      </div>
+                      {showCaptcha ? (
+                        <ReCAPTCHA
+                          sitekey={window.captchaToken || ""}
+                          ref={captchaRef}
+                          onChange={(token: string | null) => {
+                            if (token) {
+                              setCaptchaResponse(token);
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <input
+                        type="submit"
+                        value={loading ? "Signing in..." : "Sign in"}
+                        className="button primary"
+                        disabled={loading || (showCaptcha && !captchaReponse)}
+                      />
+                    </form>
+                  );
+                }}
+              />
+            ) : null}
+            <AuthFooter
+              page={AuthPage.SignIn}
+              accountId={accountId}
+              hideSeparator={hideUsernamePasswordForm}
+              hideOAuth={isCommunityPlan() || hideOauth}
+              hideSSO={isCommunityPlan() || hideSSO}
+              enabledOauthProviders={
+                isVanity ? authenticationInfo?.oauthProviders : undefined
+              }
+            />
+            {window.signupExposed === "true" || __DEV__ ? (
+              <div className={css.footer}>
+                No account?{" "}
+                <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
+              </div>
+            ) : null}
+          </>
         )}
       </div>
     </BasicLayout>

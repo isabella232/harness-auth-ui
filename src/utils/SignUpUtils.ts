@@ -1,5 +1,6 @@
 import type { UserInfo, GatewayAccountRequestDTO } from "services/ng";
 import SecureStorage from "./SecureStorage";
+import { getUTMInfoParams } from "./TrackingUtils";
 
 function createDefaultExperienceMap(
   accounts: GatewayAccountRequestDTO[]
@@ -43,4 +44,57 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
       window.location.href = `${baseUrl}ng/#/account/${resource.defaultAccountId}/purpose?source=signup`;
     }
   }
+}
+
+export enum SignupAction {
+  REGULAR = "REGULAR",
+  TRIAL = "TRIAL",
+  SUBSCRIBE = "SUBSCRIBE"
+}
+
+export enum Edition {
+  FREE = "FREE",
+  TEAM = "TEAM",
+  ENTERPRISE = "ENTERPRISE"
+}
+
+export enum BillingFrequency {
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY"
+}
+
+export function getLicenseParams(urlParams?: URLSearchParams): string {
+  const signupAction = urlParams?.get("signupAction");
+  const signupParam =
+    signupAction && signupAction.toUpperCase() in SignupAction
+      ? `&signupAction=${signupAction.toUpperCase()}`
+      : "";
+
+  const edition = urlParams?.get("edition");
+  const editionParam =
+    edition && edition.toUpperCase() in Edition
+      ? `&edition=${edition.toUpperCase()}`
+      : "";
+
+  const billingFrequency = urlParams?.get("billingFrequency");
+  const billingFrequencyParam =
+    billingFrequency && billingFrequency.toUpperCase() in BillingFrequency
+      ? `&billingFrequency=${billingFrequency.toUpperCase()}`
+      : "";
+
+  return `${signupParam}${editionParam}${billingFrequencyParam}`;
+}
+
+export function getSignupQueryParams(): string {
+  const queryString = window.location.hash?.split("?")?.[1];
+  const urlParams = new URLSearchParams(queryString);
+
+  const module = urlParams?.get("module");
+  const moduleParam = module ? `&module=${module}` : "";
+
+  const licenseParams = getLicenseParams(urlParams);
+
+  const utmInfoParams = getUTMInfoParams(urlParams);
+
+  return `&action=signup&isNG=true${moduleParam}${licenseParams}${utmInfoParams}`;
 }

@@ -22,4 +22,5 @@ CMD sed -i "s|<\!-- captchaToken -->|<script>window.captchaToken = '$CAPTCHA_TOK
   sed -i "s|<\!-- signupExposed -->|<script>window.signupExposed = '$SIGNUP_EXPOSED'</script>|" index.html && \
   sed -i "s|<\!-- deploymentType -->|<script>window.deploymentType = '$DEPLOYMENT_TYPE'</script>|" index.html && \
   sed -i "s|<\!-- apiUrl -->|<script>window.apiUrl = '$API_URL'</script>|" index.html && \
+  sed -i "s|<\!-- expectedHostname -->|<script>window.expectedHostname = '$EXPECTED_HOSTNAME'</script>|" index.html && \
   nginx -c /etc/nginx/nginx.conf -g 'daemon off;'

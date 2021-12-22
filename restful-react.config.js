@@ -24,5 +24,16 @@ module.exports = {
     customProps: {
       base: `{getConfig("ng/api")}`
     }
+  },
+  gateway: {
+    output: "src/services/gateway/index.tsx",
+    // url: "http://localhost:3457/api/swagger.json",
+    file: "src/services/gateway/swagger.json", // we are using file instead of url because "version" field is missing in actual response
+    validation: false,
+    transformer: "scripts/swagger-transform.js",
+    customImport: `import { getConfig } from "../config";`,
+    customProps: {
+      base: `{getConfig("api")}`
+    }
   }
 };
