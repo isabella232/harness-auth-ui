@@ -13,6 +13,7 @@ import css from "./AuthFooter.module.css";
 import Icon from "components/Icon/Icon";
 import RouteDefinitions from "RouteDefinitions";
 import Text from "components/Text/Text";
+import Spinner from "static/icons/spinner/Spinner";
 
 export enum AuthPage {
   SignIn,
@@ -26,6 +27,7 @@ interface AuthFooterProps {
   hideSSO?: boolean;
   hideSeparator?: boolean;
   enabledOauthProviders?: OAuthProvider[];
+  isVanity?: boolean;
 }
 
 function getOAuthLink(
@@ -49,14 +51,16 @@ function getOAuthLink(
   );
 }
 
-const AuthFooter: React.FC<AuthFooterProps> = ({
-  page,
-  hideOAuth,
-  accountId,
-  hideSSO,
-  hideSeparator,
-  enabledOauthProviders
-}) => {
+const AuthFooter: React.FC<AuthFooterProps> = (props) => {
+  const {
+    page,
+    hideOAuth,
+    accountId,
+    hideSSO,
+    hideSeparator,
+    enabledOauthProviders,
+    isVanity
+  } = props;
   const history = useHistory();
   const isSignup = page === AuthPage.SignUp;
 
@@ -104,7 +108,11 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
         </div>
       ) : (
         <>
-          {hideSSO ? null : (
+          {hideSSO ? null : isVanity ? (
+            <div className={css.center}>
+              <Spinner />
+            </div>
+          ) : (
             <button
               className={cx("button", css.ssoButton)}
               onClick={() => {

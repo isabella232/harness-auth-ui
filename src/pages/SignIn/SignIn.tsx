@@ -21,7 +21,7 @@ import {
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
 import { isCommunityPlan } from "utils/DeploymentTypeUtil";
-import { AuthenticationInfo, useGetAuthenticationInfo } from "services/gateway";
+import { useGetAuthenticationInfo } from "services/gateway";
 import Spinner from "static/icons/spinner/Spinner";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -46,20 +46,24 @@ const SignIn: React.FC = () => {
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
-  const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
-
   const {
     data,
     loading: loadingAuthInfo,
     refetch: getAuthenticationInfo
-  } = useGetAuthenticationInfo({ lazy: true });
+  } = useGetAuthenticationInfo({ lazy: true }); // this gets called only for vanity URLs
+
   const authenticationInfo = data?.resource;
+  const accountId =
+    getAccountIdFromUrl(returnUrl) || // get from returnUrl if present
+    authenticationInfo?.accountId || // get from authInfo for vanity url if present
+    undefined; // default to no accountId
 
   // if expectedHostname is defined, and not equal to current hostname, we are on vanity URL
-  const isVanity =
+  const isVanity = !!(
     window.expectedHostname &&
     window.expectedHostname !== "" &&
-    window.location.hostname !== window.expectedHostname;
+    window.location.hostname !== window.expectedHostname
+  );
 
   // easy-to-access derived flags for different auth mechanisms, used only for Vanity URL customers
   const hideUsernamePasswordForm = !!(
@@ -246,6 +250,7 @@ const SignIn: React.FC = () => {
               hideSeparator={hideUsernamePasswordForm}
               hideOAuth={isCommunityPlan() || hideOauth}
               hideSSO={isCommunityPlan() || hideSSO}
+              isVanity={isVanity}
               enabledOauthProviders={
                 isVanity ? authenticationInfo?.oauthProviders : undefined
               }
