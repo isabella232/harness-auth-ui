@@ -9,6 +9,7 @@ import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import Field from "components/Field/Field";
 import Text from "components/Text/Text";
+import telemetry from "telemetry/Telemetry";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
@@ -32,6 +33,8 @@ const SSOSignIn: React.FC = () => {
       const res = await getLoginType({ userName: data.email });
       if (res.resource?.authenticationMechanism === "SAML") {
         if (res.resource.ssorequest?.idpRedirectUrl) {
+          // send identify user event to telemetry to update the identity
+          telemetry.identify(data.email);
           window.location.href = res.resource.ssorequest?.idpRedirectUrl;
         }
       } else {

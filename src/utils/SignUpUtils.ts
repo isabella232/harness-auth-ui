@@ -1,4 +1,5 @@
 import type { UserInfo, GatewayAccountRequestDTO } from "services/ng";
+import telemetry from "telemetry/Telemetry";
 import SecureStorage from "./SecureStorage";
 
 function createDefaultExperienceMap(
@@ -27,6 +28,9 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     SecureStorage.setItem("acctId", resource.defaultAccountId);
     SecureStorage.setItem("email", resource.email);
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
+
+    // send identify user event to telemetry to update the identity
+    telemetry.identify(resource.email || "");
 
     if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
