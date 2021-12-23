@@ -1,6 +1,8 @@
 import React from "react";
 
-import AuthIllustration from "./AuthIllustration.svg";
+import { isCommunityPlan } from "utils/DeploymentTypeUtil";
+import generalBgImg from "./AuthIllustration.svg";
+import communityImg from "./community-bg.png";
 import css from "./BasicLayout.module.css";
 
 interface BasicLayoutProps {
@@ -8,13 +10,14 @@ interface BasicLayoutProps {
 }
 
 const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
+  const bgImg = isCommunityPlan() ? communityImg : generalBgImg;
   return (
     <div className={css.layout}>
       <div className={css.cardColumn}>
         <div className={css.card}>{children}</div>
       </div>
       <div className={css.imageColumn}>
-        <img className={css.image} src={AuthIllustration} alt="" aria-hidden />
+        <img className={css.image} src={bgImg} alt="" aria-hidden />
       </div>
     </div>
   );
