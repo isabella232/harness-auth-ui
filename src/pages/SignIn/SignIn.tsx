@@ -14,15 +14,15 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
-import { getAccountIdFromUrl, handleLoginSuccess } from "utils/LoginUtils";
+import { handleLoginSuccess } from "utils/LoginUtils";
 import {
   validateEmail,
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
 import { isCommunityPlan } from "utils/DeploymentTypeUtil";
-import { useGetAuthenticationInfo } from "services/gateway";
 import Spinner from "static/icons/spinner/Spinner";
+import { useVanityExperience } from "hooks/useVanityExperience";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -34,7 +34,7 @@ interface LoginFormData {
   password: string;
 }
 
-interface SignInQueryParams {
+export interface SignInQueryParams {
   returnUrl?: string;
   errorCode?: string;
   action?: "signout";
@@ -44,100 +44,20 @@ const SignIn: React.FC = () => {
   const { returnUrl, errorCode, action } = useQueryParams<SignInQueryParams>();
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
-  const [accountId, setAccountId] = useState<string | undefined>();
-  const [hideUsernamePasswordForm, setHideUsernamePasswordForm] = useState(
-    false
-  );
-  const [hideOauth, setHideOauth] = useState(false);
-  const [hideSSO, setHideSSO] = useState(false);
+  const {
+    accountId,
+    isVanity,
+    hideUsernamePasswordForm,
+    hideOauth,
+    hideSSO,
+    authenticationInfo,
+    loading: loadingAuthInfo,
+    error
+  } = useVanityExperience();
+
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
   const history = useHistory();
-
-  const {
-    data,
-    loading: loadingAuthInfo,
-    refetch: getAuthenticationInfo,
-    error
-  } = useGetAuthenticationInfo({ lazy: true }); // this gets called only for vanity URLs or if accountId is known
-
-  const authenticationInfo = data?.resource;
-
-  // if expectedHostname is defined, and not equal to current hostname, we are on vanity URL
-  const isVanity = !!(
-    window.expectedHostname &&
-    window.expectedHostname !== "" &&
-    window.location.hostname !== window.expectedHostname
-  );
-
-  useEffect(() => {
-    // get from returnUrl if present
-    const _accountId = getAccountIdFromUrl(returnUrl);
-    setAccountId(_accountId);
-
-    if (_accountId || isVanity) {
-      // call gateway to find with auth mechanisms are enabled for this vanity url or accountId
-      getAuthenticationInfo({ queryParams: { accountId: _accountId } });
-    }
-  }, [returnUrl]);
-
-  useEffect(() => {
-    if (authenticationInfo) {
-      setAccountId(
-        authenticationInfo?.accountId // get from authInfo for vanity url if present
-      );
-    }
-  }, [authenticationInfo]);
-
-  useEffect(() => {
-    // redirect to SAML IDP if authMechanism is SAML (based on returnUrl or vanity url)
-    if (
-      (isVanity || accountId) &&
-      action !== "signout" &&
-      authenticationInfo &&
-      authenticationInfo.authenticationMechanism === "SAML" &&
-      authenticationInfo.samlRedirectUrl
-    ) {
-      window.location.href = authenticationInfo.samlRedirectUrl;
-    }
-
-    setHideUsernamePasswordForm(
-      !!(
-        (isVanity || accountId) &&
-        authenticationInfo &&
-        authenticationInfo.authenticationMechanism !== "USER_PASSWORD" &&
-        authenticationInfo.authenticationMechanism !== "LDAP"
-      )
-    );
-
-    setHideOauth(
-      !!(
-        (isVanity || accountId) &&
-        authenticationInfo &&
-        !authenticationInfo.oauthEnabled
-      )
-    );
-
-    setHideSSO(
-      !!(
-        (isVanity || accountId) &&
-        authenticationInfo &&
-        authenticationInfo.authenticationMechanism !== "SAML"
-      )
-    );
-  }, [accountId, authenticationInfo]);
-
-  if (__DEV__) {
-    // eslint-disable-next-line no-console
-    console.debug({
-      returnUrl,
-      accountId,
-      isVanity,
-      hideUsernamePasswordForm,
-      hideOauth,
-      hideSSO
-    });
-  }
 
   // this runs once on first mount
   useEffect(() => {
