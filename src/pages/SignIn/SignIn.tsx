@@ -42,21 +42,24 @@ interface SignInQueryParams {
 const SignIn: React.FC = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
+  const [accountId, setAccountId] = useState<string | undefined>();
+  const [hideUsernamePasswordForm, setHideUsernamePasswordForm] = useState(
+    false
+  );
+  const [hideOauth, setHideOauth] = useState(false);
+  const [hideSSO, setHideSSO] = useState(false);
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
   const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
+
   const {
     data,
     loading: loadingAuthInfo,
     refetch: getAuthenticationInfo
-  } = useGetAuthenticationInfo({ lazy: true }); // this gets called only for vanity URLs
+  } = useGetAuthenticationInfo({ lazy: true }); // this gets called only for vanity URLs or if accountId is known
 
   const authenticationInfo = data?.resource;
-  const accountId =
-    getAccountIdFromUrl(returnUrl) || // get from returnUrl if present
-    authenticationInfo?.accountId || // get from authInfo for vanity url if present
-    undefined; // default to no accountId
 
   // if expectedHostname is defined, and not equal to current hostname, we are on vanity URL
   const isVanity = !!(
@@ -65,38 +68,72 @@ const SignIn: React.FC = () => {
     window.location.hostname !== window.expectedHostname
   );
 
-  // easy-to-access derived flags for different auth mechanisms, used only for Vanity URL customers
-  const hideUsernamePasswordForm = !!(
-    isVanity &&
-    authenticationInfo &&
-    authenticationInfo.authenticationMechanism !== "USER_PASSWORD" &&
-    authenticationInfo.authenticationMechanism !== "LDAP"
-  );
-
-  const hideOauth = !!(
-    isVanity &&
-    authenticationInfo &&
-    !authenticationInfo.oauthEnabled
-  );
-
-  const hideSSO = !!(
-    isVanity &&
-    authenticationInfo &&
-    authenticationInfo.authenticationMechanism !== "SAML"
-  );
-
-  // redirect to SAML IDP if vanity URL and authMechanism is SAML
   useEffect(() => {
-    if (!isVanity) return;
+    // get from returnUrl if present
+    setAccountId(getAccountIdFromUrl(returnUrl));
+  }, [returnUrl]);
 
+  useEffect(() => {
+    setAccountId(
+      authenticationInfo?.accountId // get from authInfo for vanity url if present
+    );
+  }, [authenticationInfo]);
+
+  useEffect(() => {
+    if (accountId || isVanity) {
+      // call gateway to find with auth mechanisms are enabled for this vanity url or accountId
+      getAuthenticationInfo({ queryParams: { accountId } });
+    }
+  }, [accountId]);
+
+  useEffect(() => {
+    // redirect to SAML IDP if authMechanism is SAML (based on returnUrl or vanity url)
     if (
+      (isVanity || accountId) &&
       authenticationInfo &&
       authenticationInfo.authenticationMechanism === "SAML" &&
       authenticationInfo.samlRedirectUrl
     ) {
       window.location.href = authenticationInfo.samlRedirectUrl;
     }
-  }, [authenticationInfo]);
+
+    setHideUsernamePasswordForm(
+      !!(
+        (isVanity || accountId) &&
+        authenticationInfo &&
+        authenticationInfo.authenticationMechanism !== "USER_PASSWORD" &&
+        authenticationInfo.authenticationMechanism !== "LDAP"
+      )
+    );
+
+    setHideOauth(
+      !!(
+        (isVanity || accountId) &&
+        authenticationInfo &&
+        !authenticationInfo.oauthEnabled
+      )
+    );
+
+    setHideSSO(
+      !!(
+        (isVanity || accountId) &&
+        authenticationInfo &&
+        authenticationInfo.authenticationMechanism !== "SAML"
+      )
+    );
+  }, [accountId, authenticationInfo]);
+
+  if (__DEV__) {
+    // eslint-disable-next-line no-console
+    console.debug({
+      returnUrl,
+      accountId,
+      isVanity,
+      hideUsernamePasswordForm,
+      hideOauth,
+      hideSSO
+    });
+  }
 
   // this runs once on first mount
   useEffect(() => {
@@ -106,11 +143,6 @@ const SignIn: React.FC = () => {
     } else {
       // clearing sessionStorage in case previous login was cancelled
       sessionStorage.removeItem("returnUrl");
-    }
-
-    if (isVanity) {
-      // call gateway to find with auth mechanisms are enabled for this vanity url
-      getAuthenticationInfo();
     }
 
     switch (errorCode) {
