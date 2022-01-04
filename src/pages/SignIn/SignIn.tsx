@@ -41,6 +41,7 @@ interface SignInQueryParams {
 }
 
 const SignIn: React.FC = () => {
+  const { returnUrl, errorCode, action } = useQueryParams<SignInQueryParams>();
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
   const [accountId, setAccountId] = useState<string | undefined>();
@@ -51,13 +52,13 @@ const SignIn: React.FC = () => {
   const [hideSSO, setHideSSO] = useState(false);
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { returnUrl, errorCode, action } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
 
   const {
     data,
     loading: loadingAuthInfo,
-    refetch: getAuthenticationInfo
+    refetch: getAuthenticationInfo,
+    error
   } = useGetAuthenticationInfo({ lazy: true }); // this gets called only for vanity URLs or if accountId is known
 
   const authenticationInfo = data?.resource;
@@ -71,21 +72,22 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     // get from returnUrl if present
-    setAccountId(getAccountIdFromUrl(returnUrl));
+    const _accountId = getAccountIdFromUrl(returnUrl);
+    setAccountId(_accountId);
+
+    if (_accountId || isVanity) {
+      // call gateway to find with auth mechanisms are enabled for this vanity url or accountId
+      getAuthenticationInfo({ queryParams: { accountId: _accountId } });
+    }
   }, [returnUrl]);
 
   useEffect(() => {
-    setAccountId(
-      authenticationInfo?.accountId // get from authInfo for vanity url if present
-    );
-  }, [authenticationInfo]);
-
-  useEffect(() => {
-    if (accountId || isVanity) {
-      // call gateway to find with auth mechanisms are enabled for this vanity url or accountId
-      getAuthenticationInfo({ queryParams: { accountId } });
+    if (authenticationInfo) {
+      setAccountId(
+        authenticationInfo?.accountId // get from authInfo for vanity url if present
+      );
     }
-  }, [accountId]);
+  }, [authenticationInfo]);
 
   useEffect(() => {
     // redirect to SAML IDP if authMechanism is SAML (based on returnUrl or vanity url)
@@ -284,11 +286,14 @@ const SignIn: React.FC = () => {
               hideSeparator={hideUsernamePasswordForm}
               hideOAuth={isCommunityPlan() || hideOauth}
               hideSSO={isCommunityPlan() || hideSSO}
-              isVanity={isVanity}
+              isVanity={!!((accountId || isVanity) && !error)}
               enabledOauthProviders={
-                isVanity ? authenticationInfo?.oauthProviders : undefined
+                (accountId || isVanity) && authenticationInfo
+                  ? authenticationInfo?.oauthProviders
+                  : undefined
               }
               ssoIdpUrl={authenticationInfo?.samlRedirectUrl}
+              action={action}
             />
             {window.signupExposed === "true" || __DEV__ ? (
               <div className={css.footer}>

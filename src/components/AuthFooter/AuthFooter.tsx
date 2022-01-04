@@ -29,6 +29,7 @@ interface AuthFooterProps {
   enabledOauthProviders?: OAuthProvider[];
   isVanity?: boolean;
   ssoIdpUrl?: string;
+  action?: "signout";
 }
 
 function getOAuthLink(
@@ -61,7 +62,8 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
     hideSeparator,
     enabledOauthProviders,
     isVanity,
-    ssoIdpUrl
+    ssoIdpUrl,
+    action
   } = props;
   const history = useHistory();
   const isSignup = page === AuthPage.SignUp;
@@ -110,7 +112,7 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
         </div>
       ) : (
         <>
-          {hideSSO ? null : isVanity ? (
+          {hideSSO ? null : isVanity && action !== "signout" ? (
             <div className={css.center}>
               <Spinner />
             </div>
