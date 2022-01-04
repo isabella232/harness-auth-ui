@@ -37,6 +37,7 @@ interface LoginFormData {
 interface SignInQueryParams {
   returnUrl?: string;
   errorCode?: string;
+  action?: "signout";
 }
 
 const SignIn: React.FC = () => {
@@ -50,7 +51,7 @@ const SignIn: React.FC = () => {
   const [hideSSO, setHideSSO] = useState(false);
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
+  const { returnUrl, errorCode, action } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
 
   const {
@@ -90,6 +91,7 @@ const SignIn: React.FC = () => {
     // redirect to SAML IDP if authMechanism is SAML (based on returnUrl or vanity url)
     if (
       (isVanity || accountId) &&
+      action !== "signout" &&
       authenticationInfo &&
       authenticationInfo.authenticationMechanism === "SAML" &&
       authenticationInfo.samlRedirectUrl
@@ -286,6 +288,7 @@ const SignIn: React.FC = () => {
               enabledOauthProviders={
                 isVanity ? authenticationInfo?.oauthProviders : undefined
               }
+              ssoIdpUrl={authenticationInfo?.samlRedirectUrl}
             />
             {window.signupExposed === "true" || __DEV__ ? (
               <div className={css.footer}>

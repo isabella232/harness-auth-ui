@@ -28,6 +28,7 @@ interface AuthFooterProps {
   hideSeparator?: boolean;
   enabledOauthProviders?: OAuthProvider[];
   isVanity?: boolean;
+  ssoIdpUrl?: string;
 }
 
 function getOAuthLink(
@@ -59,7 +60,8 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
     hideSSO,
     hideSeparator,
     enabledOauthProviders,
-    isVanity
+    isVanity,
+    ssoIdpUrl
   } = props;
   const history = useHistory();
   const isSignup = page === AuthPage.SignUp;
@@ -116,7 +118,11 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
             <button
               className={cx("button", css.ssoButton)}
               onClick={() => {
-                history.push(RouteDefinitions.toSSOSignIn());
+                if (ssoIdpUrl) {
+                  window.location.href = ssoIdpUrl;
+                } else {
+                  history.push(RouteDefinitions.toSSOSignIn());
+                }
               }}
             >
               <Text icon="sso" iconProps={{ size: 24 }}>
