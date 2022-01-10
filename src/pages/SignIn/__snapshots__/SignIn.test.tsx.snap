@@ -71,13 +71,23 @@ exports[`SignIn render 1`] = `
               <div
                 class="layout-vertical spacing-small field"
               >
-                <input
-                  class=""
-                  id="password"
-                  name="password"
-                  type="password"
-                  value=""
-                />
+                <div
+                  class="pwd"
+                >
+                  <input
+                    class="pwdInput"
+                    id="password"
+                    name="password"
+                    type="password"
+                    value=""
+                  />
+                  <img
+                    class="pwdIcon"
+                    height="25"
+                    src="test-file-stub"
+                    width="25"
+                  />
+                </div>
               </div>
             </div>
             <input

@@ -16,6 +16,8 @@ import linkedin from "static/icons/linkedin.svg";
 import sso from "static/icons/sso.svg";
 import leftArrow from "static/icons/left-arrow.svg";
 import warningSign from "static/icons/warning.svg";
+import showPwd from "static/icons/show-pwd.svg";
+import hidePwd from "static/icons/hide-pwd.svg";
 
 export type IconName =
   | "azure"
@@ -26,6 +28,8 @@ export type IconName =
   | "linkedin"
   | "sso"
   | "leftArrow"
+  | "showPwd"
+  | "hidePwd"
   | "warningSign";
 
 const iconMap: Record<IconName, string> = {
@@ -37,6 +41,8 @@ const iconMap: Record<IconName, string> = {
   linkedin,
   sso,
   leftArrow,
+  showPwd,
+  hidePwd,
   warningSign
 };
 
@@ -46,6 +52,7 @@ export interface IconProps {
   width?: number;
   size?: number;
   className?: string;
+  onClick?: () => void;
 }
 
 const Icon: React.FC<IconProps> = ({
@@ -53,7 +60,8 @@ const Icon: React.FC<IconProps> = ({
   height,
   width,
   size = 16,
-  className
+  className,
+  onClick
 }) => {
   const finalHeight = height || size;
   const finalWidth = width || size;
@@ -64,6 +72,7 @@ const Icon: React.FC<IconProps> = ({
       height={finalHeight}
       width={finalWidth}
       className={className}
+      onClick={onClick}
     />
   );
 };

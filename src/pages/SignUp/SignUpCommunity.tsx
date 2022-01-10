@@ -15,8 +15,9 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignUp.module.css";
 import Field from "components/Field/Field";
 import { handleError } from "utils/ErrorUtils";
-import { validateEmail, validatePassword } from "utils/FormValidationUtils";
+import { validateEmail } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
+import PasswordField from "components/Field/PasswordField";
 import { SignupDTO, useCommunitySignup } from "../../services/ng";
 import { handleSignUpSuccess } from "../../utils/SignUpUtils";
 import { URLS } from "../../interfaces/OAuthProviders";
@@ -79,13 +80,11 @@ const SignUpCommunity: React.FC = () => {
   );
 
   const passwordField = (
-    <Field
+    <PasswordField
       name="password"
       label="Password"
-      type="password"
       placeholder="Password"
       disabled={loading}
-      validate={validatePassword}
     />
   );
 

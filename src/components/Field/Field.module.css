@@ -29,3 +29,15 @@
     background-color: var(--light-400);
   }
 }
+
+.pwdInput {
+  width: 100%;
+}
+
+.pwd {
+  display: flex;
+}
+.pwdIcon {
+  align-self: center;
+  margin-left: -40px;
+}

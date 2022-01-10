@@ -30,6 +30,7 @@ import { useQueryParams } from "hooks/useQueryParams";
 import { isCommunityPlan } from "utils/DeploymentTypeUtil";
 import Spinner from "static/icons/spinner/Spinner";
 import { useVanityExperience } from "hooks/useVanityExperience";
+import PasswordField from "components/Field/PasswordField";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -178,9 +179,8 @@ const SignIn: React.FC = () => {
                         >
                           Forgot password?
                         </Link>
-                        <Field
+                        <PasswordField
                           name="password"
-                          type="password"
                           disabled={loading}
                           validate={validatePasswordRequiredOnly}
                         />
