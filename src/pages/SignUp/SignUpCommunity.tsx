@@ -129,8 +129,18 @@ const SignUpCommunity: React.FC = () => {
             rel="noreferrer"
             target="_blank"
           >
-            Terms of Use
+            Terms of Use.&nbsp;
           </a>
+          See our&nbsp;
+          <a
+            className={css.externalLink}
+            href={URLS.COMMUNITY_DOCUMENTATION}
+            rel="noreferrer"
+            target="_blank"
+          >
+            documentation&nbsp;
+          </a>
+          to learn more about how we process your data.
         </div>
       </div>
     </BasicLayout>

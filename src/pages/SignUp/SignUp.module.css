@@ -31,8 +31,9 @@
 
   & .disclaimer {
     margin-top: var(--spacing-huge);
-    text-align: center;
+    text-align: start;
     font-size: var(--font-size-normal);
+    line-height: 1.5;
 
     & .externalLink {
       color: var(--blue-500);
