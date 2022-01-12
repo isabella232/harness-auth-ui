@@ -53,5 +53,7 @@ export const URLS = {
   OAUTH: `${location.protocol}//${location.host}/gateway/`,
   FREE_TRIAL: "https://harness.io/thanks-freetrial-p/",
   PRIVACY_AGREEMENT: "https://harness.io/privacy/",
-  SUBSCRIPTION_TERMS: "https://harness.io/subscriptionterms/"
+  SUBSCRIPTION_TERMS: "https://harness.io/subscriptionterms/",
+  COMMUNITY_DOCUMENTATION:
+    "https://ngdocs.harness.io/article/yhyyq0v0y4-harness-community-edition-overview"
 };
