@@ -21,8 +21,8 @@ $ brew install yarn
 3. Clone this repo
 
 ```
-$ git clone git@github.com:wings-software/ng-auth-ui.git
-$ cd ng-auth-ui
+$ git clone git@github.com:harness/harness-auth-ui.git
+$ cd harness-auth-ui
 ```
 
 4. Install/Update/Refresh dependencies
@@ -54,8 +54,7 @@ $ yarn docker <tagname>
 
 First command will create a production build (minified, optimised).
 
-Second command will create a docker image and _publish_ it to `harness/ng-auth-ui` GCR project.
-
+Second command will create a docker image and _publish_ it to `harness/harness-auth-ui` GCR project.
 
 ### Utilities
 

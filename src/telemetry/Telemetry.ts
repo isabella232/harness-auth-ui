@@ -1,4 +1,4 @@
-import Telemetry from "@wings-software/telemetry";
+import Telemetry from "@harness/telemetry";
 
 const stubTelemetry = {
   identify: () => void 0,
