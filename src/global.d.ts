@@ -8,6 +8,7 @@ declare interface Window {
   signupExposed: string;
   deploymentType: DEPLOYMENT_TYPE;
   apiUrl: string;
+  expectedHostname: string;
 }
 
 declare enum DEPLOYMENT_TYPE {

@@ -19,6 +19,16 @@
   display: flex;
   justify-content: space-between;
 
+  &.fullButtons {
+    grid-template-columns: 1fr;
+
+    & .iconContainer {
+      text-align: center;
+      width: unset;
+      color: black;
+    }
+  }
+
   & .iconContainer {
     cursor: pointer;
     background-color: var(--light-400);
@@ -29,6 +39,14 @@
 
     &:hover {
       background-color: var(--light-600);
+    }
+
+    & .icon {
+      vertical-align: text-bottom;
+    }
+
+    & .name {
+      margin-left: var(--spacing-small);
     }
   }
 }
@@ -54,4 +72,8 @@
   & .icon {
     margin-right: var(--spacing-small);
   }
+}
+
+.center {
+  text-align: center;
 }

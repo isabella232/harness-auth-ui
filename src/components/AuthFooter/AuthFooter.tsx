@@ -2,145 +2,114 @@ import React from "react";
 import cx from "classnames";
 import { useHistory } from "react-router-dom";
 import {
+  OAuthProvider,
   OAuthProviders,
   OAuthProviderType,
   URLS
 } from "interfaces/OAuthProviders";
+import { getSignupQueryParams } from "utils/SignUpUtils";
 
 import css from "./AuthFooter.module.css";
 import Icon from "components/Icon/Icon";
 import RouteDefinitions from "RouteDefinitions";
 import Text from "components/Text/Text";
-import { useQueryParams } from "hooks/useQueryParams";
+import Spinner from "static/icons/spinner/Spinner";
 
 export enum AuthPage {
   SignIn,
   SignUp
 }
 
-export enum SignupAction {
-  REGULAR = "REGULAR",
-  TRIAL = "TRIAL",
-  SUBSCRIBE = "SUBSCRIBE"
-}
-
-export enum Edition {
-  FREE = "FREE",
-  TEAM = "TEAM",
-  ENTERPRISE = "ENTERPRISE"
-}
-
-export enum BillingFrequency {
-  MONTHLY = "MONTHLY",
-  YEARLY = "YEARLY"
-}
 interface AuthFooterProps {
   page: AuthPage;
   hideOAuth?: boolean;
   accountId?: string;
   hideSSO?: boolean;
+  hideSeparator?: boolean;
+  enabledOauthProviders?: OAuthProvider[];
+  isVanity?: boolean;
+  ssoIdpUrl?: string;
+  action?: "signout";
 }
 
-const AuthFooter: React.FC<AuthFooterProps> = ({
-  page,
-  hideOAuth,
-  accountId,
-  hideSSO
-}) => {
+function getOAuthLink(
+  isOauthSignup: boolean,
+  oAuthProvider: OAuthProviderType,
+  accountId?: string,
+  showFullOauthButtons?: boolean
+) {
+  const { iconName, type, url } = oAuthProvider;
+  const link = `${URLS.OAUTH}api/users/${url}${
+    isOauthSignup
+      ? getSignupQueryParams()
+      : accountId
+      ? `&accountId=${accountId}`
+      : ""
+  }`;
+
+  return (
+    <a className={cx(css.iconContainer)} key={type} href={link}>
+      <Icon name={iconName} size={24} className={css.icon} />{" "}
+      {showFullOauthButtons ? (
+        <span className={css.name}>{oAuthProvider.name}</span>
+      ) : (
+        ""
+      )}
+    </a>
+  );
+}
+
+const AuthFooter: React.FC<AuthFooterProps> = (props) => {
+  const {
+    page,
+    hideOAuth,
+    accountId,
+    hideSSO,
+    hideSeparator,
+    enabledOauthProviders,
+    isVanity,
+    ssoIdpUrl,
+    action
+  } = props;
   const history = useHistory();
-  const { returnUrl } = useQueryParams();
   const isSignup = page === AuthPage.SignUp;
-
-  function getLicenseParams(urlParams?: URLSearchParams): string {
-    const signupAction = urlParams?.get("signupAction");
-    const signupParam =
-      signupAction && signupAction.toUpperCase() in SignupAction
-        ? `&signupAction=${signupAction.toUpperCase()}`
-        : "";
-
-    const edition = urlParams?.get("edition");
-    const editionParam =
-      edition && edition.toUpperCase() in Edition
-        ? `&edition=${edition.toUpperCase()}`
-        : "";
-
-    const billingFrequency = urlParams?.get("billingFrequency");
-    const billingFrequencyParam =
-      billingFrequency && billingFrequency.toUpperCase() in BillingFrequency
-        ? `&billingFrequency=${billingFrequency.toUpperCase()}`
-        : "";
-
-    return `${signupParam}${editionParam}${billingFrequencyParam}`;
-  }
-
-  function getUTMInfoParams(urlParams?: URLSearchParams): string {
-    const utmCampaign = urlParams?.get("utm_campaign");
-    const utmCampaignParam = utmCampaign ? `&utm_campaign=${utmCampaign}` : "";
-
-    const utmSource = urlParams?.get("utm_source");
-    const utmSourceParam = utmSource ? `&utm_source=${utmSource}` : "";
-
-    const utmTerm = urlParams?.get("utm_term");
-    const utmTermParam = utmTerm ? `&utm_term=${utmTerm}` : "";
-
-    const utmContent = urlParams?.get("utm_content");
-    const utmContentParam = utmContent ? `&utm_content=${utmContent}` : "";
-
-    const utmMedium = urlParams?.get("utm_medium");
-    const utmMediumParam = utmMedium ? `&utm_medium=${utmMedium}` : "";
-
-    return `${utmCampaignParam}${utmSourceParam}${utmTermParam}${utmContentParam}${utmMediumParam}`;
-  }
-
-  function getSignupQueryParams() {
-    const queryString = window.location.hash?.split("?")?.[1];
-    const urlParams = new URLSearchParams(queryString);
-
-    const module = urlParams?.get("module");
-    const moduleParam = module ? `&module=${module}` : "";
-
-    const licenseParams = getLicenseParams(urlParams);
-
-    const utmInfoParams = getUTMInfoParams(urlParams);
-
-    return `&action=signup&isNG=true${moduleParam}${licenseParams}${utmInfoParams}`;
-  }
-
-  function getOAuthLink(
-    isOauthSignup: boolean,
-    oAuthProvider: OAuthProviderType
-  ) {
-    const { iconName, type, url } = oAuthProvider;
-    const link = `${URLS.OAUTH}api/users/${url}${
-      isOauthSignup
-        ? getSignupQueryParams()
-        : accountId
-        ? `&accountId=${accountId}`
-        : ""
-    }`;
-
-    return (
-      <a className={css.iconContainer} key={type} href={link}>
-        <Icon name={iconName} size={24} />
-      </a>
-    );
-  }
+  const showFullOauthButtons =
+    enabledOauthProviders && enabledOauthProviders.length <= 4;
 
   return (
     <>
-      {hideOAuth === true ? null : (
-        <>
-          <h2 className={css.lineMessage}>
-            <span className={css.message}>
-              {isSignup ? "or sign up with" : "or login with"}
-            </span>
-          </h2>
-          <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
-            {OAuthProviders.map((oAuthProvider: OAuthProviderType) =>
-              getOAuthLink(isSignup, oAuthProvider)
-            )}
-          </div>
-        </>
+      {hideSeparator || (hideOAuth && hideSSO) ? null : (
+        <h2 className={css.lineMessage}>
+          <span className={css.message}>
+            {isSignup ? "or sign up with" : "or login with"}
+          </span>
+        </h2>
+      )}
+      {hideOAuth ? null : (
+        <div
+          className={cx(
+            {
+              "layout-horizontal spacing-auto": !showFullOauthButtons,
+              "layout-vertical spacing-medium": showFullOauthButtons,
+              [css.fullButtons]: showFullOauthButtons
+            },
+            css.oAuthIcons
+          )}
+        >
+          {OAuthProviders.filter((provider) =>
+            // if a list is provided, filter on that, otherwise show all
+            enabledOauthProviders
+              ? enabledOauthProviders.includes(provider.type)
+              : true
+          ).map((oAuthProvider: OAuthProviderType) =>
+            getOAuthLink(
+              isSignup,
+              oAuthProvider,
+              accountId,
+              showFullOauthButtons
+            )
+          )}
+        </div>
       )}
       {isSignup ? (
         <div className={css.disclaimer}>
@@ -165,11 +134,19 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
         </div>
       ) : (
         <>
-          {hideSSO ? undefined : (
+          {hideSSO ? null : isVanity && action !== "signout" ? (
+            <div className={css.center}>
+              <Spinner />
+            </div>
+          ) : (
             <button
               className={cx("button", css.ssoButton)}
               onClick={() => {
-                history.push(RouteDefinitions.toSSOSignIn());
+                if (ssoIdpUrl) {
+                  window.location.href = ssoIdpUrl;
+                } else {
+                  history.push(RouteDefinitions.toSSOSignIn());
+                }
               }}
             >
               <Text icon="sso" iconProps={{ size: 24 }}>

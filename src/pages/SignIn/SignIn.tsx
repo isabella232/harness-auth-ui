@@ -14,13 +14,15 @@ import logo from "static/images/harness-logo.svg";
 import css from "./SignIn.module.css";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import { handleError } from "utils/ErrorUtils";
-import { getAccountIdFromUrl, handleLoginSuccess } from "utils/LoginUtils";
+import { handleLoginSuccess } from "utils/LoginUtils";
 import {
   validateEmail,
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
 import { isCommunityPlan } from "utils/DeploymentTypeUtil";
+import Spinner from "static/icons/spinner/Spinner";
+import { useVanityExperience } from "hooks/useVanityExperience";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -32,19 +34,30 @@ interface LoginFormData {
   password: string;
 }
 
-interface SignInQueryParams {
+export interface SignInQueryParams {
   returnUrl?: string;
   errorCode?: string;
+  action?: "signout";
 }
 
 const SignIn: React.FC = () => {
+  const { returnUrl, errorCode, action } = useQueryParams<SignInQueryParams>();
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaReponse, setCaptchaResponse] = useState<string | undefined>();
+  const {
+    accountId,
+    isVanity,
+    hideUsernamePasswordForm,
+    hideOauth,
+    hideSSO,
+    authenticationInfo,
+    loading: loadingAuthInfo,
+    error
+  } = useVanityExperience();
+
   const { mutate: login, loading } = useLogin({});
   const captchaRef = useRef<ReCAPTCHA>(null);
-  const { returnUrl, errorCode } = useQueryParams<SignInQueryParams>();
   const history = useHistory();
-  const accountId = returnUrl ? getAccountIdFromUrl(returnUrl) : undefined;
 
   // this runs once on first mount
   useEffect(() => {
@@ -123,72 +136,92 @@ const SignIn: React.FC = () => {
         </div>
         <div className={css.title}>Sign in</div>
         <div className={css.subtitle}>and get ship done.</div>
-        <Form
-          onSubmit={handleLogin}
-          render={({ handleSubmit }) => {
-            return (
-              <form
-                className="layout-vertical spacing-medium"
-                onSubmit={handleSubmit}
-              >
-                <Field
-                  name="email"
-                  type="email"
-                  label="Email"
-                  placeholder="email@work.com"
-                  disabled={loading}
-                  validate={validateEmail}
-                />
-                <div
-                  className="layout-vertical spacing-small"
-                  style={{ position: "relative" }}
-                >
-                  <label htmlFor="password">Password</label>
-                  <Link
-                    to={RouteDefinitions.toForgotPassword()}
-                    className={css.forgotLink}
-                    tabIndex={-1}
-                  >
-                    Forgot password?
-                  </Link>
-                  <Field
-                    name="password"
-                    type="password"
-                    disabled={loading}
-                    validate={validatePasswordRequiredOnly}
-                  />
-                </div>
-                {showCaptcha ? (
-                  <ReCAPTCHA
-                    sitekey={window.captchaToken || ""}
-                    ref={captchaRef}
-                    onChange={(token: string | null) => {
-                      if (token) {
-                        setCaptchaResponse(token);
-                      }
-                    }}
-                  />
-                ) : null}
-                <input
-                  type="submit"
-                  value={loading ? "Signing in..." : "Sign in"}
-                  className="button primary"
-                  disabled={loading || (showCaptcha && !captchaReponse)}
-                />
-              </form>
-            );
-          }}
-        />
-        <AuthFooter
-          hideOAuth={isCommunityPlan()}
-          page={AuthPage.SignIn}
-          accountId={accountId}
-          hideSSO={isCommunityPlan()}
-        />
-        {window.signupExposed === "true" && (
-          <div className={css.footer}>
-            No account? <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
+        {loadingAuthInfo ? (
+          <div className={css.center}>
+            <Spinner />
           </div>
+        ) : (
+          <>
+            {!hideUsernamePasswordForm ? (
+              <Form
+                onSubmit={handleLogin}
+                render={({ handleSubmit }) => {
+                  return (
+                    <form
+                      className="layout-vertical spacing-medium"
+                      onSubmit={handleSubmit}
+                    >
+                      <Field
+                        name="email"
+                        type="email"
+                        label="Email"
+                        placeholder="email@work.com"
+                        disabled={loading}
+                        validate={validateEmail}
+                      />
+                      <div
+                        className="layout-vertical spacing-small"
+                        style={{ position: "relative" }}
+                      >
+                        <label htmlFor="password">Password</label>
+                        <Link
+                          to={RouteDefinitions.toForgotPassword()}
+                          className={css.forgotLink}
+                          tabIndex={-1}
+                        >
+                          Forgot password?
+                        </Link>
+                        <Field
+                          name="password"
+                          type="password"
+                          disabled={loading}
+                          validate={validatePasswordRequiredOnly}
+                        />
+                      </div>
+                      {showCaptcha ? (
+                        <ReCAPTCHA
+                          sitekey={window.captchaToken || ""}
+                          ref={captchaRef}
+                          onChange={(token: string | null) => {
+                            if (token) {
+                              setCaptchaResponse(token);
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <input
+                        type="submit"
+                        value={loading ? "Signing in..." : "Sign in"}
+                        className="button primary"
+                        disabled={loading || (showCaptcha && !captchaReponse)}
+                      />
+                    </form>
+                  );
+                }}
+              />
+            ) : null}
+            <AuthFooter
+              page={AuthPage.SignIn}
+              accountId={accountId}
+              hideSeparator={hideUsernamePasswordForm}
+              hideOAuth={isCommunityPlan() || hideOauth}
+              hideSSO={isCommunityPlan() || hideSSO}
+              isVanity={!!((accountId || isVanity) && !error)}
+              enabledOauthProviders={
+                (accountId || isVanity) && authenticationInfo
+                  ? authenticationInfo?.oauthProviders
+                  : undefined
+              }
+              ssoIdpUrl={authenticationInfo?.samlRedirectUrl}
+              action={action}
+            />
+            {window.signupExposed === "true" || __DEV__ ? (
+              <div className={css.footer}>
+                No account?{" "}
+                <Link to={RouteDefinitions.toSignUp()}>Sign up</Link>
+              </div>
+            ) : null}
+          </>
         )}
       </div>
     </BasicLayout>

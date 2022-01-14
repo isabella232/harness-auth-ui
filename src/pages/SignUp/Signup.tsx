@@ -17,11 +17,7 @@ import { validateEmail, validatePassword } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
-import {
-  BillingFrequency,
-  Edition,
-  SignupAction
-} from "components/AuthFooter/AuthFooter";
+import { BillingFrequency, Edition, SignupAction } from "utils/SignUpUtils";
 
 interface SignUpFormData {
   email: string;

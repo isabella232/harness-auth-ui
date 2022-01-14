@@ -1,0 +1,162 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuthFooter it should render oauth buttons in a column when less than 5 providers 1`] = `
+<div>
+  <h2
+    class="lineMessage"
+  >
+    <span
+      class="message"
+    >
+      or login with
+    </span>
+  </h2>
+  <div
+    class="layout-vertical spacing-medium fullButtons oAuthIcons"
+  >
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      <span
+        class="name"
+      >
+        Github
+      </span>
+    </a>
+  </div>
+  <button
+    class="button ssoButton"
+  >
+    <span
+      class="text"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+      Single sign-on
+    </span>
+  </button>
+</div>
+`;
+
+exports[`AuthFooter it should render oauth buttons in a row when more than 4 providers 1`] = `
+<div>
+  <h2
+    class="lineMessage"
+  >
+    <span
+      class="message"
+    >
+      or login with
+    </span>
+  </h2>
+  <div
+    class="layout-horizontal spacing-auto oAuthIcons"
+  >
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+    <a
+      class="iconContainer"
+      href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+       
+      
+    </a>
+  </div>
+  <button
+    class="button ssoButton"
+  >
+    <span
+      class="text"
+    >
+      <img
+        class="icon"
+        height="24"
+        src="test-file-stub"
+        width="24"
+      />
+      Single sign-on
+    </span>
+  </button>
+</div>
+`;

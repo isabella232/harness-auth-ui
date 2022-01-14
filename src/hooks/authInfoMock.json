@@ -1,0 +1,77 @@
+{
+  "one": {
+    "metaData": {},
+    "resource": {
+      "authenticationMechanism": "USER_PASSWORD",
+      "oauthEnabled": true,
+      "oauthProviders": [
+        "GOOGLE",
+        "AZURE",
+        "BITBUCKET",
+        "GITLAB",
+        "LINKEDIN",
+        "GITHUB"
+      ],
+      "samlRedirectUrl": null,
+      "accountId": "zEaak-FLS425IEO7OLzMUg"
+    },
+    "responseMessages": []
+  },
+  "two": {
+    "metaData": {},
+    "resource": {
+      "authenticationMechanism": "USER_PASSWORD",
+      "oauthEnabled": false,
+      "oauthProviders": null,
+      "samlRedirectUrl": null,
+      "accountId": "zEaak-FLS425IEO7OLzMUg"
+    },
+    "responseMessages": []
+  },
+  "three": {
+    "metaData": {},
+    "resource": {
+      "authenticationMechanism": "OAUTH",
+      "oauthEnabled": true,
+      "oauthProviders": [
+        "GITHUB",
+        "GOOGLE",
+        "GITLAB",
+        "AZURE",
+        "LINKEDIN",
+        "BITBUCKET"
+      ],
+      "samlRedirectUrl": null,
+      "accountId": "zEaak-FLS425IEO7OLzMUg"
+    },
+    "responseMessages": []
+  },
+  "four": {
+    "metaData": {},
+    "resource": {
+      "authenticationMechanism": "SAML",
+      "oauthEnabled": false,
+      "oauthProviders": null,
+      "samlRedirectUrl": "https://harness.onelogin.com/trust/saml2/http-post/sso/e3c5e4cb-13fa-41bb-b01c-060f9006c2eb?SAMLRequest=fZHLTsMwEEX3fIXlvdPYpoVYSaqiqiISj4gGFuxcx6WWEjt4HAR8PSVppbKg29Ho3Htm0vln26AP7cE4m2EaxRhpq1xt7FuGn6sVucbz%2FCIF2TasE4s%2B7OyTfu81BFQsM%2FydqCRW9SYhXCpGLimfkSSmmtR8ypIp5zPFrjAqAHpdWAjShgyzmFFCGWG0ihPBuOA0YpS9YlR6F5xyzY2xY4PeW%2BEkGBBWthpEUGK9uL8TLIrFZlwCcVtVJSkf1xVGL0cT9muyd7Mgxu7nWd0hGOejqhga%2B1PCeYAE0D7so3Euuy7aSW81QGRcOjkF5sdLPuwJxbJ0jVFfaOV8K8P%2FATSiw8TUZDusit5Cp5XZGl3jSX7I%2BPuf%2FAc%3D&RelayState=triggerType%3Dlogin",
+      "accountId": "zEaak-FLS425IEO7OLzMUg"
+    },
+    "responseMessages": []
+  },
+  "five": {
+    "metaData": {},
+    "resource": {
+      "authenticationMechanism": "USER_PASSWORD",
+      "oauthEnabled": true,
+      "oauthProviders": [
+        "GOOGLE",
+        "AZURE",
+        "BITBUCKET",
+        "GITLAB",
+        "LINKEDIN",
+        "GITHUB"
+      ],
+      "samlRedirectUrl": null
+    },
+    "responseMessages": []
+  }
+}

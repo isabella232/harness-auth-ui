@@ -1,7 +1,10 @@
 import type { IconName } from "components/Icon/Icon";
+import type { AuthenticationInfo } from "services/gateway";
+
+export type OAuthProvider = Required<AuthenticationInfo>["oauthProviders"][0];
 
 export interface OAuthProviderType {
-  type: string;
+  type: OAuthProvider;
   name: string;
   url: string;
   iconName: IconName;

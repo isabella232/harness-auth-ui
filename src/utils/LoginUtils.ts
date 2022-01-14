@@ -38,7 +38,8 @@ export function createDefaultExperienceMap(accounts: Account[]): void {
 
 const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
 
-export const getAccountIdFromUrl = (url: string): string | undefined => {
+export const getAccountIdFromUrl = (url?: string): string | undefined => {
+  if (!url) return;
   const urlObject = new URL(url);
   const accountId = urlObject.hash?.match(accountIdExtractionRegex)?.[1];
   return accountId;

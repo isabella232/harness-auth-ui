@@ -103,60 +103,78 @@ exports[`SignIn render 1`] = `
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=github"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
             <a
               class="iconContainer"
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=bitbucket"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
             <a
               class="iconContainer"
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=gitlab"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
             <a
               class="iconContainer"
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=linkedin"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
             <a
               class="iconContainer"
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=google"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
             <a
               class="iconContainer"
               href="http://localhost/gateway/api/users/oauth2Redirect?provider=azure"
             >
               <img
+                class="icon"
                 height="24"
                 src="test-file-stub"
                 width="24"
               />
+               
+              
             </a>
           </div>
           <button
@@ -174,6 +192,17 @@ exports[`SignIn render 1`] = `
               Single sign-on
             </span>
           </button>
+          <div
+            class="footer"
+          >
+            No account?
+             
+            <a
+              href="/signup"
+            >
+              Sign up
+            </a>
+          </div>
         </div>
       </div>
     </div>

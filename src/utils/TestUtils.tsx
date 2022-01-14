@@ -3,7 +3,7 @@ import qs from "qs";
 import { compile } from "path-to-regexp";
 import { Router, Route, Switch } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import { RestfulProvider } from "restful-react";
+import { RestfulProvider, UseGetProps } from "restful-react";
 import { queryByAttribute } from "@testing-library/react";
 
 export interface TestWrapperProps {
@@ -40,3 +40,10 @@ export const queryByNameAttribute = (
   name: string,
   container: HTMLElement
 ): HTMLElement | null => queryByAttribute("name", container, name);
+
+export type UseGetMockData<
+  TData,
+  TError = undefined,
+  TQueryParams = undefined,
+  TPathParams = undefined
+> = Required<UseGetProps<TData, TError, TQueryParams, TPathParams>>["mock"];

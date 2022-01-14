@@ -26,4 +26,8 @@
   & .footer {
     margin-top: var(--spacing-huge);
   }
+
+  & .center {
+    text-align: center;
+  }
 }
