@@ -35,7 +35,8 @@ interface AuthFooterProps {
 function getOAuthLink(
   isOauthSignup: boolean,
   oAuthProvider: OAuthProviderType,
-  accountId?: string
+  accountId?: string,
+  showFullOauthButtons?: boolean
 ) {
   const { iconName, type, url } = oAuthProvider;
   const link = `${URLS.OAUTH}api/users/${url}${
@@ -47,8 +48,13 @@ function getOAuthLink(
   }`;
 
   return (
-    <a className={css.iconContainer} key={type} href={link}>
-      <Icon name={iconName} size={24} />
+    <a className={cx(css.iconContainer)} key={type} href={link}>
+      <Icon name={iconName} size={24} className={css.icon} />{" "}
+      {showFullOauthButtons ? (
+        <span className={css.name}>{oAuthProvider.name}</span>
+      ) : (
+        ""
+      )}
     </a>
   );
 }
@@ -67,6 +73,8 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
   } = props;
   const history = useHistory();
   const isSignup = page === AuthPage.SignUp;
+  const showFullOauthButtons =
+    enabledOauthProviders && enabledOauthProviders.length <= 4;
 
   return (
     <>
@@ -78,14 +86,28 @@ const AuthFooter: React.FC<AuthFooterProps> = (props) => {
         </h2>
       )}
       {hideOAuth ? null : (
-        <div className={cx("layout-horizontal spacing-auto", css.oAuthIcons)}>
+        <div
+          className={cx(
+            {
+              "layout-horizontal spacing-auto": !showFullOauthButtons,
+              "layout-vertical spacing-medium": showFullOauthButtons,
+              [css.fullButtons]: showFullOauthButtons
+            },
+            css.oAuthIcons
+          )}
+        >
           {OAuthProviders.filter((provider) =>
             // if a list is provided, filter on that, otherwise show all
             enabledOauthProviders
               ? enabledOauthProviders.includes(provider.type)
               : true
           ).map((oAuthProvider: OAuthProviderType) =>
-            getOAuthLink(isSignup, oAuthProvider, accountId)
+            getOAuthLink(
+              isSignup,
+              oAuthProvider,
+              accountId,
+              showFullOauthButtons
+            )
           )}
         </div>
       )}
