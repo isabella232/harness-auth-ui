@@ -74,13 +74,23 @@ exports[`LocalLogin render 1`] = `
               <label>
                 Password
               </label>
-              <input
-                class=""
-                id="password"
-                name="password"
-                type="password"
-                value=""
-              />
+              <div
+                class="pwd"
+              >
+                <input
+                  class="pwdInput"
+                  id="password"
+                  name="password"
+                  type="password"
+                  value=""
+                />
+                <img
+                  class="pwdIcon"
+                  height="25"
+                  src="test-file-stub"
+                  width="25"
+                />
+              </div>
             </div>
             <input
               class="button primary"

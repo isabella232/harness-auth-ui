@@ -56,14 +56,24 @@ exports[`SignUp render 1`] = `
               <label>
                 Password
               </label>
-              <input
-                class=""
-                id="password"
-                name="password"
-                placeholder="Password"
-                type="password"
-                value=""
-              />
+              <div
+                class="pwd"
+              >
+                <input
+                  class="pwdInput"
+                  id="password"
+                  name="password"
+                  placeholder="Password"
+                  type="password"
+                  value=""
+                />
+                <img
+                  class="pwdIcon"
+                  height="25"
+                  src="test-file-stub"
+                  width="25"
+                />
+              </div>
               <span
                 class="info-message"
               >
@@ -275,15 +285,25 @@ exports[`SignUp telemetry 1`] = `
               <label>
                 Password
               </label>
-              <input
-                class=""
-                disabled=""
-                id="password"
-                name="password"
-                placeholder="Password"
-                type="password"
-                value="12345678"
-              />
+              <div
+                class="pwd"
+              >
+                <input
+                  class="pwdInput"
+                  disabled=""
+                  id="password"
+                  name="password"
+                  placeholder="Password"
+                  type="password"
+                  value="12345678"
+                />
+                <img
+                  class="pwdIcon"
+                  height="25"
+                  src="test-file-stub"
+                  width="25"
+                />
+              </div>
               <span
                 class="info-message"
               >

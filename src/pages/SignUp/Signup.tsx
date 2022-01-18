@@ -19,8 +19,9 @@ import css from "./SignUp.module.css";
 import RouteDefinitions from "RouteDefinitions";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
+import PasswordField from "components/Field/PasswordField";
 import { handleError } from "utils/ErrorUtils";
-import { validateEmail, validatePassword } from "utils/FormValidationUtils";
+import { validateEmail } from "utils/FormValidationUtils";
 import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
@@ -184,13 +185,11 @@ const SignUp: React.FC = () => {
   );
 
   const passwordField = (
-    <Field
+    <PasswordField
       name="password"
       label="Password"
-      type="password"
       placeholder="Password"
       disabled={loading || captchaExecuting}
-      validate={validatePassword}
       infoMessage={"The password must be between 8 and 64 characters long"}
     />
   );

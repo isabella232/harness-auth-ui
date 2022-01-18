@@ -24,6 +24,7 @@ import {
 import { useQueryParams } from "hooks/useQueryParams";
 
 import logo from "static/images/harness-logo.svg";
+import PasswordField from "components/Field/PasswordField";
 import css from "../SignIn/SignIn.module.css";
 
 const createAuthToken = (email: string, password: string): string => {
@@ -96,10 +97,9 @@ const LocalLogin: React.FC = () => {
                   disabled={loading}
                   validate={validateEmail}
                 />
-                <Field
+                <PasswordField
                   name="password"
                   label="Password"
-                  type="password"
                   disabled={loading}
                   validate={validatePasswordRequiredOnly}
                 />

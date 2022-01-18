@@ -18,15 +18,12 @@ import { handleError } from "utils/ErrorUtils";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import AuthFooter, { AuthPage } from "components/AuthFooter/AuthFooter";
 import Field from "components/Field/Field";
-import {
-  validateEmail,
-  validateName,
-  validatePassword
-} from "utils/FormValidationUtils";
+import { validateEmail, validateName } from "utils/FormValidationUtils";
 
 import logo from "static/images/harness-logo.svg";
 import css from "./AcceptInvite.module.css";
 import { handleLoginSuccess } from "utils/LoginUtils";
+import PasswordField from "components/Field/PasswordField";
 
 interface AcceptInviteFormData {
   name: string;
@@ -107,13 +104,11 @@ const SignUp: React.FC = () => {
                 disabled={true}
                 validate={validateEmail}
               />
-              <Field
+              <PasswordField
                 name="password"
                 label="Password"
-                type="password"
                 placeholder="Password"
                 disabled={loading}
-                validate={validatePassword}
               />
               <input
                 type="submit"

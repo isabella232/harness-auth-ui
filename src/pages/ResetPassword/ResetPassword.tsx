@@ -14,13 +14,13 @@ import toast from "react-hot-toast";
 import RouteDefinitions from "RouteDefinitions";
 import BasicLayout from "components/BasicLayout/BasicLayout";
 import { useUpdatePassword } from "services/portal";
-import Field from "components/Field/Field";
 
 import logo from "static/images/harness-logo.svg";
 import css from "../SignIn/SignIn.module.css";
 import Text from "components/Text/Text";
 import { handleError } from "utils/ErrorUtils";
 import { validatePassword } from "utils/FormValidationUtils";
+import PasswordField from "components/Field/PasswordField";
 
 interface UpdatePasswordFormData {
   password: string;
@@ -84,16 +84,14 @@ export default function ResetPassword() {
                 className="layout-vertical spacing-medium"
                 onSubmit={handleSubmit}
               >
-                <Field
+                <PasswordField
                   name="password"
-                  type="password"
                   label="Password"
                   disabled={loading}
                   validate={validatePassword}
                 />
-                <Field
+                <PasswordField
                   name="confirmPassword"
-                  type="password"
                   label="Confirm password"
                   disabled={loading}
                   validate={(confirmPassword: string) =>
