@@ -26,6 +26,7 @@ import telemetry from "telemetry/Telemetry";
 import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
 import { BillingFrequency, Edition, SignupAction } from "utils/SignUpUtils";
+import { CATEGORY, PAGE, EVENT } from "utils/TelemetryUtils";
 
 interface SignUpFormData {
   email: string;
@@ -144,9 +145,9 @@ const SignUp: React.FC = () => {
       data.email = data.email.toLowerCase();
       setSignupData(data);
       telemetry.track({
-        event: "Signup submit",
+        event: EVENT.SIGNUP_SUBMIT,
         properties: {
-          category: "SIGNUP",
+          category: CATEGORY.SIGNUP,
           userId: data.email,
           groupId: "",
           utm_source: utm_source || "",
@@ -168,9 +169,9 @@ const SignUp: React.FC = () => {
       validate={validateEmail}
       onBlur={(e: FocusEvent<HTMLInputElement>) => {
         telemetry.track({
-          event: "Email input",
+          event: EVENT.EMAIL_INPUT,
           properties: {
-            category: "SIGNUP",
+            category: CATEGORY.SIGNUP,
             userId: e.target.value,
             groupId: "",
             utm_source: utm_source || "",
@@ -195,8 +196,8 @@ const SignUp: React.FC = () => {
   );
 
   telemetry.page({
-    name: "Signup Page",
-    category: "SIGNUP",
+    name: PAGE.SIGNUP_PAGE,
+    category: CATEGORY.SIGNUP,
     properties: {
       userId: "",
       groupId: "",
