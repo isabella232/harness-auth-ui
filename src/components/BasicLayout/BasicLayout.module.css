@@ -33,15 +33,17 @@
     background-color: #07182b;
     padding-left: 0px;
 
-    & .image {
-      background-position: cover;
-      height: 100%;
-      width: 100%;
+    & .foreground {
+      position: absolute;
+      top: 25%;
+      left: 35%;
+      height: auto;
+      width: 65%;
     }
   }
 }
 
-@media (max-width: 1270px) {
+@media (max-width: 1520px) {
   .layout {
     display: flex;
     justify-content: center;
