@@ -34,16 +34,16 @@
     padding-left: 0px;
 
     & .foreground {
-      position: absolute;
+      position: sticky;
       top: 25%;
-      left: 35%;
+      right: 0px;
       height: auto;
-      width: 65%;
+      width: 100%;
     }
   }
 }
 
-@media (max-width: 1520px) {
+@media (max-width: 1270px) {
   .layout {
     display: flex;
     justify-content: center;
