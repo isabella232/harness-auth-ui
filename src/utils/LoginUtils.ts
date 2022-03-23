@@ -32,17 +32,6 @@ export function formatJWTHeader(authCode: string): AuthHeader {
   return header;
 }
 
-// export function createDefaultExperienceMap(accounts: Account[]): void {
-//   // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
-//   const defaultExperienceMap = accounts.reduce((previousValue, account) => {
-//     return {
-//       ...previousValue,
-//       [account.uuid]: account.defaultExperience
-//     };
-//   }, {});
-//   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
-// }
-
 const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
 
 export const getAccountIdFromUrl = (url?: string): string | undefined => {

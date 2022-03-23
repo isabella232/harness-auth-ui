@@ -10,22 +10,6 @@ import telemetry from "telemetry/Telemetry";
 import SecureStorage from "./SecureStorage";
 import { getUTMInfoParams } from "./TrackingUtils";
 
-// function createDefaultExperienceMap(
-//   accounts: GatewayAccountRequestDTO[]
-// ): void {
-//   // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
-//   const defaultExperienceMap = accounts.reduce((previousValue, account) => {
-//     if (account.uuid) {
-//       return {
-//         ...previousValue,
-//         [account.uuid]: account.defaultExperience
-//       };
-//     }
-//     return { ...previousValue };
-//   }, {});
-//   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
-// }
-
 export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
   const baseUrl = window.location.pathname.replace("auth/", "");
 
