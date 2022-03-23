@@ -5,26 +5,26 @@
  * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
  */
 
-import type { UserInfo, GatewayAccountRequestDTO } from "services/ng";
+import type { UserInfo } from "services/ng";
 import telemetry from "telemetry/Telemetry";
 import SecureStorage from "./SecureStorage";
 import { getUTMInfoParams } from "./TrackingUtils";
 
-function createDefaultExperienceMap(
-  accounts: GatewayAccountRequestDTO[]
-): void {
-  // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
-  const defaultExperienceMap = accounts.reduce((previousValue, account) => {
-    if (account.uuid) {
-      return {
-        ...previousValue,
-        [account.uuid]: account.defaultExperience
-      };
-    }
-    return { ...previousValue };
-  }, {});
-  SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
-}
+// function createDefaultExperienceMap(
+//   accounts: GatewayAccountRequestDTO[]
+// ): void {
+//   // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
+//   const defaultExperienceMap = accounts.reduce((previousValue, account) => {
+//     if (account.uuid) {
+//       return {
+//         ...previousValue,
+//         [account.uuid]: account.defaultExperience
+//       };
+//     }
+//     return { ...previousValue };
+//   }, {});
+//   SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
+// }
 
 export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
   const baseUrl = window.location.pathname.replace("auth/", "");
@@ -40,7 +40,9 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     // send identify user event to telemetry to update the identity
     telemetry.identify(resource.email || "");
 
-    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
+    // Disabling this to avoid overloading LS with Harness Support usergroup accounts
+    // https://harness.atlassian.net/browse/PL-20761
+    // if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     if (intent) {
       switch (intent.toUpperCase()) {
