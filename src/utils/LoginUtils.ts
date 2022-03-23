@@ -5,7 +5,7 @@
  * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
  */
 
-import type { Account, User } from "services/portal";
+import type { User } from "services/portal";
 import SecureStorage from "./SecureStorage";
 import RouteDefinitions from "RouteDefinitions";
 import { History } from "history";
@@ -30,17 +30,6 @@ export function formatJWTHeader(authCode: string): AuthHeader {
     authorization: `JWT ${token}`
   };
   return header;
-}
-
-export function createDefaultExperienceMap(accounts: Account[]): void {
-  // create map of { accountId: defaultExperience } from accounts list and store in LS for root redirect
-  const defaultExperienceMap = accounts.reduce((previousValue, account) => {
-    return {
-      ...previousValue,
-      [account.uuid]: account.defaultExperience
-    };
-  }, {});
-  SecureStorage.setItem("defaultExperienceMap", defaultExperienceMap);
 }
 
 const accountIdExtractionRegex = /\/account\/([\w|-]+)\//;
@@ -88,7 +77,9 @@ export function handleLoginSuccess({
       return;
     }
 
-    if (resource.accounts) createDefaultExperienceMap(resource.accounts);
+    // Disabling this to avoid overloading LS with Harness Support usergroup accounts
+    // https://harness.atlassian.net/browse/PL-20761
+    // if (resource.accounts) createDefaultExperienceMap(resource.accounts);
 
     if (returnUrl) {
       try {
