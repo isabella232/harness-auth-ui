@@ -27,7 +27,7 @@ import {
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
-import { isCommunityPlan } from "utils/DeploymentTypeUtil";
+import { isCommunityPlan, isOnPrem } from "utils/DeploymentTypeUtil";
 import Spinner from "static/icons/spinner/Spinner";
 import { useVanityExperience } from "hooks/useVanityExperience";
 import PasswordField from "components/Field/PasswordField";
@@ -211,8 +211,8 @@ const SignIn: React.FC = () => {
               page={AuthPage.SignIn}
               accountId={accountId}
               hideSeparator={hideUsernamePasswordForm}
-              hideOAuth={isCommunityPlan() || hideOauth}
-              hideSSO={isCommunityPlan() || hideSSO}
+              hideOAuth={isCommunityPlan() || isOnPrem() || hideOauth}
+              hideSSO={isCommunityPlan() || isOnPrem() || hideSSO}
               isVanity={!!((accountId || isVanity) && !error)}
               enabledOauthProviders={
                 (accountId || isVanity) && authenticationInfo
