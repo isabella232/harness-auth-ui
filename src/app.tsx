@@ -23,6 +23,7 @@ import CompleteInvitePage from "./pages/CompleteInvite/CompleteInvitePage";
 import AppErrorBoundary from "AppErrorBoundary/AppErrorBoundary";
 import { isCommunityPlan, isOnPrem, isSaas } from "utils/DeploymentTypeUtil";
 import SignUpCommunity from "./pages/SignUp/SignUpCommunity";
+import SignUpOnPrem from "./pages/SignUp/SignUpOnPrem";
 
 const initializeApp = () => {
   // initialize bugsnagClient
@@ -48,6 +49,21 @@ const AppWithCommunityRoutes: React.FC = () => {
       <Route path={routes.toResetPassword()} component={ResetPassword} />
       <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
       <Route path={routes.toSignUp()} component={SignUpCommunity} />
+      <Route path="/" exact>
+        <Redirect to={routes.toSignIn()} />
+      </Route>
+    </>
+  );
+};
+
+const AppWithOnPremRoutes: React.FC = () => {
+  return (
+    <>
+      <Route path={routes.toSignIn()} component={SignIn} />
+      <Route path={routes.toForgotPassword()} component={ForgotPassword} />
+      <Route path={routes.toResetPassword()} component={ResetPassword} />
+      <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
+      <Route path={routes.toSignUp()} component={SignUpOnPrem} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
@@ -84,7 +100,7 @@ export function App(): React.ReactElement {
     }
 
     if (isOnPrem()) {
-      return <AppWithSaasRoutes />;
+      return <AppWithOnPremRoutes />;
     }
 
     return <AppWithSaasRoutes />;
