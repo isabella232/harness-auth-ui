@@ -34,7 +34,7 @@ interface SignUpFormData {
   lastname?: string;
 }
 
-const SignUpCommunity: React.FC = () => {
+const SignUpOnPrem: React.FC = () => {
   const { mutate: signup, loading } = useSignup({ source: "ONPREM" });
   const history = useHistory();
 
@@ -158,4 +158,4 @@ const SignUpCommunity: React.FC = () => {
   );
 };
 
-export default SignUpCommunity;
+export default SignUpOnPrem;
