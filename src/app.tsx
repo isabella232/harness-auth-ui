@@ -64,6 +64,7 @@ const AppWithOnPremRoutes: React.FC = () => {
       <Route path={routes.toResetPassword()} component={ResetPassword} />
       <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
       <Route path={routes.toSignUp()} component={SignUpOnPrem} />
+      <Route path={routes.toLocalLogin()} component={LocalLogin} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
