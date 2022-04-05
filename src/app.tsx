@@ -60,13 +60,18 @@ const AppWithOnPremRoutes: React.FC = () => {
   return (
     <>
       <Route path={routes.toSignIn()} component={SignIn} />
+      <Route path={routes.toLocalLogin()} component={LocalLogin} />
+      <Route path={routes.toSignUp()} component={SignUpOnPrem} />
       <Route path={routes.toForgotPassword()} component={ForgotPassword} />
       <Route path={routes.toResetPassword()} component={ResetPassword} />
+      <Route path={routes.toSSOSignIn()} component={SSOSignIn} />
+      <Route path={routes.toTwoFactorAuth()} component={TwoFactorAuth} />
       <Route path={routes.toAcceptInvite()} component={AcceptInvite} />
-      <Route path={routes.toSignUp()} component={SignUpOnPrem} />
       <Route path="/" exact>
         <Redirect to={routes.toSignIn()} />
       </Route>
+      <Route path={routes.toEmailVerification()} component={VerifyEmailPage} />
+      <Route path={routes.toCompleteInvite()} component={CompleteInvitePage} />
     </>
   );
 };
