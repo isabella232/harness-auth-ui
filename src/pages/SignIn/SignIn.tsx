@@ -211,8 +211,8 @@ const SignIn: React.FC = () => {
               page={AuthPage.SignIn}
               accountId={accountId}
               hideSeparator={hideUsernamePasswordForm}
-              hideOAuth={isCommunityPlan() || isOnPrem() || hideOauth}
-              hideSSO={isCommunityPlan() || isOnPrem() || hideSSO}
+              hideOAuth={isCommunityPlan() || hideOauth}
+              hideSSO={isCommunityPlan() || hideSSO}
               isVanity={!!((accountId || isVanity) && !error)}
               enabledOauthProviders={
                 (accountId || isVanity) && authenticationInfo
