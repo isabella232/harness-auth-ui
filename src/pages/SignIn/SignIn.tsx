@@ -27,7 +27,7 @@ import {
   validatePasswordRequiredOnly
 } from "utils/FormValidationUtils";
 import { useQueryParams } from "hooks/useQueryParams";
-import { isCommunityPlan, isOnPrem } from "utils/DeploymentTypeUtil";
+import { isCommunityPlan } from "utils/DeploymentTypeUtil";
 import Spinner from "static/icons/spinner/Spinner";
 import { useVanityExperience } from "hooks/useVanityExperience";
 import PasswordField from "components/Field/PasswordField";

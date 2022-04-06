@@ -99,9 +99,10 @@ const SignUpCommunity: React.FC = () => {
               />
               <Field
                 name="accountName"
-                label={"Account Name (Optional)"}
+                label={"Account Name"}
                 placeholder="Account"
                 disabled={loading}
+                validate={validateString}
               />
               <Field
                 name="companyName"
