@@ -252,7 +252,10 @@ const SignUp: React.FC = () => {
             </form>
           )}
         />
-        <AuthFooter page={AuthPage.SignUp} />
+        <AuthFooter
+          page={AuthPage.SignUp}
+          hideOAuth={window.oauthDisabled === "true"}
+        />
         <div className={css.footer}>
           Already have an account?{" "}
           <Link to={RouteDefinitions.toSignIn()}>Sign in</Link>
