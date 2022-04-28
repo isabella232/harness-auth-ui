@@ -147,9 +147,10 @@ const SignUp: React.FC = () => {
       telemetry.track({
         event: EVENT.SIGNUP_SUBMIT,
         properties: {
+          intent: module || "",
           category: CATEGORY.SIGNUP,
           userId: data.email,
-          groupId: "",
+          groupId: data.email,
           utm_source: utm_source || "",
           utm_medium: utm_medium || "",
           utm_campaign: utm_campaign || "",
@@ -172,8 +173,7 @@ const SignUp: React.FC = () => {
           event: EVENT.EMAIL_INPUT,
           properties: {
             category: CATEGORY.SIGNUP,
-            userId: e.target.value,
-            groupId: "",
+            email: e.target.value,
             utm_source: utm_source || "",
             utm_medium: utm_medium || "",
             utm_campaign: utm_campaign || "",
@@ -195,20 +195,20 @@ const SignUp: React.FC = () => {
     />
   );
 
-  telemetry.page({
-    name: PAGE.SIGNUP_PAGE,
-    category: CATEGORY.SIGNUP,
-    properties: {
-      userId: "",
-      groupId: "",
-      module: module || "",
-      utm_source: utm_source || "",
-      utm_medium: utm_medium || "",
-      utm_campaign: utm_campaign || "",
-      utm_term: utm_term || "",
-      utm_content: utm_content || ""
-    }
-  });
+  useEffect(() => {
+    telemetry.page({
+      name: PAGE.SIGNUP_PAGE,
+      category: CATEGORY.SIGNUP,
+      properties: {
+        intent: module || "",
+        utm_source: utm_source || "",
+        utm_medium: utm_medium || "",
+        utm_campaign: utm_campaign || "",
+        utm_term: utm_term || "",
+        utm_content: utm_content || ""
+      }
+    });
+  }, []);
 
   function handleRecaptchaError() {
     // Block the user until they refresh

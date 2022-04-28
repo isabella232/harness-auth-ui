@@ -6,16 +6,16 @@
  */
 
 export enum EVENT {
-  SIGNUP_SUBMIT = "SIGNUP_SUBMIT",
-  EMAIL_INPUT = "EMAIL_INPUT",
-  RESEND_VERIFY_EMAIL = "RESEND_VERIFY_EMAIL",
-  OAUTH_SIGNUP = "OAUTH_SIGNUP"
+  SIGNUP_SUBMIT = "Signup Submitted",
+  EMAIL_INPUT = "Email inputted",
+  RESEND_VERIFY_EMAIL = "Verify email resent",
+  OAUTH_SIGNUP = "Oauth Signup clicked"
 }
 
 export enum CATEGORY {
-  SIGNUP = "SIGNUP"
+  SIGNUP = "Signup"
 }
 
 export enum PAGE {
-  SIGNUP_PAGE = "SIGNUP_PAGE"
+  SIGNUP_PAGE = "Signup"
 }
