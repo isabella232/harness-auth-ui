@@ -63,7 +63,9 @@ export function handleLoginSuccess({
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     // send identify user event to telemetry to update the identity
-    resource.email && telemetry.identify(resource.email);
+    if (resource.email) {
+      telemetry.identify(resource.email);
+    }
 
     if (
       resource.twoFactorAuthenticationEnabled === true &&
