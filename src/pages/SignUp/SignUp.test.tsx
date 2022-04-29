@@ -41,9 +41,7 @@ describe("SignUp", () => {
         name: PAGE.SIGNUP_PAGE,
         category: CATEGORY.SIGNUP,
         properties: {
-          userId: "",
-          groupId: "",
-          module: "ci",
+          intent: "ci",
           utm_campaign: "",
           utm_content: "",
           utm_medium: "",
@@ -62,8 +60,7 @@ describe("SignUp", () => {
         event: EVENT.EMAIL_INPUT,
         properties: {
           category: CATEGORY.SIGNUP,
-          userId: "random@hotmail.com",
-          groupId: "",
+          email: "random@hotmail.com",
           utm_campaign: "",
           utm_content: "",
           utm_medium: "",
@@ -84,7 +81,8 @@ describe("SignUp", () => {
         properties: {
           category: CATEGORY.SIGNUP,
           userId: "random@hotmail.com",
-          groupId: "",
+          intent: "ci",
+          groupId: "random@hotmail.com",
           utm_campaign: "",
           utm_content: "",
           utm_medium: "",
