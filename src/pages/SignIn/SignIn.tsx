@@ -31,6 +31,8 @@ import { isCommunityPlan } from "utils/DeploymentTypeUtil";
 import Spinner from "static/icons/spinner/Spinner";
 import { useVanityExperience } from "hooks/useVanityExperience";
 import PasswordField from "components/Field/PasswordField";
+import telemetry from "telemetry/Telemetry";
+import { CATEGORY, EVENT } from "utils/TelemetryUtils";
 
 const createAuthToken = (email: string, password: string): string => {
   const encodedToken = btoa(email + ":" + password);
@@ -108,6 +110,15 @@ const SignIn: React.FC = () => {
   }, []);
 
   const handleLogin = async (formData: LoginFormData) => {
+    telemetry.track({
+      event: EVENT.SIGNIN_SUBMIT,
+      properties: {
+        category: CATEGORY.SIGNIN,
+        userId: formData.email,
+        groupId: formData.email
+      }
+    });
+
     try {
       const response = await login(
         {
