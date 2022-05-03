@@ -22,7 +22,9 @@ export async function handleSignUpSuccess(resource?: UserInfo): Promise<void> {
     SecureStorage.setItem("lastTokenSetTime", new Date().getTime());
 
     // send identify user event to telemetry to update the identity
-    telemetry.identify(resource.email || "");
+    if (resource.email) {
+      telemetry.identify(resource.email);
+    }
 
     // Disabling this to avoid overloading LS with Harness Support usergroup accounts
     // https://harness.atlassian.net/browse/PL-20761
