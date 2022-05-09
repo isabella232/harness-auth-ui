@@ -42,11 +42,11 @@ describe("SignUp", () => {
         category: CATEGORY.SIGNUP,
         properties: {
           intent: "ci",
-          utm_campaign: "",
-          utm_content: "",
-          utm_medium: "",
-          utm_source: "",
-          utm_term: ""
+          utmCampaign: "",
+          utmContent: "",
+          utmMedium: "",
+          utmSource: "",
+          utmTerm: ""
         }
       })
     );
@@ -61,11 +61,11 @@ describe("SignUp", () => {
         properties: {
           category: CATEGORY.SIGNUP,
           email: "random@hotmail.com",
-          utm_campaign: "",
-          utm_content: "",
-          utm_medium: "",
-          utm_source: "",
-          utm_term: ""
+          utmCampaign: "",
+          utmContent: "",
+          utmMedium: "",
+          utmSource: "",
+          utmTerm: ""
         }
       })
     );
@@ -83,11 +83,11 @@ describe("SignUp", () => {
           userId: "random@hotmail.com",
           intent: "ci",
           groupId: "random@hotmail.com",
-          utm_campaign: "",
-          utm_content: "",
-          utm_medium: "",
-          utm_source: "",
-          utm_term: ""
+          utmCampaign: "",
+          utmContent: "",
+          utmMedium: "",
+          utmSource: "",
+          utmTerm: ""
         }
       })
     );

@@ -27,6 +27,7 @@ import { useQueryParams } from "hooks/useQueryParams";
 import { VERIFY_EMAIL_STATUS } from "pages/VerifyEmail/VerifyEmailStatus";
 import { BillingFrequency, Edition, SignupAction } from "utils/SignUpUtils";
 import { CATEGORY, PAGE, EVENT } from "utils/TelemetryUtils";
+import { getCookieByName } from "utils/SignUpUtils";
 
 interface SignUpFormData {
   email: string;
@@ -61,6 +62,12 @@ const SignUp: React.FC = () => {
     utm_campaign?: string;
   }>();
 
+  const utmCampaign = utm_campaign || getCookieByName("utm_campaign") || "";
+  const utmSource = utm_source || getCookieByName("utm_source") || "";
+  const utmContent = utm_content || getCookieByName("utm_content") || "";
+  const utmMedium = utm_medium || getCookieByName("utm_medium") || "";
+  const utmTerm = utm_term || getCookieByName("utm_term") || "";
+
   const [captchaExecuting, setCaptchaExecuting] = useState(false);
   useEffect(() => {
     const { email, password } = signupData;
@@ -81,11 +88,11 @@ const SignUp: React.FC = () => {
         ...data,
         intent: module,
         utmInfo: {
-          utmSource: utm_source,
-          utmContent: utm_content,
-          utmMedium: utm_medium,
-          utmTerm: utm_term,
-          utmCampaign: utm_campaign
+          utmSource,
+          utmContent,
+          utmMedium,
+          utmTerm,
+          utmCampaign
         }
       };
 
@@ -151,11 +158,11 @@ const SignUp: React.FC = () => {
           category: CATEGORY.SIGNUP,
           userId: data.email,
           groupId: data.email,
-          utm_source: utm_source || "",
-          utm_medium: utm_medium || "",
-          utm_campaign: utm_campaign || "",
-          utm_term: utm_term || "",
-          utm_content: utm_content || ""
+          utmSource,
+          utmContent,
+          utmMedium,
+          utmTerm,
+          utmCampaign
         }
       });
     }
@@ -174,11 +181,11 @@ const SignUp: React.FC = () => {
           properties: {
             category: CATEGORY.SIGNUP,
             email: e.target.value,
-            utm_source: utm_source || "",
-            utm_medium: utm_medium || "",
-            utm_campaign: utm_campaign || "",
-            utm_term: utm_term || "",
-            utm_content: utm_content || ""
+            utmSource,
+            utmContent,
+            utmMedium,
+            utmTerm,
+            utmCampaign
           }
         });
       }}
@@ -201,11 +208,11 @@ const SignUp: React.FC = () => {
       category: CATEGORY.SIGNUP,
       properties: {
         intent: module || "",
-        utm_source: utm_source || "",
-        utm_medium: utm_medium || "",
-        utm_campaign: utm_campaign || "",
-        utm_term: utm_term || "",
-        utm_content: utm_content || ""
+        utmSource,
+        utmContent,
+        utmMedium,
+        utmTerm,
+        utmCampaign
       }
     });
   }, []);
