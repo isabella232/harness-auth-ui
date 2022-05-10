@@ -97,3 +97,13 @@ export function getSignupQueryParams(): string {
 
   return `&action=signup&isNG=true${moduleParam}${licenseParams}${utmInfoParams}`;
 }
+
+const cookies = document.cookie.split(";").reduce((map, c) => {
+  const pair = c.trim().split("=");
+  map.set(pair[0], pair[1]);
+  return map;
+}, new Map());
+
+export function getCookieByName(name: string): string | undefined {
+  return cookies.get(name);
+}
