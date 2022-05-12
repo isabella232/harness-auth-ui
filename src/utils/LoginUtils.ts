@@ -48,7 +48,11 @@ export function handleLoginSuccess({
 }: HandleLoginSuccess): void {
   const queryString = window.location.hash?.split("?")?.[1];
   const urlParams = new URLSearchParams(queryString);
-  const returnUrl = urlParams?.get("returnUrl");
+  let returnUrl = urlParams?.get("returnUrl");
+  if (!returnUrl) {
+    returnUrl = sessionStorage.getItem("returnUrl");
+    sessionStorage.removeItem("returnUrl");
+  }
   const baseUrl = window.location.pathname.replace("auth/", "");
 
   if (resource) {
