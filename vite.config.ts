@@ -24,7 +24,7 @@ if (!DEV) {
     },
     `
     if(!window.deploymentType)
-    window.deploymentType="SAAS"
+    window.deploymentType="COMMUNITY"
     `
   ];
 } else {
